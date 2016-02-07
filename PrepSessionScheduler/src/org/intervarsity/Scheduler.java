@@ -152,7 +152,7 @@ public class Scheduler {
 	}
 	
 
-	public static void getSetUpFromUser(int increment, int maxNumSessions,int minStudents, int blkSize){
+	/*public static void getSetUpFromUser(int increment, int maxNumSessions,int minStudents, int blkSize){
 		//
 		//
 		//how many days are being scheduled?
@@ -195,7 +195,7 @@ public class Scheduler {
 		//minimum number of students in a session
 		//# of sessions in solution?? or a max # of sessions??
 		
-	}
+	}*/
 	
 	public static void runScheduler(int increment, int maxSessions, int minStudents, int blockSize) {
 	}
