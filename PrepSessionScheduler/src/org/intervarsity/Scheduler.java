@@ -31,101 +31,7 @@ public class Scheduler {
 			1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,2,
 			1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1};
 	
-	private static void setup(){
-			
-//		s1=new SimpleSchedule("one",SCHED_SIZE);
-//		//s1.fillSchedule();
-//		s1.schedule[0]=FULL;
-//		s1.schedule[1]=EMPTY;
-//		s1.schedule[2]=EMPTY;
-//		s1.schedule[3]=FULL;
-//		s1.schedule[4]=EMPTY;
-//		s1.schedule[5]=0;
-//		s1.schedule[6]=0;
-//		s1.schedule[7]=1;
-//		s1.schedule[8]=0;
-//		s1.schedule[9]=1;
-//		s1.schedule[10]=0;
-//		s1.schedule[11]=0;
-//		s1.determineRank(blockSize);
-//		
-//
-//		s2=new SimpleSchedule("two",SCHED_SIZE);
-//		s2.fillSchedule();
-//		/*s2.schedule[0]=false;
-//		s2.schedule[1]=false;
-//		s2.schedule[2]=false;
-//		s2.schedule[3]=false;
-//		s2.schedule[4]=false;
-//		s2.schedule[5]=false;
-//		s2.schedule[6]=false;
-//		s2.schedule[7]=true;
-//		s2.schedule[8]=false;
-//		s2.schedule[9]=true;
-//		s2.schedule[10]=false;
-//		s2.schedule[11]=true;*/
-//		s2.determineRank(blockSize);
-//		
-//		s3=new SimpleSchedule("three",SCHED_SIZE);
-//		s3.fillSchedule();
-//		/*s3.schedule[0]=true;
-//		s3.schedule[1]=true;
-//		s3.schedule[2]=true;
-//		s3.schedule[3]=true;
-//		s3.schedule[4]=true;
-//		s3.schedule[5]=true;
-//		s3.schedule[6]=false;
-//		s3.schedule[7]=false;
-//		s3.schedule[8]=false;
-//		s3.schedule[9]=false;
-//		s3.schedule[10]=false;
-//		s3.schedule[11]=false;*/
-//		s3.determineRank(blockSize);
-//		
-//		s4=new SimpleSchedule("four",SCHED_SIZE);
-//		s4.fillSchedule();
-//		/*s4.schedule[0]=true;
-//		s4.schedule[1]=true;
-//		s4.schedule[2]=true;
-//		s4.schedule[3]=true;
-//		s4.schedule[4]=true;
-//		s4.schedule[5]=true;
-//		s4.schedule[6]=true;
-//		s4.schedule[7]=false;
-//		s4.schedule[8]=false;
-//		s4.schedule[9]=false;
-//		s4.schedule[10]=true;
-//		s4.schedule[11]=true;*/
-//		s4.determineRank(blockSize);
-//		
-//		s5 =new SimpleSchedule("five",SCHED_SIZE);
-//		s5.fillSchedule();
-//		s5.determineRank(blockSize);
-//		
-//		s6 =new SimpleSchedule("six",SCHED_SIZE);
-//		s6.fillSchedule();
-//		s6.determineRank(blockSize);
-//
-//		s7 =new SimpleSchedule("seven",SCHED_SIZE);
-//		s7.fillSchedule();
-//		s7.determineRank(blockSize);
-//		
-//		s8 =new SimpleSchedule("eight",SCHED_SIZE);
-//		s8.fillSchedule();
-//		s8.determineRank(blockSize);
-//		
-//		s9 =new SimpleSchedule("nine",SCHED_SIZE);
-//		s9.fillSchedule();
-//		s9.determineRank(blockSize);
-//		
-//		s10 =new SimpleSchedule("ten",SCHED_SIZE);
-//		s10.fillSchedule();
-//		s10.determineRank(blockSize);
-
-	}
-
-	
-	
+		
 	public static void sortSchedules(ArrayList<Schedule> sList, int blockSize){
 		for (Schedule s:sList){
 			if (s.getRank()==-1) s.determineRank(blockSize);
@@ -217,31 +123,6 @@ public class Scheduler {
 		 return null;
 	}
 	
-//	public static ArrayList<Solution> createSolutions(Tree t,ArrayList<Session> sessionList,ArrayList<Schedule> schedules,int blockSize){
-//		ArrayList<Solution> solutions=new ArrayList<Solution>();
-//
-//		if (t.isEnd) {
-//			Solution solution=new Solution();
-//			ArrayList<Session> sessionListClone = (ArrayList<Session>) sessionList.clone();
-//			solution.setSessions(sessionList);
-//			//solution.print();
-//			solution.findAllMembers(schedules, blockSize);
-//			solutions.add(solution);
-//			//solution.print();
-//		}
-//		else for (Tree leaf:t.leaves){
-//			int time=leaf.session.time;
-//			boolean preferred;
-//			if (preferredMask[time]==0) preferred=true;
-//			else preferred = false;
-//			Session s=new Session(time,preferred);
-//			ArrayList<Session> sessionListCopy=(ArrayList<Session>)sessionList.clone();
-//			sessionListCopy.add(s);
-//			createSolutions(leaf, sessionListCopy,blockSize);
-//			
-//		}
-//		return solutions;
-//	}
 	
 	public static String[] createTimeArray(ArrayList<Day> days, int schedSize){
 		int index=0;
@@ -270,34 +151,7 @@ public class Scheduler {
 		return times;
 	}
 	
-//	public static void printSolutions(){
-//		//for (Solution sol:solutions){
-//		for (int i=0; i<solutions.size();i++){
-//			if (solutions.get(i).getNumSessions()<=maxSessions){
-//				System.out.println();
-//				Solution sol=solutions.get(i);
-//				System.out.println("*******Solution "+i+"********");
-//				System.out.format("Rank: %.2f\n",sol.getRank());
-//				Collections.sort(sol.getSessions());
-//				for (Session session:sol.getSessions()){
-//					int index=session.time;
-//					System.out.println("\t"+times[index]);
-//					
-//					//print ratio of must attend to can attend
-//					//System.out.println(session.membersMustAttend.size()+"/"+session.members.size());
-//					
-//					//print names of those who can attend
-//					//session.print();
-//					//System.out.println();
-//					
-//					//print names of those who must attend:
-//					//session.printMustAttend();
-//					//System.out.println();
-//				}
-//			}
-//		}
-//	}
-	
+
 	public static void getSetUpFromUser(int increment, int maxNumSessions,int minStudents, int blkSize){
 		//
 		//
@@ -344,67 +198,6 @@ public class Scheduler {
 	}
 	
 	public static void runScheduler(int increment, int maxSessions, int minStudents, int blockSize) {
-		// TODO get constraints from user- blockSize, mask of allowable times
-		//setup();
-		//getSetUpFromUser();
-		//TODO finish getting user input then remove these lines
-//		Day day1 = new Day(30, 8,new Time(13,30) , "Wednesday");
-//		Day day2 = new Day(30, 17, new Time(9, 0), "Thursday");
-//		Day day3 = new Day(30, 17, new Time(9, 0), "Friday");
-//		days.add(day1);
-//		days.add(day2);
-//		days.add(day3);
-		//createTimeArray();
-		//schedules=new ArrayList<Schedule>();
-		//readSchedulesFromFile("schedule_fall_2015_test.csv");
-		//ArrayList<Schedule> schedulesCopy = (ArrayList<Schedule>)schedules.clone();
-		//solutionTree=new Tree(null, new Session(-1));
-		// find worst schedule
-		//sortSchedules(schedulesCopy);
-		
-		//int[] possibleMask=new int[SCHED_SIZE];
-		// print out each students schedule:
-		//for (Schedule s:schedulesCopy){
-		//	System.out.print(s.getName()+" ");
-		//	s.printSchedule();
-		//	System.out.println();
-		//	}
-//		do {
-//			createTree(schedulesCopy, 0,solutionTree,possibleMask);
-//			if (!solutionTree.hasLeaves()) {
-//				System.out.println("Impossible schedule, "+schedulesCopy.get(0).getName()+"removed");
-//				schedulesCopy.remove(0);
-//			}
-//		}
-//		while (!solutionTree.hasLeaves());
-//		//System.out.println("*******Before Pruning***********");
-		//Tree.printTree(solutionTree,0);
-		//Tree.printSolutionToFile(solutionTree, 0,"solution.txt");
-		//if (!(solutionTree==null)) solutionTree.pruneTree();
-		//System.out.println("*******After Pruning***********");
-		//Tree.printTree(solutionTree,0);
-		//Tree.printRankedSolutionToFile(solutionTree, "solutionList.txt");
-		//TODO if tree is dead, remove worst schedule and try again
-		
-		//createSolutions(solutionTree, new ArrayList<Session>());
-		// prints the days and times of all slots:
-		//for (int i=0;i<times.length;i++){
-		//	System.out.println(times[i]);
-		//}
-//		for (Solution sol:solutions){
-//			sol.calculateNormalizedRank(fewestSessionsWeight, preferredTimesWeight, canComeWeight, mustComeWeight, solutions);
-//		}
-		//Collections.sort(solutions);
-		/*for (Solution sol:solutions){
-			System.out.format("%.2f",sol.getRank());
-			Collections.sort(sol.getSessions());
-			for (Session session:sol.getSessions()){
-				int index=session.time;
-				System.out.print("\t"+times[index]);
-				System.out.println();
-			}
-		}*/
-		//printSolutions();
 	}
 
 }
