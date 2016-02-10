@@ -999,7 +999,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			textSolutionOutput.append(printString);
 			int[] possibleMask=new int[preferredMask.length];
 			do {
-				Scheduler.createTree(schedulesCopy, 0,solutionTree,possibleMask);
+				Scheduler.createTree(schedulesCopy, 0,solutionTree,possibleMask,minStudents,schedSize);
 				if (!solutionTree.hasLeaves()) {
 					System.out.println("Impossible schedule, "+schedulesCopy.get(0).getName()+"removed");
 					schedulesCopy.remove(0);

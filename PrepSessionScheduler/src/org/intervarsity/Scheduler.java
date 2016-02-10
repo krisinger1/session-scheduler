@@ -12,14 +12,6 @@ public class Scheduler {
 	static ArrayList<Schedule> schedules ;
 	static ArrayList<Solution> solutions=new ArrayList<Solution>();
 	static Tree solutionTree;
-	static double fewestSessionsWeight=10;
-	static double preferredTimesWeight=12;
-	static double canComeWeight=2;
-	static double mustComeWeight=1;
-	static int slotSize;
-	static int maxSessions=5;
-	static int minSessionSize = 4;
-	static final int SCHED_SIZE=44;
 	static int blockSize=3; //number of slots needed
 	static final int FULL=1;
 	static final int EMPTY=0;
@@ -40,7 +32,7 @@ public class Scheduler {
 	}
 		
 	
-	public static void createTree(ArrayList<Schedule> sList, int index,Tree parent, int[] mask){
+	public static void createTree(ArrayList<Schedule> sList, int index,Tree parent, int[] mask, int minSessionSize, int SCHED_SIZE){
 		if (sList.size()==0) {
 			parent.isEnd=true;
 			return;
@@ -71,7 +63,7 @@ public class Scheduler {
 						session.members.addAll(tempList);
 						//session.print();
 						smallerList.removeAll(tempList);					
-						createTree(smallerList,0,solutionLeaf,newMask);
+						createTree(smallerList,0,solutionLeaf,newMask,minSessionSize,SCHED_SIZE);
 						//Tree.printTree(solutionTree, 0);
 					}
 					//index++;
@@ -151,53 +143,4 @@ public class Scheduler {
 		return times;
 	}
 	
-
-	/*public static void getSetUpFromUser(int increment, int maxNumSessions,int minStudents, int blkSize){
-		//
-		//
-		//how many days are being scheduled?
-		//ArrayList<Day> daysTest=new ArrayList<Day>();
-		Scanner input = new Scanner( System.in );
-		System.out.println("How many days in schedule?");
-		int numDays = input.nextInt();
-		//start and end times for each day & day name
-		System.out.println("How many minutes in slot: ");
-		slotSize = increment;
-		System.out.println("How many slots do you need for session? ");
-		blockSize = blkSize;
-		System.out.println("Minimum number of students in a session: ");
-		minSessionSize = minStudents;
-		System.out.println("Maximum number of sessions to schedule in a week: ");
-		maxSessions = maxNumSessions;
-		for (int i=1;i<=numDays;i++){
-			//TODO error handling for user input - make sure data entered is right type
-			System.out.println("For Day "+i);
-			System.out.println("Day name: ");
-			String dayName=input.next();
-			System.out.println("Start time: ");
-			System.out.println("Hour: ");
-			int startHour = input.nextInt();
-			System.out.println("Minute: ");
-			int startMin = input.nextInt();
-			System.out.println("End time: ");
-			System.out.println("Hour: ");
-			int endHour = input.nextInt();
-			System.out.println("Minute: ");
-			int endMin = input.nextInt();
-			
-			days.add(new Day(slotSize, new Time(startHour, startMin), new Time(endHour, endMin), dayName));
-		}
-		days.get(0).printDay();
-		days.get(1).printDay();
-		input.close();
-		//schedule split into __minute increments
-		//preferred start and end times for each day
-		//minimum number of students in a session
-		//# of sessions in solution?? or a max # of sessions??
-		
-	}*/
-	
-	public static void runScheduler(int increment, int maxSessions, int minStudents, int blockSize) {
-	}
-
 }
