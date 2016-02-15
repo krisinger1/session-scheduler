@@ -12,18 +12,14 @@ public class Scheduler {
 	static ArrayList<Schedule> schedules ;
 	static ArrayList<Solution> solutions=new ArrayList<Solution>();
 	static Tree solutionTree;
-	static int blockSize=3; //number of slots needed
-	static final int FULL=1;
-	static final int EMPTY=0;
-	static final int BREAK=2;
+	//static int blockSize=3; //number of slots needed
 	static ArrayList<Day> days=new ArrayList<Day>();
-	//static String[] times= new String[SCHED_SIZE];
-	static int preferredMask[]=new int[]{
-			1,1,1,1,1,1,1,1,2,
-			1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,2,
-			1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1};
-	
-		
+
+	/**
+	 * sort and arraylist of Schedules from worst to best	
+	 * @param sList - an ArrayList of Schedule objects
+	 * @param blockSize - integer number of schedule blocks needed
+	 */
 	public static void sortSchedules(ArrayList<Schedule> sList, int blockSize){
 		for (Schedule s:sList){
 			if (s.getRank()==-1) s.determineRank(blockSize);
@@ -31,13 +27,23 @@ public class Scheduler {
 		Collections.sort(sList);
 	}
 		
-	
-	public static void createTree(ArrayList<Schedule> sList, int index,Tree parent, int[] mask, int minSessionSize, int SCHED_SIZE){
+	/**
+	 * creates a tree of possible session combinations that cover all the schedules
+	 * and meet other restrictions 
+	 * @param sList - list of schedules trying to put into a tree of solutions
+	 * @param parent - node of the tree we are starting from 
+	 * @param mask - integer array to mask off any not allowable schedule times
+	 * @param minSessionSize - int number of students required for a session to be a valid solution
+	 * @param SCHED_SIZE- integer number of total blocks in a schedule
+	 * @param blockSize - integer number of schedule blocks needed
+	 */
+	public static void createTree(ArrayList<Schedule> sList,Tree parent, int[] mask, int minSessionSize, int SCHED_SIZE, int blockSize){
 		if (sList.size()==0) {
 			parent.isEnd=true;
 			return;
 		}
 		else {
+			int index=0;
 			Schedule worst=sList.get(0);
 			boolean foundOne=false;
 			while (sList.size()>0 && index<SCHED_SIZE-1 && index>=0){
@@ -59,14 +65,11 @@ public class Scheduler {
 						int[] newMask=mask.clone();
 						newMask[index]=1;
 						newMask[index+1]=1;
-						//index++;
 						session.members.addAll(tempList);
-						//session.print();
 						smallerList.removeAll(tempList);					
-						createTree(smallerList,0,solutionLeaf,newMask,minSessionSize,SCHED_SIZE);
+						createTree(smallerList,solutionLeaf,newMask,minSessionSize,SCHED_SIZE,blockSize);
 						//Tree.printTree(solutionTree, 0);
 					}
-					//index++;
 				}
 				else if (index<0){
 					if (!foundOne)parent.isDead=true;
@@ -79,8 +82,14 @@ public class Scheduler {
 		return;
 	}
 	
+	/**
+	 * Read in schedules from a .csv file.
+	 * [0]Name,[1]email,[2+]0=empty 1=full 2=break for new day 
+	 * @param filename - name of the file to read from
+	 * @return schedules from file as an ArrayList<Schedule>
+	 */
 	public static ArrayList<Schedule> readSchedulesFromFile (String filename){
-		 File csvFile=new File(filename);
+		File csvFile=new File(filename);
 		 ArrayList<Schedule> schedules=new ArrayList<Schedule>();
 		 try{
 			 Scanner scanner = new Scanner(csvFile);
@@ -93,6 +102,7 @@ public class Scheduler {
 			    int[] slots=new int[schedSize];
 			    int value;
 			    for (int i=2;i<arraySize;i++){
+			    	// this code is incorrect because file was setup incorrectly in spring 2016 switch 1 & 0
 			    	if (fields[i].equals("1")) value=0;
 			    	else if (fields[i].equals("0"))value=1;	
 			    	else value=2;
@@ -102,7 +112,7 @@ public class Scheduler {
 		        //create the schedule
 		        Schedule studentSchedule=new SimpleSchedule(fields[0], schedSize);
 		        studentSchedule.setSchedule(slots);
-		        studentSchedule.determineRank(blockSize);
+		        studentSchedule.determineRank(BibleStudySchedulerWindow.blockSize);
 		        //add schedule to list
 		        schedules.add(studentSchedule);
 			 }

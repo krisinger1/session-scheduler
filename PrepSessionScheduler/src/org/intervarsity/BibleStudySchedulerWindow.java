@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.lang.reflect.Array;
 
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
@@ -19,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SpinnerListModel;
 import javax.swing.JSlider;
 import java.awt.Cursor;
@@ -28,12 +26,10 @@ import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.text.html.HTMLDocument.HTMLReader.BlockAction;
 import javax.swing.JSeparator;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.List;
 
 import javax.swing.JScrollPane;
 import java.awt.Dimension;
@@ -44,6 +40,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	private ArrayList<Solution> solutions=new ArrayList<Solution>();
 	private String[] times;
 	private ArrayList<Schedule> schedules;
+	public static int schedSize;
 	private ArrayList<Time> possibleTimes=new ArrayList<Time>();
 	private int[] preferredMask;
 	private JFrame frame;
@@ -63,13 +60,13 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	private JLabel lblResults;
 	private JPanel panel,panelTuesdayTimes,panelMonTimes,panelWedTimes,panelThursTimes,panelFriTimes;
 	private JComboBox<Integer> comboMinStudents, comboMaxSessions,comboIncrement,comboBlockSize;
-	private JSpinner spnrMonStartHr,spnrMonStartMin,spnrMonStartAM,spnrMonPrefStartHr,spnrMonPrefStartMin,spnrMonPrefStartAM,spnrMonPrefEndHr,spnrMonPrefEndMin,spnrMonPrefEndAM,
+	private JSpinner spnrMonStartHr,spnrMonPrefStartHr,spnrMonPrefEndHr,
 			spnrTueStartHr,spnrTuePrefStartHr,spnrTuePrefEndHr,
 			spnrWedStartHr,spnrWedPrefStartHr,spnrWedPrefEndHr,
 			spnrThursStartHr,spnrThursPrefStartHr,spnrThursPrefEndHr,
 			spnrFriStartHr,spnrFriPrefStartHr,spnrFriPrefEndHr;
 	private JScrollPane scrollPane;
-	private int blockSize;
+	public static int blockSize;
 	private int maxSessions;
 	//TODO why is minStudents never used?
 	private int minStudents;
@@ -830,7 +827,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			schedules=Scheduler.readSchedulesFromFile("bible_prep_schedule_spring_16.csv");
 			if (schedules==null)return;
 			Schedule s=schedules.get(0);
-			int schedSize=s.getSchedule().length;
+			schedSize=s.getSchedule().length;
 			int i=0;
 			for (int slot:s.getSchedule()){if (slot==2)i++;}
 			int[] numslots=new int[i+1];
@@ -868,7 +865,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					Time prefStart=(Time)spnrMonPrefStartHr.getValue();
 					Time prefEnd=(Time)spnrMonPrefEndHr.getValue();
 					Time t=start;
-					int temp;
 					for (int index=lastIndex;index<(numslots[num]+lastIndex);index++){
 						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
 						else preferredMask[index]=0;
@@ -894,7 +890,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					Time prefStart=(Time)spnrTuePrefStartHr.getValue();
 					Time prefEnd=(Time)spnrTuePrefEndHr.getValue();
 					Time t=start;
-					int temp;
 					for (int index=lastIndex;index<(numslots[num]+lastIndex);index++){
 						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
 						else preferredMask[index]=0;
@@ -921,7 +916,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					Time prefStart=(Time)spnrWedPrefStartHr.getValue();
 					Time prefEnd=(Time)spnrWedPrefEndHr.getValue();
 					Time t=start;
-					int temp;
 					for (int index=lastIndex;index<(numslots[num]+lastIndex);index++){
 						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
 						else preferredMask[index]=0;
@@ -947,7 +941,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					Time prefStart=(Time)spnrThursPrefStartHr.getValue();
 					Time prefEnd=(Time)spnrThursPrefEndHr.getValue();
 					Time t=start;
-					int temp;
 					for (int index=lastIndex;index<(numslots[num]+lastIndex);index++){
 						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
 						else preferredMask[index]=0;
@@ -973,7 +966,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					Time prefStart=(Time)spnrFriPrefStartHr.getValue();
 					Time prefEnd=(Time)spnrFriPrefEndHr.getValue();
 					Time t=start;
-					int temp;
 					for (int index=lastIndex;index<(numslots[num]+lastIndex);index++){
 						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
 						else preferredMask[index]=0;
@@ -999,7 +991,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			textSolutionOutput.append(printString);
 			int[] possibleMask=new int[preferredMask.length];
 			do {
-				Scheduler.createTree(schedulesCopy, 0,solutionTree,possibleMask,minStudents,schedSize);
+				Scheduler.createTree(schedulesCopy, solutionTree,possibleMask,minStudents,schedSize,blockSize);
 				if (!solutionTree.hasLeaves()) {
 					System.out.println("Impossible schedule, "+schedulesCopy.get(0).getName()+"removed");
 					schedulesCopy.remove(0);
@@ -1043,7 +1035,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	}
 	
 	public void itemStateChanged(ItemEvent ie){
-		JCheckBox cb=(JCheckBox)ie.getItem();
 		if (chckbxTuesday.isSelected())	panelTuesdayTimes.setVisible(true);
 		if (!chckbxTuesday.isSelected()) panelTuesdayTimes.setVisible(false);
 		if (chckbxMonday.isSelected())	panelMonTimes.setVisible(true);
