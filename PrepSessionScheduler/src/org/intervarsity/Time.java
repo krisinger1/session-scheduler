@@ -1,6 +1,5 @@
 package org.intervarsity;
 
-import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
 //TODO error handling in methods for Time Class
 public class Time implements Comparable<Time>{
 	private int minute;
@@ -53,10 +52,18 @@ public class Time implements Comparable<Time>{
 		}
 	}
 	
+	/**
+	 * gets the hour portion of this time
+	 * @return the hour of this time assuming 24 hour clock
+	 */
 	public int getHour(){
 		return hour;
 	}
 	
+	/**
+	 * gets the minute portion of this time
+	 * @return the minute of this time
+	 */
 	public int getMinute(){
 		return minute;
 	}
@@ -67,15 +74,19 @@ public class Time implements Comparable<Time>{
 	 * @return time difference in minutes unsigned
 	 */
 	public int timeDifference(Time t){
-		int minutesStart=hour*60+minute;
-		int minutesEnd=t.getHour()*60+t.getMinute();
-		return Math.abs(minutesEnd-minutesStart);
+		if (t!=null){
+			int minutesStart=hour*60+minute;
+			int minutesEnd=t.getHour()*60+t.getMinute();
+			return Math.abs(minutesEnd-minutesStart);
+		}
+		else return -1;
 	}
 	/**
 	 * compares whether one time is later than another assuming 24 hour clock.
 	 */
-	public int compareTo(Time t){
-		if (hour<t.getHour()) return -1;
+	public int compareTo(Time t)throws NullPointerException{
+		if (t==null)throw new NullPointerException();
+		else if (hour<t.getHour()) return -1;
 		else if (hour>t.getHour()) return 1;
 		else if (minute<t.getMinute()) return -1;
 		else if (minute>t.getMinute()) return 1;
@@ -83,7 +94,7 @@ public class Time implements Comparable<Time>{
 	}
 	
 	/**
-	 * function to find the time advanced by increment from calling time
+	 * creates a new time equal to this time advanced by increment
 	 * @param increment in minutes
 	 * @return a new time incremented by increment w/o changing original time
 	 */
@@ -97,7 +108,7 @@ public class Time implements Comparable<Time>{
 	}
 	
 	/**
-	 * function to advance the time by increment
+	 * advances this time by increment
 	 * @param increment in minutes
 	 * @return calling time incremented by increment 
 	 */
