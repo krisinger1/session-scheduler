@@ -2,7 +2,6 @@ package org.intervarsity;
 
 import java.util.ArrayList;
 
-import javax.swing.text.DefaultEditorKit.CopyAction;
 /**
  * Represents one session of a Bible prep.
  * includes time of the session. 

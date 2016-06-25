@@ -98,6 +98,7 @@ public class Scheduler {
 			 Scanner scanner = new Scanner(csvFile);
 			 while (scanner.hasNextLine()){
 				 //TODO learn how to check for empty data
+				 //TODO read in email addresses as well and add to schedule
 				String line = scanner.nextLine();
 			    String[] fields = line.split(",");
 			    int arraySize=fields.length;

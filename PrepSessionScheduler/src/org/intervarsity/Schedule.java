@@ -6,6 +6,7 @@ public abstract class Schedule implements Comparable<Schedule>{
 	private int rank;
 	private String name;
 	protected int[] schedule;
+	//TODO need variable to hold email address of student
 	
 	abstract void fillSchedule();
 	abstract int findOpenBlock(int startIndex,int numSlots);
