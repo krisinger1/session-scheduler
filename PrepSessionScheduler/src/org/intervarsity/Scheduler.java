@@ -65,6 +65,9 @@ public class Scheduler {
 						int[] newMask=mask.clone();
 						newMask[index]=1;
 						newMask[index+1]=1;
+						//newMask[index+2]=1;
+
+						//for (int i=0;i<blockSize;i++){newMask[index+i]=1;}
 						session.members.addAll(tempList);
 						smallerList.removeAll(tempList);					
 						createTree(smallerList,solutionLeaf,newMask,minSessionSize,SCHED_SIZE,blockSize);
