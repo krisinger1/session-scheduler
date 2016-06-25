@@ -52,7 +52,7 @@ public class Session implements Comparable<Session>{
 	 */
 	public void print(){
 		System.out.print(time+":");
-		for (Schedule s:members)System.out.println("\t"+s.getName());
+		for (Schedule s:members)System.out.println("\t"+s.getName()+"\t"+s.getEmail());
 		System.out.println("");
 
 	}
@@ -72,7 +72,7 @@ public class Session implements Comparable<Session>{
 	 */
 	public String toString(){
 		String result=time+":";
-		for (Schedule s:members)result+=" "+s.getName();
+		for (Schedule s:members)result+=" "+s.getName()+" "+s.getEmail();
 		result+="\n";
 		return result;
 

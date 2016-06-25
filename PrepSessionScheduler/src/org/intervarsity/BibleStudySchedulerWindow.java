@@ -1185,8 +1185,8 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					//System.out.println(session.membersMustAttend.size()+"/"+session.members.size());
 					
 					//print names of those who can attend
-	//				session.print();
-	//				System.out.println();
+					session.print();
+					System.out.println();
 					
 					//print names of those who must attend:
 					//session.printMustAttend();

@@ -8,7 +8,7 @@ public class SimpleScheduleTest extends TestCase {
 	SimpleSchedule s2;
 	
 	private void setup(){
-		s1=new SimpleSchedule("one",12);
+		s1=new SimpleSchedule("one","",12);
 		s1.schedule[0]=1;
 		s1.schedule[1]=0;
 		s1.schedule[2]=0;
@@ -23,7 +23,7 @@ public class SimpleScheduleTest extends TestCase {
 		s1.schedule[11]=0;
 		s1.determineRank(2);
 
-		s2=new SimpleSchedule("two",12);
+		s2=new SimpleSchedule("two","",12);
 		s2.schedule[0]=0;
 		s2.schedule[1]=0;
 		s2.schedule[2]=0;
@@ -42,15 +42,15 @@ public class SimpleScheduleTest extends TestCase {
 	
 	public void testSimpleSchedule() {
 		
-		SimpleSchedule s3=new SimpleSchedule("three",12);
+		SimpleSchedule s3=new SimpleSchedule("three","",12);
 		assertTrue(s3!=null);
 		
 
 	}
 
 	public void testFillSchedule() {
-		SimpleSchedule s4=new SimpleSchedule("four",12);
-		SimpleSchedule s5=new SimpleSchedule("five",12);
+		SimpleSchedule s4=new SimpleSchedule("four","",12);
+		SimpleSchedule s5=new SimpleSchedule("five","",12);
 		s4.fillSchedule();
 		s5.fillSchedule();
 		s4.printSchedule();

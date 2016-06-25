@@ -114,7 +114,7 @@ public class Scheduler {
 			    	}
 		        scanner.useDelimiter(",");
 		        //create the schedule
-		        Schedule studentSchedule=new SimpleSchedule(fields[0], schedSize);
+		        Schedule studentSchedule=new SimpleSchedule(fields[0], fields[1], schedSize);
 		        studentSchedule.setSchedule(slots);
 		        studentSchedule.determineRank(BibleStudySchedulerWindow.blockSize);
 		        //add schedule to list

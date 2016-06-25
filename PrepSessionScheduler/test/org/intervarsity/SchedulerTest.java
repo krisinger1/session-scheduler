@@ -7,7 +7,7 @@ public class SchedulerTest extends TestCase {
 	Tree solutionTree;
 	
 	private void setup(){
-		s1=new SimpleSchedule("one",12);
+		s1=new SimpleSchedule("one","",12);
 		//s1.fillSchedule();
 		s1.schedule[0]=1;
 		s1.schedule[1]=0;
@@ -23,7 +23,7 @@ public class SchedulerTest extends TestCase {
 		s1.schedule[11]=0;
 		s1.determineRank(2);
 
-		s2=new SimpleSchedule("two",12);
+		s2=new SimpleSchedule("two","",12);
 		s2.fillSchedule();
 		/*s2.schedule[0]=false;
 		s2.schedule[1]=false;
@@ -39,7 +39,7 @@ public class SchedulerTest extends TestCase {
 		s2.schedule[11]=true;*/
 		s2.determineRank(2);
 		
-		s3=new SimpleSchedule("three",12);
+		s3=new SimpleSchedule("three","",12);
 		s3.fillSchedule();
 		/*s3.schedule[0]=true;
 		s3.schedule[1]=true;
@@ -55,7 +55,7 @@ public class SchedulerTest extends TestCase {
 		s3.schedule[11]=false;*/
 		s3.determineRank(2);
 		
-		s4=new SimpleSchedule("four",12);
+		s4=new SimpleSchedule("four","",12);
 		s4.fillSchedule();
 		/*s4.schedule[0]=true;
 		s4.schedule[1]=true;
@@ -71,15 +71,15 @@ public class SchedulerTest extends TestCase {
 		s4.schedule[11]=true;*/
 		s4.determineRank(2);
 		
-		s5 =new SimpleSchedule("five",12);
+		s5 =new SimpleSchedule("five","",12);
 		s5.fillSchedule();
 		s5.determineRank(2);
 		
-		s6 =new SimpleSchedule("six",12);
+		s6 =new SimpleSchedule("six","",12);
 		s6.fillSchedule();
 		s6.determineRank(2);
 
-		s7 =new SimpleSchedule("seven",12);
+		s7 =new SimpleSchedule("seven","",12);
 		s7.fillSchedule();
 		s7.determineRank(2);
 		

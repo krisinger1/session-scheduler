@@ -6,6 +6,7 @@ public abstract class Schedule implements Comparable<Schedule>{
 	private int rank;
 	private String name;
 	protected int[] schedule;
+	private String email;
 	//TODO need variable to hold email address of student
 	
 	abstract void fillSchedule();
@@ -14,8 +15,9 @@ public abstract class Schedule implements Comparable<Schedule>{
 	abstract void determineRank(int blockSize);
 	abstract boolean isBlockOpen(int index, int blockSize);
 	
-	public Schedule(String name, int size) {
+	public Schedule(String name, String email, int size) {
 		this.name=name;
+		this.email=email;
 		rank=-1;
 		schedule = new int[size];
 	}
@@ -42,6 +44,10 @@ public abstract class Schedule implements Comparable<Schedule>{
 	
 	public String getName(){
 		return name;
+	}
+	
+	public String getEmail(){
+		return email;
 	}
 	
 	public int compareTo(Schedule s){
