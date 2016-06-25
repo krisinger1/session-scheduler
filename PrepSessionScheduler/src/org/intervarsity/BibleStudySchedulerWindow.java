@@ -1008,7 +1008,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				textSolutionOutput.append(sol.getCanBalance()+"");
 			}
 			Collections.sort(solutions);
-			printSolutions();
+			printSolutionsToOutputWindow();
 			//empty arraylists for next run
 			//solutionTree=null;
 			solutions.clear();
@@ -1166,30 +1166,30 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		}
 	}
 	
-	public void printSolutions(){
+	public void printSolutionsToOutputWindow(){
 		//for (Solution sol:solutions){
 		for (int i=0; i<solutions.size();i++){
 		//for (int i=0;i<25;i++){
 			if (solutions.get(i).getNumSessions()<=maxSessions){
-				System.out.println();
+//				System.out.println();
 				textSolutionOutput.append("\n");
 				Solution sol=solutions.get(i);
 				textSolutionOutput.append("*******Solution "+i+"********\n");
 				textSolutionOutput.append(""+sol.getRank()+"\n");
-				System.out.println("*******Solution "+i+"********");
-				System.out.format("Rank: %.2f\n",sol.getRank());
+	//			System.out.println("*******Solution "+i+"********");
+	//			System.out.format("Rank: %.2f\n",sol.getRank());
 				Collections.sort(sol.getSessions());
 				for (Session session:sol.getSessions()){
 					int index=session.time;
-					System.out.println("\t"+times[index]);
+	//				System.out.println("\t"+times[index]);
 					textSolutionOutput.append("\t"+times[index]+"\n");;
 					
 					//print ratio of must attend to can attend
 					//System.out.println(session.membersMustAttend.size()+"/"+session.members.size());
 					
 					//print names of those who can attend
-					session.print();
-					System.out.println();
+	//				session.print();
+	//				System.out.println();
 					
 					//print names of those who must attend:
 					//session.printMustAttend();
