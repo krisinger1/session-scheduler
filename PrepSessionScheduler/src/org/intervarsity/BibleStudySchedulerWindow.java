@@ -33,9 +33,7 @@ import java.awt.Insets;
 
 import javax.swing.JScrollPane;
 import java.awt.Dimension;
-//TODO print sorted schedules to a csv file?
 //TODO print solutions to file
-//TODO how to use Git with eclipse?
 public class BibleStudySchedulerWindow implements ActionListener,ItemListener,ChangeListener{
 	private ArrayList<Solution> solutions=new ArrayList<Solution>();
 	private String[] times;
@@ -68,13 +66,11 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	private JScrollPane scrollPane;
 	public static int blockSize;
 	private int maxSessions;
-	//TODO why is minStudents never used?
 	private int minStudents;
 	//TODO fix code to not allow more than maxStudents per session to force more solutions - 
 	// don't want 30+ students in a session
 	private int maxStudents = 20;
-	//TODO cap off number of solutions to print - especially if printing students names
-	private int maxSolutionsToPrint; 
+	private int maxSolutionsToPrint=20; 
 	private int increment;
 	private boolean formChanged=false;
 
@@ -823,7 +819,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	
 	public void actionPerformed(ActionEvent ae){
 		if (ae.getActionCommand().equals("Run")){
-			
+	//TODO not read in schedules every time run button is pushed? in initialize instead?		
 			schedules=Scheduler.readSchedulesFromFile("bible_prep_schedule_spring_16.csv");
 			if (schedules==null)return;
 			Schedule s=schedules.get(0);
@@ -1047,9 +1043,10 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		if (!chckbxFriday.isSelected()) panelFriTimes.setVisible(false);
 		
 	}
-
+	//Code for checkboxes for starting and ending times for each day
 	@Override
 	public void stateChanged(ChangeEvent ce) {
+		//*****MONDAY***************************************
 		if((ce.getSource()).equals(spnrMonStartHr)){
 			if (((Time)spnrMonStartHr.getValue()).compareTo((Time)spnrMonPrefStartHr.getValue())>0){
 				spnrMonPrefStartHr.setValue(spnrMonStartHr.getValue());
@@ -1068,6 +1065,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				spnrMonPrefEndHr.setValue(spnrMonPrefStartHr.getValue());
 			}
 		}
+		//*****TUESDAY**************************************
 		else if((ce.getSource()).equals(spnrTueStartHr)){
 			if (((Time)spnrTueStartHr.getValue()).compareTo((Time)spnrTuePrefStartHr.getValue())>0){
 				spnrTuePrefStartHr.setValue(spnrTueStartHr.getValue());
@@ -1086,6 +1084,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				spnrTuePrefEndHr.setValue(spnrTuePrefStartHr.getValue());
 			}
 		}
+		//*****WEDNESDAY***************************************
 		else if((ce.getSource()).equals(spnrWedStartHr)){
 			if (((Time)spnrWedStartHr.getValue()).compareTo((Time)spnrWedPrefStartHr.getValue())>0){
 				spnrWedPrefStartHr.setValue(spnrWedStartHr.getValue());
@@ -1104,6 +1103,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				spnrWedPrefEndHr.setValue(spnrWedPrefStartHr.getValue());
 			}
 		}
+		//*****THURSDAY***************************************
 		else if((ce.getSource()).equals(spnrThursStartHr)){
 			if (((Time)spnrThursStartHr.getValue()).compareTo((Time)spnrThursPrefStartHr.getValue())>0){
 				spnrThursPrefStartHr.setValue(spnrThursStartHr.getValue());
@@ -1122,6 +1122,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				spnrThursPrefEndHr.setValue(spnrThursPrefStartHr.getValue());
 			}
 		}
+		//*****FRIDAY***************************************
 		else if((ce.getSource()).equals(spnrFriStartHr)){
 			if (((Time)spnrFriStartHr.getValue()).compareTo((Time)spnrFriPrefStartHr.getValue())>0){
 				spnrFriPrefStartHr.setValue(spnrFriStartHr.getValue());
@@ -1143,16 +1144,14 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	}
 	
 	public void createSolutions(Tree t,ArrayList<Session> sessionList){
-//TODO do not include solutions if not enough students or too amny sessions
+//TODO do not include solutions if not enough students or too many sessions
 		if (t.isEnd) {
 			Solution solution=new Solution();
-			ArrayList<Session> sessionListClone = (ArrayList<Session>) sessionList.clone();
+			//ArrayList<Session> sessionListClone = (ArrayList<Session>) sessionList.clone();
 			solution.setSessions(sessionList);
-			//solution.print();
 			solution.findAllMembers(schedules, blockSize);
 			solutions.add(solution);
-			//solution.print();
-		}
+			}
 		else for (Tree leaf:t.leaves){
 			int time=leaf.session.time;
 			boolean preferred;
@@ -1167,11 +1166,9 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	}
 	
 	public void printSolutionsToOutputWindow(){
-		//for (Solution sol:solutions){
-		for (int i=0; i<solutions.size();i++){
-		//for (int i=0;i<25;i++){
+		//limit number of solutions to print by maxSolutionsToPrint or all if smaller
+		for (int i=0;i<maxSolutionsToPrint && i<solutions.size();i++){
 			if (solutions.get(i).getNumSessions()<=maxSessions){
-//				System.out.println();
 				textSolutionOutput.append("\n");
 				Solution sol=solutions.get(i);
 				textSolutionOutput.append("*******Solution "+i+"********\n");
