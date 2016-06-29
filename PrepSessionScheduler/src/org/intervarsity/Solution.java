@@ -79,13 +79,13 @@ public class Solution implements Comparable<Solution>{
 	 * @param m3 weight of balance of people who _can_ attend sessions criteria
 	 * @param m4 weight of balance of people who _must_ attend sessions criteria
 	 */
-	// Looks like this code is never used
-	/*public void calculateRank(double m1,double m2,double m3, double m4){
+	// Looks like this code is never used except in test class
+	public void calculateRank(double m1,double m2,double m3, double m4){
 		rank= (m1*getNumSessions()+
 				m2*(getNumSessions()-numSessionsInPrefTime())+
 				m3*checkCanBalance()+
 				m4*checkMustBalance());
-	}*/
+	}
 	
 	/**
 	 * calculates how good this solution is - how well it meets criteria

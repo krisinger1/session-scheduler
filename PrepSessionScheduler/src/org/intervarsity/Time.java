@@ -1,6 +1,5 @@
 package org.intervarsity;
 
-//TODO error handling in methods for Time Class
 public class Time implements Comparable<Time>{
 	private int minute;
 	private int hour;

@@ -24,9 +24,9 @@ public class SolutionTest extends TestCase {
 		sched1= new int[]{1,1,1,1,1,0,0,0,0,0};
 		sched2= new int[]{0,0,0,0,0,0,0,0,0,0};
 		sched3= new int[]{0,0,0,0,0,1,1,1,1,1};
-		Schedule schedule1 =new SimpleSchedule("Sched1", 10);
-		Schedule schedule2 =new SimpleSchedule("Sched2", 10);
-		Schedule schedule3 =new SimpleSchedule("Sched3", 10);
+		Schedule schedule1 =new SimpleSchedule("Sched1","", 10);
+		Schedule schedule2 =new SimpleSchedule("Sched2","", 10);
+		Schedule schedule3 =new SimpleSchedule("Sched3","", 10);
 		schedule1.setSchedule(sched1);
 		schedule2.setSchedule(sched2);
 		schedule3.setSchedule(sched3);

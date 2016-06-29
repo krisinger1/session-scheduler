@@ -1,12 +1,10 @@
 package org.intervarsity;
 
 import java.util.Random;
-//TODO make just one Schedule class for this project
+//TODO make just one Schedule class for this project?
 public class SimpleSchedule extends Schedule{
-	
 	int size;
-	
-	
+		
 	public SimpleSchedule(String scheduleName,String email,int size){
 		super(scheduleName,email, size);
 		this.size=size;
@@ -89,6 +87,11 @@ public class SimpleSchedule extends Schedule{
 		return super.getRank();
 	}
 	
+	/**
+	 * Determines if a block is open in a schedule
+	 * @param index first index of the block to check
+	 * @param blockSize the number of consecutive open slots in schedule needed (0's)
+	 */
 	public boolean isBlockOpen(int index, int blockSize){
 		int sum=0;
 		if ((index+blockSize)>schedule.length)return false;
@@ -108,13 +111,10 @@ public class SimpleSchedule extends Schedule{
 		return theString;
 	}
 	
+	
 	public void printSchedule(){
-		//int full;
 		System.out.print("\t\t");
 		for (int i=0;i<size;i++){
-			//if (schedule[i]==1) full=1;
-			//else full=0;
-			//System.out.print(full+"  ");
 			System.out.print(schedule[i]+"  ");
 		}
 	}

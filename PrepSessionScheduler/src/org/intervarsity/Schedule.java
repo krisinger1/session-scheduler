@@ -1,13 +1,10 @@
 package org.intervarsity;
 
-import java.util.ArrayList;
-
 public abstract class Schedule implements Comparable<Schedule>{
 	private int rank;
 	private String name;
 	protected int[] schedule;
 	private String email;
-	//TODO need variable to hold email address of student
 	
 	abstract void fillSchedule();
 	abstract int findOpenBlock(int startIndex,int numSlots);
