@@ -5,15 +5,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.DefaultComboBoxModel;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.JPanel;
@@ -73,6 +76,12 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	private int maxSolutionsToPrint=20; 
 	private int increment;
 	private boolean formChanged=false;
+	private JFileChooser chooser = new JFileChooser();
+	private File dataFile;
+	private JButton btnRun = new JButton("Run");
+	private JLabel lblFileChosen = new JLabel();
+
+
 
 	/**
 	 * Launch the application.
@@ -118,15 +127,20 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		lblWhichDaysDo.setBounds(10, 211, 359, 26);
 		frame.getContentPane().add(lblWhichDaysDo);
 		
-		JButton btnDone = new JButton("Run");
-		btnDone.setBounds(723, 331, 133, 23);
-		btnDone.addActionListener(this);
-		frame.getContentPane().add(btnDone);
+		btnRun.setBounds(723, 331, 133, 23);
+		btnRun.addActionListener(this);
+		frame.getContentPane().add(btnRun);
+		btnRun.setEnabled(false);
 		
 		JButton btnResetForm = new JButton("Reset Form");
 		btnResetForm.setBounds(723, 365, 133, 23);
 		frame.getContentPane().add(btnResetForm);
 		btnResetForm.addActionListener(this);
+		
+		JButton btnChooseFile= new JButton("Choose file");
+		btnChooseFile.setBounds(723, 399, 133, 23);
+		frame.getContentPane().add(btnChooseFile);
+		btnChooseFile.addActionListener(this);
 		
 		lblResults = new JLabel("Results:");
 		lblResults.setBounds(894, 12, 94, 14);
@@ -820,162 +834,177 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	public void actionPerformed(ActionEvent ae){
 		if (ae.getActionCommand().equals("Run")){
 	//TODO not read in schedules every time run button is pushed? in initialize instead?		
-			schedules=Scheduler.readSchedulesFromFile("bible_prep_schedule_spring_16.csv");
+			//schedules=Scheduler.readSchedulesFromFile("bible_prep_schedule_spring_16.csv");
+			schedules=Scheduler.readSchedulesFromFile(dataFile);
+
 			if (schedules==null)return;
 			Schedule s=schedules.get(0);
 			schedSize=s.getSchedule().length;
 			int i=0;
 			for (int slot:s.getSchedule()){if (slot==2)i++;}
-			int[] numslots=new int[i+1];
+			int[] numSlotsPerDay=new int[i+1];
 			int j=0;
 			i=0;
 			for (int slot:s.getSchedule()){
 				if (slot!=2) j++;
 				else {
-					numslots[i]=j;
+					numSlotsPerDay[i]=j;
 					j=0;
 					i++;
 				}
 			}
-			numslots[i]=j;  //final entry in array
+			numSlotsPerDay[i]=j;  //final entry in array
 //TODO create button on form to read in csv file then disable checkboxes when num days are checked
 			increment=(int)comboIncrement.getSelectedItem();
-			int num=0;
+			int numDaysChecked=0;
 			String dayString= "";
 			ArrayList<Day> days=new ArrayList<Day>();
 			preferredMask =new int[schedSize];
 			int lastIndex=0;
 				if (chckbxMonday.isSelected()) {
-					if (numslots.length<=num){
-						textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+					if (numSlotsPerDay.length<=numDaysChecked){
+						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+
 						return;
 					}
 					//int hour = (int)spnrMonStartHr.getValue();
 					//if (spnrMonStartAM.getValue().equals("PM")) hour+=12;
 					//Time start=new Time(hour, (int)spnrMonStartMin.getValue());
 					Time start = (Time)spnrMonStartHr.getValue();
-					Time end=start.nextTime(increment*numslots[num]);
+					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
 					Day monday=new Day(increment, start, end, "Monday");
 					days.add(monday);
 					dayString+=monday.toString()+start+end;
 					Time prefStart=(Time)spnrMonPrefStartHr.getValue();
 					Time prefEnd=(Time)spnrMonPrefEndHr.getValue();
 					Time t=start;
-					for (int index=lastIndex;index<(numslots[num]+lastIndex);index++){
+					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
 						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
 						else preferredMask[index]=0;
 						t=t.nextTime(increment);
 					}
-					lastIndex+=numslots[num];
+					lastIndex+=numSlotsPerDay[numDaysChecked];
 					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
 					lastIndex++;
-					num++;
+					numDaysChecked++;
 				}
 				if (chckbxTuesday.isSelected()) {
-					if (numslots.length<=num){
-						textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+					if (numSlotsPerDay.length<=numDaysChecked){
+						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+
 						return;
 					}
 					//int hour = (int)spnrTueStartHr.getValue();
 					//if (spnrTueStartAM.getValue().equals("PM")) hour+=12;
 					Time start=(Time)spnrTueStartHr.getValue(); 
-					Time end=start.nextTime(increment*numslots[num]);
+					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
 					Day tuesday=new Day(increment, start, end, "Tuesday");
 					days.add(tuesday);
 					dayString+=tuesday.toString()+start+end;
 					Time prefStart=(Time)spnrTuePrefStartHr.getValue();
 					Time prefEnd=(Time)spnrTuePrefEndHr.getValue();
 					Time t=start;
-					for (int index=lastIndex;index<(numslots[num]+lastIndex);index++){
+					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
 						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
 						else preferredMask[index]=0;
 						t=t.nextTime(increment);
 					}
-					lastIndex+=numslots[num];
+					lastIndex+=numSlotsPerDay[numDaysChecked];
 					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
 					lastIndex++;
-					num++;
+					numDaysChecked++;
 				
 				}
 				if (chckbxWednesday.isSelected()){
-					if (numslots.length<=num){
-						textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+					if (numSlotsPerDay.length<=numDaysChecked){
+						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+
 						return;
 					}
 					//int hour = (int)spnrWedStartHr.getValue();
 					//if (spnrWedStartAM.getValue().equals("PM")) hour+=12;
 					Time start=(Time)spnrWedStartHr.getValue();
-					Time end=start.nextTime(increment*numslots[num]);
+					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
 					Day wednesday=new Day(increment, start, end, "Wednesday");
 					days.add(wednesday);
 					dayString+=wednesday.toString()+start+end;
 					Time prefStart=(Time)spnrWedPrefStartHr.getValue();
 					Time prefEnd=(Time)spnrWedPrefEndHr.getValue();
 					Time t=start;
-					for (int index=lastIndex;index<(numslots[num]+lastIndex);index++){
+					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
 						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
 						else preferredMask[index]=0;
 						t=t.nextTime(increment);
 					}
-					lastIndex+=numslots[num];
+					lastIndex+=numSlotsPerDay[numDaysChecked];
 					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
 					lastIndex++;
-					num++;
+					numDaysChecked++;
 				}
 				if (chckbxThursday.isSelected()){
-					if (numslots.length<=num){
-						textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+					if (numSlotsPerDay.length<=numDaysChecked){
+						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
 						return;
 					}
 					//int hour = (int)spnrThursStartHr.getValue();
 					//if (spnrThursStartAM.getValue().equals("PM")) hour+=12;
 					Time start=(Time)spnrThursStartHr.getValue();
-					Time end=start.nextTime(increment*numslots[num]);
+					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
 					Day thursday=new Day(increment, start, end, "Thursday");
 					days.add(thursday);
 					dayString+=thursday.toString()+start+end;
 					Time prefStart=(Time)spnrThursPrefStartHr.getValue();
 					Time prefEnd=(Time)spnrThursPrefEndHr.getValue();
 					Time t=start;
-					for (int index=lastIndex;index<(numslots[num]+lastIndex);index++){
+					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
 						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
 						else preferredMask[index]=0;
 						t=t.nextTime(increment);
 					}
-					lastIndex+=numslots[num];
+					lastIndex+=numSlotsPerDay[numDaysChecked];
 					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
 					lastIndex++;
-					num++;
+					numDaysChecked++;
 				}
 				if (chckbxFriday.isSelected()){
-					if (numslots.length<=num){
-						textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+					if (numSlotsPerDay.length<=numDaysChecked){
+						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+
 						return;
 					}
 					//int hour = (int)spnrFriStartHr.getValue();
 					//if (spnrFriStartAM.getValue().equals("PM")) hour+=12;
 					Time start=(Time)spnrFriStartHr.getValue();
-					Time end=start.nextTime(increment*numslots[num]);
+					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
 					Day friday=new Day(increment, start, end, "Friday");
 					days.add(friday);
 					dayString+=friday.toString()+start+end;
 					Time prefStart=(Time)spnrFriPrefStartHr.getValue();
 					Time prefEnd=(Time)spnrFriPrefEndHr.getValue();
 					Time t=start;
-					for (int index=lastIndex;index<(numslots[num]+lastIndex);index++){
+					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
 						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
 						else preferredMask[index]=0;
 						t=t.nextTime(increment);
 						
 					}
-					lastIndex+=numslots[num];
+					lastIndex+=numSlotsPerDay[numDaysChecked];
 					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
 					lastIndex++;
-					num++;
+					numDaysChecked++;
 				}
 			
-			if (numslots.length!=num)textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-			else textSolutionOutput.append("number of day checked: "+num+" "+sldrSessions.getValue()+"  "+increment
+			//if (numslots.length!=num)textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+			if (numSlotsPerDay.length!=numDaysChecked) {
+				JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+				return;
+				}
+			else textSolutionOutput.append("number of day checked: "+numDaysChecked+" "+sldrSessions.getValue()+"  "+increment
 					+"\n"+dayString+"\n"+schedules.get(0).getName());
 			times=Scheduler.createTimeArray(days,schedSize);
 			Tree solutionTree=new Tree(null, new Session(-1));
@@ -1027,6 +1056,36 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			comboMaxSessions.setSelectedIndex(4);
 			comboMinStudents.setSelectedIndex(3);
 			textSolutionOutput.setText("number of day checked: 0");
+			lblFileChosen.setText("");
+			btnRun.setEnabled(false);
+		}
+		
+		else if (ae.getActionCommand().equals("Choose file")){
+				
+			//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
+			boolean okFile=false;
+			int option = 0;
+			while (option != JFileChooser.CANCEL_OPTION && !okFile){
+				option = chooser.showOpenDialog(frame);
+				if(option == JFileChooser.APPROVE_OPTION){
+					//String folder = (String)chooser.getSelectedFile( ).getAbsolutePath();
+					dataFile = chooser.getSelectedFile();
+					if (dataFile.getName().endsWith(".csv")){
+						btnRun.setEnabled(true);
+						frame.getContentPane().add(lblFileChosen);
+						lblFileChosen.setBounds(575, 425, 275, 23);
+						lblFileChosen.setText("File: "+dataFile.getName());
+						//fileChosen.setVisible(true);
+						okFile =true;
+					}
+					else
+					{
+						//open dialog box that tells user to choose a .csv file
+						JOptionPane.showMessageDialog(null, "Please choose a .csv file");
+						okFile =false;
+					}
+				}
+			}
 		}
 	}
 	

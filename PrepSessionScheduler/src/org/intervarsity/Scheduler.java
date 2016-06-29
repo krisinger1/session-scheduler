@@ -91,7 +91,7 @@ public class Scheduler {
 	 * @param filename - name of the file to read from
 	 * @return schedules from file as an ArrayList<Schedule>
 	 */
-	public static ArrayList<Schedule> readSchedulesFromFile (String filename){
+	/*public static ArrayList<Schedule> readSchedulesFromFile (String filename){
 		File csvFile=new File(filename);
 		 ArrayList<Schedule> schedules=new ArrayList<Schedule>();
 		 try{
@@ -126,7 +126,45 @@ public class Scheduler {
 			 System.out.println("File not found");
 		 }
 		 return null;
+	}*/
+	
+	public static ArrayList<Schedule> readSchedulesFromFile (File csvFile){
+		//TODO make sure file is csv and in correct format
+		 ArrayList<Schedule> schedules=new ArrayList<Schedule>();
+		 try{
+			 Scanner scanner = new Scanner(csvFile);
+			 while (scanner.hasNextLine()){
+				 //TODO learn how to check for empty data
+				String line = scanner.nextLine();
+			    String[] fields = line.split(",");
+			    int arraySize=fields.length;
+			    int schedSize=arraySize-2;
+			    int[] slots=new int[schedSize];
+			    int value;
+			    for (int i=2;i<arraySize;i++){
+			    	// this code is incorrect because file was setup incorrectly in spring 2016 switch 1 & 0
+			    	if (fields[i].equals("1")) value=0;
+			    	else if (fields[i].equals("0"))value=1;	
+			    	else value=2;
+			    	slots[i-2]=value;
+			    	}
+		        scanner.useDelimiter(",");
+		        //create the schedule
+		        Schedule studentSchedule=new SimpleSchedule(fields[0], fields[1], schedSize);
+		        studentSchedule.setSchedule(slots);
+		        studentSchedule.determineRank(BibleStudySchedulerWindow.blockSize);
+		        //add schedule to list
+		        schedules.add(studentSchedule);
+			 }
+	         scanner.close();
+	         return schedules;
+		 }
+		 catch (FileNotFoundException e){
+			 System.out.println("File not found");
+		 }
+		 return null;
 	}
+	
 	
 	
 	public static String[] createTimeArray(ArrayList<Day> days, int schedSize){
