@@ -3,6 +3,26 @@ package org.intervarsity;
 public class Time implements Comparable<Time>{
 	private int minute;
 	private int hour;
+	
+	/**
+	 * Takes a String in format "hh:mm am/pm" and creates time object
+	 * @param time 12 hour clock hh:mm with am/pm
+	 */
+	public Time(String time){
+		int index = time.indexOf(":");
+		int indexSpace = time.indexOf(" ");
+		String ampm = time.substring(indexSpace+1,indexSpace+3);
+		hour = Integer.parseInt(time.substring(0, index));
+		minute = Integer.parseInt(time.substring(index+1, index+3));
+		if (hour>=0 && minute>=0){
+			hour=hour%12+minute/60;
+			//if (hour==0) hour=12;
+			minute=minute%60;
+			if (ampm.equalsIgnoreCase("pm")) hour+=12;
+
+		}
+	}
+	
 	/**
 	 * constructor assumes 24 hour clock
 	 * @param theHour - the hour portion of the time 0-23

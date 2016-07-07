@@ -1,5 +1,4 @@
 package org.intervarsity;
-//TODO Day class is never used - remove? or move to another project?
 public class Day {
 	private int slotIncrement;
 	private int slotNumber;

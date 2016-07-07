@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
@@ -13,14 +14,17 @@ import javax.swing.JFileChooser;
 import javax.swing.DefaultComboBoxModel;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Scanner;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.SpinnerListModel;
 import javax.swing.JSlider;
 import java.awt.Cursor;
@@ -29,6 +33,8 @@ import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.JSeparator;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -72,9 +78,10 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	private int minStudents;
 	//TODO fix code to not allow more than maxStudents per session to force more solutions - 
 	// don't want 30+ students in a session
-	private int maxStudents = 20;
+	//TODO make max students a selector in window
+	private int maxStudents = 25;
 	private int maxSolutionsToPrint=20; 
-	private int increment;
+	private int increment=30;
 	private boolean formChanged=false;
 	private JFileChooser chooser = new JFileChooser();
 	private File dataFile;
@@ -113,16 +120,18 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		Time t=new Time(8, 0);
 		for (int i=1;i<21;i++){
 			possibleTimes.add(t);
-			t=t.nextTime(30);
+			t=t.nextTime(increment);
 		}
 		
 		frame = new JFrame();
-		frame.getContentPane().setBackground(new Color(176, 196, 222));
+		frame.getContentPane().setBackground(new Color(50, 196, 196));
+
+		//frame.getContentPane().setBackground(new Color(176, 196, 222));
 		frame.setBounds(25, 25, 1200, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
-		JLabel lblWhichDaysDo = new JLabel("Enter days and start times for student schedules:");
+		JLabel lblWhichDaysDo = new JLabel("Select times for template used for student schedules:");
 		lblWhichDaysDo.setVerticalAlignment(SwingConstants.TOP);
 		lblWhichDaysDo.setBounds(10, 211, 359, 26);
 		frame.getContentPane().add(lblWhichDaysDo);
@@ -259,461 +268,63 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		 gbl_panel_3.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		 panel_3.setLayout(gbl_panel_3);
 
-//		MONDAY
-		 
-		 chckbxMonday = new JCheckBox("Monday");
-		 chckbxMonday.setOpaque(false);
-		 GridBagConstraints gbc_chckbxMonday = new GridBagConstraints();
-		 gbc_chckbxMonday.anchor = GridBagConstraints.WEST;
-		 gbc_chckbxMonday.insets = new Insets(0, 0, 5, 5);
-		 gbc_chckbxMonday.gridx = 0;
-		 gbc_chckbxMonday.gridy = 0;
-		 panel_3.add(chckbxMonday, gbc_chckbxMonday);
-		 chckbxMonday.addItemListener(this);
-		 
-		 panelMonTimes = new JPanel();
-		 panelMonTimes.setOpaque(false);
-		  GridBagConstraints gbc_panelMonTimes = new GridBagConstraints();
-		  gbc_panelMonTimes.gridwidth = 2;
-		  gbc_panelMonTimes.insets = new Insets(0, 0, 5, 0);
-		  gbc_panelMonTimes.gridx = 0;
-		  gbc_panelMonTimes.gridy = 1;
-		  panel_3.add(panelMonTimes, gbc_panelMonTimes);
-		  GridBagLayout gbl_panelMonTimes = new GridBagLayout();
-		  gbl_panelMonTimes.columnWidths = new int[]{43, 90, 23, 0, 87, 0, 0};
-		  gbl_panelMonTimes.rowHeights = new int[]{0, 0, 0};
-		  gbl_panelMonTimes.columnWeights = new double[]{0.0, 64.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		  gbl_panelMonTimes.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		  panelMonTimes.setLayout(gbl_panelMonTimes);
-		  
-		  JLabel label = new JLabel("Start time");
-		  GridBagConstraints gbc_label = new GridBagConstraints();
-		  gbc_label.anchor = GridBagConstraints.EAST;
-		  gbc_label.insets = new Insets(0, 0, 5, 5);
-		  gbc_label.gridx = 0;
-		  gbc_label.gridy = 0;
-		  panelMonTimes.add(label, gbc_label);
-		  
-		  spnrMonStartHr = new JSpinner();
-		  spnrMonStartHr.setPreferredSize(new Dimension(75, 20));
-		  spnrMonStartHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrMonStartHr.setValue(possibleTimes.get(2));
-		  //spnrMonStartHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrMonStartHr = new GridBagConstraints();
-		  gbc_spnrMonStartHr.insets = new Insets(0, 0, 5, 5);
-		  gbc_spnrMonStartHr.gridx = 1;
-		  gbc_spnrMonStartHr.gridy = 0;
-		  panelMonTimes.add(spnrMonStartHr, gbc_spnrMonStartHr);
-		  spnrMonStartHr.addChangeListener(this);
-		  
-		  JLabel lblPrefStartTime = new JLabel("Pref Start Time");
-		  GridBagConstraints gbc_lblPrefStartTime = new GridBagConstraints();
-		  gbc_lblPrefStartTime.anchor = GridBagConstraints.EAST;
-		  gbc_lblPrefStartTime.gridwidth = 2;
-		  gbc_lblPrefStartTime.insets = new Insets(0, 0, 5, 5);
-		  gbc_lblPrefStartTime.gridx = 2;
-		  gbc_lblPrefStartTime.gridy = 0;
-		  panelMonTimes.add(lblPrefStartTime, gbc_lblPrefStartTime);
-		  
-		  spnrMonPrefStartHr = new JSpinner();
-		  spnrMonPrefStartHr.setPreferredSize(new Dimension(75, 20));
-		  spnrMonPrefStartHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrMonPrefStartHr.setValue(possibleTimes.get(2));
-		  //spnrMonPrefStartHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrMonPrefStartHr = new GridBagConstraints();
-		  gbc_spnrMonPrefStartHr.insets = new Insets(0, 0, 5, 5);
-		  gbc_spnrMonPrefStartHr.gridx = 4;
-		  gbc_spnrMonPrefStartHr.gridy = 0;
-		  panelMonTimes.add(spnrMonPrefStartHr, gbc_spnrMonPrefStartHr);
-		  spnrMonPrefStartHr.addChangeListener(this);
-		 	  
-		  JLabel lblPrefEndTime = new JLabel("Pref End Time");
-		  GridBagConstraints gbc_lblPrefEndTime = new GridBagConstraints();
-		  gbc_lblPrefEndTime.anchor = GridBagConstraints.EAST;
-		  gbc_lblPrefEndTime.insets = new Insets(0, 0, 0, 5);
-		  gbc_lblPrefEndTime.gridx = 3;
-		  gbc_lblPrefEndTime.gridy = 1;
-		  panelMonTimes.add(lblPrefEndTime, gbc_lblPrefEndTime);
-		  
-		  spnrMonPrefEndHr = new JSpinner();
-		  spnrMonPrefEndHr.setPreferredSize(new Dimension(75, 20));
-		  //spnrMonPrefEndHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  spnrMonPrefEndHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrMonPrefEndHr.setValue(possibleTimes.get(possibleTimes.size()-1));
-		  GridBagConstraints gbc_spnrMonPrefEndHr = new GridBagConstraints();
-		  gbc_spnrMonPrefEndHr.insets = new Insets(0, 0, 0, 5);
-		  gbc_spnrMonPrefEndHr.gridx = 4;
-		  gbc_spnrMonPrefEndHr.gridy = 1;
-		  panelMonTimes.add(spnrMonPrefEndHr, gbc_spnrMonPrefEndHr);
-		  //spnrMonPrefEndHr.setValue(5);
-		  spnrMonPrefEndHr.addChangeListener(this);
-	
-		  panelMonTimes.setVisible(false);
-//		  
-//		TUESDAY		
-		 
-		  chckbxTuesday = new JCheckBox("Tuesday");
-		  chckbxTuesday.setOpaque(false);
-		  GridBagConstraints gbc_chckbxTuesday = new GridBagConstraints();
-		  gbc_chckbxTuesday.anchor = GridBagConstraints.WEST;
-		  gbc_chckbxTuesday.insets = new Insets(0, 0, 5, 5);
-		  gbc_chckbxTuesday.gridx = 0;
-		  gbc_chckbxTuesday.gridy = 2;
-		  panel_3.add(chckbxTuesday, gbc_chckbxTuesday);
-		  chckbxTuesday.addItemListener(this);
-		  
-		  panelTuesdayTimes = new JPanel();
-		  panelTuesdayTimes.setOpaque(false);
-		  GridBagConstraints gbc_panelTuesdayTimes = new GridBagConstraints();
-		  gbc_panelTuesdayTimes.gridwidth = 2;
-		  gbc_panelTuesdayTimes.insets = new Insets(0, 0, 5, 0);
-		  gbc_panelTuesdayTimes.gridx = 0;
-		  gbc_panelTuesdayTimes.gridy = 3;
-		  panel_3.add(panelTuesdayTimes, gbc_panelTuesdayTimes);
-		  GridBagLayout gbl_panelTuesdayTimes = new GridBagLayout();
-		  gbl_panelTuesdayTimes.columnWidths = new int[]{28, 0, 0, 0, 23, 0, 0, 0, 0, 0};
-		  gbl_panelTuesdayTimes.rowHeights = new int[]{0, 0, 0};
-		  gbl_panelTuesdayTimes.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		  gbl_panelTuesdayTimes.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		  panelTuesdayTimes.setLayout(gbl_panelTuesdayTimes);
-		  
-		  JLabel lblTueStart = new JLabel("Start time");
-		  GridBagConstraints gbc_lblTueStart = new GridBagConstraints();
-		  gbc_lblTueStart.anchor = GridBagConstraints.EAST;
-		  gbc_lblTueStart.insets = new Insets(0, 0, 5, 5);
-		  gbc_lblTueStart.gridx = 0;
-		  gbc_lblTueStart.gridy = 0;
-		  panelTuesdayTimes.add(lblTueStart, gbc_lblTueStart);
-		  
-		  spnrTueStartHr = new JSpinner();
-		  spnrTueStartHr.setPreferredSize(new Dimension(75, 20));
-		  //spnrTueStartHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  spnrTueStartHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrTueStartHr.setValue(possibleTimes.get(2));
-		  GridBagConstraints gbc_spnrTueStartHr = new GridBagConstraints();
-		  gbc_spnrTueStartHr.insets = new Insets(0, 0, 5, 5);
-		  gbc_spnrTueStartHr.gridx = 1;
-		  gbc_spnrTueStartHr.gridy = 0;
-		  panelTuesdayTimes.add(spnrTueStartHr, gbc_spnrTueStartHr);
-		  spnrTueStartHr.addChangeListener(this);
-		  
-		  JLabel lblTuePrefStartTime = new JLabel("Pref Start Time");
-		  GridBagConstraints gbc_lblTuePrefStartTime = new GridBagConstraints();
-		  gbc_lblTuePrefStartTime.anchor = GridBagConstraints.EAST;
-		  gbc_lblTuePrefStartTime.gridwidth = 2;
-		  gbc_lblTuePrefStartTime.insets = new Insets(0, 0, 5, 5);
-		  gbc_lblTuePrefStartTime.gridx = 4;
-		  gbc_lblTuePrefStartTime.gridy = 0;
-		  panelTuesdayTimes.add(lblTuePrefStartTime, gbc_lblTuePrefStartTime);
-		  
-		  spnrTuePrefStartHr = new JSpinner();
-		  spnrTuePrefStartHr.setPreferredSize(new Dimension(75, 20));
-		  spnrTuePrefStartHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrTuePrefStartHr.setValue(possibleTimes.get(2));
-		  //spnrTuePrefStartHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrTuePrefStartHr = new GridBagConstraints();
-		  gbc_spnrTuePrefStartHr.insets = new Insets(0, 0, 5, 5);
-		  gbc_spnrTuePrefStartHr.gridx = 6;
-		  gbc_spnrTuePrefStartHr.gridy = 0;
-		  panelTuesdayTimes.add(spnrTuePrefStartHr, gbc_spnrTuePrefStartHr);
-		  spnrTuePrefStartHr.addChangeListener(this);
-		  
-		  JLabel lblTuePrefEndTime = new JLabel("Pref End Time");
-		  GridBagConstraints gbc_lblTuePrefEndTime = new GridBagConstraints();
-		  gbc_lblTuePrefEndTime.anchor = GridBagConstraints.EAST;
-		  gbc_lblTuePrefEndTime.insets = new Insets(0, 0, 0, 5);
-		  gbc_lblTuePrefEndTime.gridx = 5;
-		  gbc_lblTuePrefEndTime.gridy = 1;
-		  panelTuesdayTimes.add(lblTuePrefEndTime, gbc_lblTuePrefEndTime);
-		  
-		  spnrTuePrefEndHr = new JSpinner();
-		  spnrTuePrefEndHr.setPreferredSize(new Dimension(75, 20));
-		  spnrTuePrefEndHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrTuePrefEndHr.setValue(possibleTimes.get(possibleTimes.size()-1));
-		  //spnrTuePrefEndHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrTuePrefEndHr = new GridBagConstraints();
-		  gbc_spnrTuePrefEndHr.insets = new Insets(0, 0, 0, 5);
-		  gbc_spnrTuePrefEndHr.gridx = 6;
-		  gbc_spnrTuePrefEndHr.gridy = 1;
-		  panelTuesdayTimes.add(spnrTuePrefEndHr, gbc_spnrTuePrefEndHr);
-		  spnrTuePrefEndHr.addChangeListener(this);
-		  
-		  panelTuesdayTimes.setVisible(false);
+		 // table here for selecting times/days
+		 //table.getColumnModel().setColumnSelectionAllowed(true); 
+		 //table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); 
+		 String[] weekdays={"Monday","Tuesday","Wednesday","Thursday","Friday"};
+		 Integer[][] staffSchedule = new Integer[19][5];
+		 String[][] strTimes=new String[20][1];
+		 int k=0;
+		 for (Time slotTime:possibleTimes){
+			 strTimes[k][0]=slotTime.toString();
+			 k++;
+		 }
+		 for (int i=0;i<5;i++){
+			 for (int j=0;j<19;j++){
+				 staffSchedule[j][i] = 1;
+			 }
+		 }
+		 JTable tblWeek = new JTable(staffSchedule,weekdays);
+		 JTable tblTimes = new JTable(strTimes,new String[]{""});
+		 JScrollPane jscrlp = new JScrollPane(tblWeek);
+		 jscrlp.setBounds(64, 238, 418, 327);
+		 tblTimes.setBounds(7, 250, 57, 400);
+		 //tblWeek.setValueAt(0, 0, 0);
+		 tblWeek.getColumnModel().setColumnSelectionAllowed(true); 
+		 tblWeek.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); 
+		 tblWeek.setPreferredScrollableViewportSize(new Dimension(400,175));
+		 tblTimes.setBackground(new Color(50, 196, 196));
+		 tblTimes.setGridColor(new Color(50, 196, 196));
+		 tblTimes.setEnabled(false);
+		 frame.getContentPane().add(jscrlp);
+		 frame.add(tblTimes);
+		 ListSelectionModel lsmRow = tblWeek.getSelectionModel();
+		 JLabel jlab = new JLabel();
+		 jlab.setBounds(7, 500, 100, 30);
+		 jlab.setText("test");
+		 lsmRow.addListSelectionListener(new ListSelectionListener()
+		 {
+			 public void valueChanged(ListSelectionEvent le){
+				 //tblWeek.changeSelection(rowIndex, columnIndex, toggle, extend);
+				 int[] str = tblWeek.getSelectedRows();
+				 int selCol=tblWeek.getSelectedColumn();
+				 String theString="";
+				 for (int i=0; i<str.length;i++){
+					 theString += str[i]+" ";
+					 if (!lsmRow.getValueIsAdjusting()){
+					 //tblWeek.changeSelection(str[i], selCol, false, false);
+					 if (staffSchedule[(str[i])][selCol]==0) staffSchedule[(str[i])][selCol]=1;
+					 else if (staffSchedule[(str[i])][selCol]==1)staffSchedule[(str[i])][selCol]=0;}
+					 tblWeek.setSelectionBackground(Color.RED);
+				 }
 
-//		WEDNESDAY
-		  
-		  chckbxWednesday = new JCheckBox("Wednesday");
-		  chckbxWednesday.setOpaque(false);
-		  GridBagConstraints gbc_chckbxWednesday = new GridBagConstraints();
-		  gbc_chckbxWednesday.anchor = GridBagConstraints.WEST;
-		  gbc_chckbxWednesday.insets = new Insets(0, 0, 5, 5);
-		  gbc_chckbxWednesday.gridx = 0;
-		  gbc_chckbxWednesday.gridy = 4;
-		  panel_3.add(chckbxWednesday, gbc_chckbxWednesday);
-		  chckbxWednesday.addItemListener(this);
-		  
-		  panelWedTimes = new JPanel();
-		  panelWedTimes.setOpaque(false);
-		  GridBagConstraints gbc_panelWedTimes = new GridBagConstraints();
-		  gbc_panelWedTimes.gridwidth = 2;
-		  gbc_panelWedTimes.insets = new Insets(0, 0, 5, 0);
-		  gbc_panelWedTimes.gridx = 0;
-		  gbc_panelWedTimes.gridy = 5;
-		  panel_3.add(panelWedTimes, gbc_panelWedTimes);
-		  GridBagLayout gbl_panelWedTimes = new GridBagLayout();
-		  gbl_panelWedTimes.columnWidths = new int[]{28, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		  gbl_panelWedTimes.rowHeights = new int[]{0, 0, 0};
-		  gbl_panelWedTimes.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		  gbl_panelWedTimes.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		  panelWedTimes.setLayout(gbl_panelWedTimes);
-		  panelWedTimes.setVisible(false);
-		  
-		  JLabel label_1 = new JLabel("Start time");
-		  GridBagConstraints gbc_label_1 = new GridBagConstraints();
-		  gbc_label_1.anchor = GridBagConstraints.WEST;
-		  gbc_label_1.insets = new Insets(0, 0, 5, 5);
-		  gbc_label_1.gridx = 0;
-		  gbc_label_1.gridy = 0;
-		  panelWedTimes.add(label_1, gbc_label_1);
-		  
-		  spnrWedStartHr = new JSpinner();
-		  spnrWedStartHr.setPreferredSize(new Dimension(75, 20));
-		  spnrWedStartHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrWedStartHr.setValue(possibleTimes.get(2));
-		  //spnrWedStartHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrWedStartHr = new GridBagConstraints();
-		  gbc_spnrWedStartHr.insets = new Insets(0, 0, 5, 5);
-		  gbc_spnrWedStartHr.gridx = 1;
-		  gbc_spnrWedStartHr.gridy = 0;
-		  panelWedTimes.add(spnrWedStartHr, gbc_spnrWedStartHr);
-		  spnrWedStartHr.addChangeListener(this);
-		  
-		  JLabel label_2 = new JLabel("Pref Start Time");
-		  GridBagConstraints gbc_label_2 = new GridBagConstraints();
-		  gbc_label_2.anchor = GridBagConstraints.EAST;
-		  gbc_label_2.gridwidth = 2;
-		  gbc_label_2.insets = new Insets(0, 0, 5, 5);
-		  gbc_label_2.gridx = 4;
-		  gbc_label_2.gridy = 0;
-		  panelWedTimes.add(label_2, gbc_label_2);
-		  
-		  spnrWedPrefStartHr = new JSpinner();
-		  spnrWedPrefStartHr.setPreferredSize(new Dimension(75, 20));
-		  spnrWedPrefStartHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrWedPrefStartHr.setValue(possibleTimes.get(2));
-		  //spnrWedPrefStartHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrWedPrefStartHr = new GridBagConstraints();
-		  gbc_spnrWedPrefStartHr.insets = new Insets(0, 0, 5, 5);
-		  gbc_spnrWedPrefStartHr.gridx = 6;
-		  gbc_spnrWedPrefStartHr.gridy = 0;
-		  panelWedTimes.add(spnrWedPrefStartHr, gbc_spnrWedPrefStartHr);
-		  spnrWedPrefStartHr.addChangeListener(this);
-		  
-		  JLabel label_4 = new JLabel("Pref End Time");
-		  GridBagConstraints gbc_label_4 = new GridBagConstraints();
-		  gbc_label_4.anchor = GridBagConstraints.EAST;
-		  gbc_label_4.insets = new Insets(0, 0, 0, 5);
-		  gbc_label_4.gridx = 5;
-		  gbc_label_4.gridy = 1;
-		  panelWedTimes.add(label_4, gbc_label_4);
-		  
-		  spnrWedPrefEndHr = new JSpinner();
-		  spnrWedPrefEndHr.setPreferredSize(new Dimension(75, 20));
-		  spnrWedPrefEndHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrWedPrefEndHr.setValue(possibleTimes.get(possibleTimes.size()-1));
-		  //spnrWedPrefEndHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrWedPrefEndHr = new GridBagConstraints();
-		  gbc_spnrWedPrefEndHr.insets = new Insets(0, 0, 0, 5);
-		  gbc_spnrWedPrefEndHr.gridx = 6;
-		  gbc_spnrWedPrefEndHr.gridy = 1;
-		  panelWedTimes.add(spnrWedPrefEndHr, gbc_spnrWedPrefEndHr);
-		  spnrWedPrefEndHr.addChangeListener(this);
-		  
-//		THURSDAY 
-		  
-		  chckbxThursday = new JCheckBox("Thursday");
-		  chckbxThursday.setOpaque(false);
-		  GridBagConstraints gbc_chckbxThursday = new GridBagConstraints();
-		  gbc_chckbxThursday.anchor = GridBagConstraints.WEST;
-		  gbc_chckbxThursday.insets = new Insets(0, 0, 5, 5);
-		  gbc_chckbxThursday.gridx = 0;
-		  gbc_chckbxThursday.gridy = 6;
-		  panel_3.add(chckbxThursday, gbc_chckbxThursday);
-		  chckbxThursday.addItemListener(this);
-		  
-		  panelThursTimes = new JPanel();
-		  panelThursTimes.setOpaque(false);
-		  GridBagConstraints gbc_panelThursTimes = new GridBagConstraints();
-		  gbc_panelThursTimes.gridwidth = 2;
-		  gbc_panelThursTimes.insets = new Insets(0, 0, 5, 0);
-		  gbc_panelThursTimes.gridx = 0;
-		  gbc_panelThursTimes.gridy = 7;
-		  panel_3.add(panelThursTimes, gbc_panelThursTimes);
-		  GridBagLayout gbl_panelThursTimes = new GridBagLayout();
-		  gbl_panelThursTimes.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		  gbl_panelThursTimes.rowHeights = new int[]{0, 0, 0};
-		  gbl_panelThursTimes.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		  gbl_panelThursTimes.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		  panelThursTimes.setLayout(gbl_panelThursTimes);
-		  panelThursTimes.setVisible(false);
-		  
-		  JLabel label_3 = new JLabel("Start time");
-		  GridBagConstraints gbc_label_3 = new GridBagConstraints();
-		  gbc_label_3.anchor = GridBagConstraints.EAST;
-		  gbc_label_3.insets = new Insets(0, 0, 5, 5);
-		  gbc_label_3.gridx = 0;
-		  gbc_label_3.gridy = 0;
-		  panelThursTimes.add(label_3, gbc_label_3);
-		  
-		  spnrThursStartHr = new JSpinner();
-		  spnrThursStartHr.setPreferredSize(new Dimension(75, 20));
-		  spnrThursStartHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrThursStartHr.setValue(possibleTimes.get(2));
-		  //spnrThursStartHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrThursStartHr = new GridBagConstraints();
-		  gbc_spnrThursStartHr.insets = new Insets(0, 0, 5, 5);
-		  gbc_spnrThursStartHr.gridx = 1;
-		  gbc_spnrThursStartHr.gridy = 0;
-		  panelThursTimes.add(spnrThursStartHr, gbc_spnrThursStartHr);
-		  spnrThursStartHr.addChangeListener(this);
-		  
-		  JLabel label_5 = new JLabel("Pref Start Time");
-		  GridBagConstraints gbc_label_5 = new GridBagConstraints();
-		  gbc_label_5.anchor = GridBagConstraints.EAST;
-		  gbc_label_5.gridwidth = 2;
-		  gbc_label_5.insets = new Insets(0, 0, 5, 5);
-		  gbc_label_5.gridx = 4;
-		  gbc_label_5.gridy = 0;
-		  panelThursTimes.add(label_5, gbc_label_5);
-		  
-		  spnrThursPrefStartHr = new JSpinner();
-		  spnrThursPrefStartHr.setPreferredSize(new Dimension(75, 20));
-		  spnrThursPrefStartHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrThursPrefStartHr.setValue(possibleTimes.get(2));
-		  //spnrThursPrefStartHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrThursPrefStartHr = new GridBagConstraints();
-		  gbc_spnrThursPrefStartHr.insets = new Insets(0, 0, 5, 5);
-		  gbc_spnrThursPrefStartHr.gridx = 6;
-		  gbc_spnrThursPrefStartHr.gridy = 0;
-		  panelThursTimes.add(spnrThursPrefStartHr, gbc_spnrThursPrefStartHr);
-		  spnrThursPrefStartHr.addChangeListener(this);
-		  
-		  JLabel label_6 = new JLabel("Pref End Time");
-		  GridBagConstraints gbc_label_6 = new GridBagConstraints();
-		  gbc_label_6.anchor = GridBagConstraints.EAST;
-		  gbc_label_6.insets = new Insets(0, 0, 0, 5);
-		  gbc_label_6.gridx = 5;
-		  gbc_label_6.gridy = 1;
-		  panelThursTimes.add(label_6, gbc_label_6);
-		  
-		  spnrThursPrefEndHr = new JSpinner();
-		  spnrThursPrefEndHr.setPreferredSize(new Dimension(75, 20));
-		  spnrThursPrefEndHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrThursPrefEndHr.setValue(possibleTimes.get(possibleTimes.size()-1));
-		  //spnrThursPrefEndHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrThursPrefEndHr = new GridBagConstraints();
-		  gbc_spnrThursPrefEndHr.insets = new Insets(0, 0, 0, 5);
-		  gbc_spnrThursPrefEndHr.gridx = 6;
-		  gbc_spnrThursPrefEndHr.gridy = 1;
-		  panelThursTimes.add(spnrThursPrefEndHr, gbc_spnrThursPrefEndHr);
-		  spnrThursPrefEndHr.addChangeListener(this);
-		  
-//		FRIDAY
-		  
-		  chckbxFriday = new JCheckBox("Friday");
-		  chckbxFriday.setOpaque(false);
-		  GridBagConstraints gbc_chckbxFriday = new GridBagConstraints();
-		  gbc_chckbxFriday.anchor = GridBagConstraints.WEST;
-		  gbc_chckbxFriday.insets = new Insets(0, 0, 5, 5);
-		  gbc_chckbxFriday.gridx = 0;
-		  gbc_chckbxFriday.gridy = 8;
-		  panel_3.add(chckbxFriday, gbc_chckbxFriday);
-		  chckbxFriday.addItemListener(this);
-		  
-		  panelFriTimes = new JPanel();
-		  panelFriTimes.setOpaque(false);
-		  GridBagConstraints gbc_panelFriTimes = new GridBagConstraints();
-		  gbc_panelFriTimes.insets = new Insets(0, 0, 5, 0);
-		  gbc_panelFriTimes.gridwidth = 2;
-		  gbc_panelFriTimes.gridx = 0;
-		  gbc_panelFriTimes.gridy = 9;
-		  panel_3.add(panelFriTimes, gbc_panelFriTimes);
-		  GridBagLayout gbl_panelFriTimes = new GridBagLayout();
-		  gbl_panelFriTimes.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		  gbl_panelFriTimes.rowHeights = new int[]{0, 0, 0};
-		  gbl_panelFriTimes.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		  gbl_panelFriTimes.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		  panelFriTimes.setLayout(gbl_panelFriTimes);
-		  panelFriTimes.setVisible(false);
-		  
-		  JLabel label_10 = new JLabel("Start time");
-		  GridBagConstraints gbc_label_10 = new GridBagConstraints();
-		  gbc_label_10.anchor = GridBagConstraints.EAST;
-		  gbc_label_10.insets = new Insets(0, 0, 5, 5);
-		  gbc_label_10.gridx = 0;
-		  gbc_label_10.gridy = 0;
-		  panelFriTimes.add(label_10, gbc_label_10);
-		  
-		  spnrFriStartHr = new JSpinner();
-		  spnrFriStartHr.setPreferredSize(new Dimension(75, 20));
-		  spnrFriStartHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrFriStartHr.setValue(possibleTimes.get(2));
-		  //spnrFriStartHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrFriStartHr = new GridBagConstraints();
-		  gbc_spnrFriStartHr.insets = new Insets(0, 0, 5, 5);
-		  gbc_spnrFriStartHr.gridx = 1;
-		  gbc_spnrFriStartHr.gridy = 0;
-		  panelFriTimes.add(spnrFriStartHr, gbc_spnrFriStartHr);
-		  spnrFriStartHr.addChangeListener(this);
-		  
-		  JLabel label_11 = new JLabel("Pref Start Time");
-		  GridBagConstraints gbc_label_11 = new GridBagConstraints();
-		  gbc_label_11.anchor = GridBagConstraints.EAST;
-		  gbc_label_11.gridwidth = 2;
-		  gbc_label_11.insets = new Insets(0, 0, 5, 5);
-		  gbc_label_11.gridx = 4;
-		  gbc_label_11.gridy = 0;
-		  panelFriTimes.add(label_11, gbc_label_11);
-		  
-		  spnrFriPrefStartHr = new JSpinner();
-		  spnrFriPrefStartHr.setPreferredSize(new Dimension(75, 20));
-		  spnrFriPrefStartHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrFriPrefStartHr.setValue(possibleTimes.get(2));
-		  //spnrFriPrefStartHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrFriPrefStartHr = new GridBagConstraints();
-		  gbc_spnrFriPrefStartHr.insets = new Insets(0, 0, 5, 5);
-		  gbc_spnrFriPrefStartHr.gridx = 6;
-		  gbc_spnrFriPrefStartHr.gridy = 0;
-		  panelFriTimes.add(spnrFriPrefStartHr, gbc_spnrFriPrefStartHr);
-		  spnrFriPrefStartHr.addChangeListener(this);
-		  
-		  JLabel label_12 = new JLabel("Pref End Time");
-		  GridBagConstraints gbc_label_12 = new GridBagConstraints();
-		  gbc_label_12.anchor = GridBagConstraints.EAST;
-		  gbc_label_12.insets = new Insets(0, 0, 0, 5);
-		  gbc_label_12.gridx = 5;
-		  gbc_label_12.gridy = 1;
-		  panelFriTimes.add(label_12, gbc_label_12);
-		  
-		  spnrFriPrefEndHr = new JSpinner();
-		  spnrFriPrefEndHr.setPreferredSize(new Dimension(75, 20));
-		  spnrFriPrefEndHr.setModel(new SpinnerListModel(possibleTimes));
-		  spnrFriPrefEndHr.setValue(possibleTimes.get(possibleTimes.size()-1));
-		  //spnrFriPrefEndHr.setModel(new SpinnerNumberModel(9, 1, 12, 1));
-		  GridBagConstraints gbc_spnrFriPrefEndHr = new GridBagConstraints();
-		  gbc_spnrFriPrefEndHr.insets = new Insets(0, 0, 0, 5);
-		  gbc_spnrFriPrefEndHr.gridx = 6;
-		  gbc_spnrFriPrefEndHr.gridy = 1;
-		  panelFriTimes.add(spnrFriPrefEndHr, gbc_spnrFriPrefEndHr);
-		  spnrFriPrefEndHr.addChangeListener(this);
-		  
-		  JLabel lblSortingWeights = new JLabel("Sorting weights");
-		  lblSortingWeights.setBounds(529, 12, 138, 14);
-		  frame.getContentPane().add(lblSortingWeights);
-		  
-		  JLabel lblIntervalSessionLength = new JLabel("interval, session length, max sessions, min students...Parameters");
-		  lblIntervalSessionLength.setBounds(10, 12, 406, 14);
-		  frame.getContentPane().add(lblIntervalSessionLength);
+				 jlab.setText(theString);
+			 } 
+		 });
+		 frame.add(jlab);
+		 
+		 //add Done button
+
 
 //		   Parameter input section
 		  
@@ -728,29 +339,29 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  gbl_panelParameterInput.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		  panelParameterInput.setLayout(gbl_panelParameterInput);
 		  
-		  comboIncrement = new JComboBox<Integer>();
-		  comboIncrement.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent ie) {
-				increment=(int)comboIncrement.getSelectedItem();
-				formChanged=true;
-			}
-		});
-		  GridBagConstraints gbc_comboIncrement = new GridBagConstraints();
-		  gbc_comboIncrement.insets = new Insets(0, 0, 5, 5);
-		  gbc_comboIncrement.gridx = 0;
-		  gbc_comboIncrement.gridy = 0;
-		  panelParameterInput.add(comboIncrement, gbc_comboIncrement);
-		  comboIncrement.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {15, 30, 60}));
-		  comboIncrement.setSelectedIndex(1);
+//		  comboIncrement = new JComboBox<Integer>();
+//		  comboIncrement.addItemListener(new ItemListener() {
+//			public void itemStateChanged(ItemEvent ie) {
+//				increment=(int)comboIncrement.getSelectedItem();
+//				formChanged=true;
+//			}
+//		});
+//		  GridBagConstraints gbc_comboIncrement = new GridBagConstraints();
+//		  gbc_comboIncrement.insets = new Insets(0, 0, 5, 5);
+//		  gbc_comboIncrement.gridx = 0;
+//		  gbc_comboIncrement.gridy = 0;
+//		  panelParameterInput.add(comboIncrement, gbc_comboIncrement);
+//		  comboIncrement.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {15, 30, 60}));
+//		  comboIncrement.setSelectedIndex(1);
 		  
-		  JLabel lblScheduleInc = new JLabel("schedule increment (minutes)");
-		  GridBagConstraints gbc_lblScheduleInc = new GridBagConstraints();
-		  gbc_lblScheduleInc.anchor = GridBagConstraints.WEST;
-		  gbc_lblScheduleInc.insets = new Insets(0, 0, 5, 0);
-		  gbc_lblScheduleInc.gridx = 1;
-		  gbc_lblScheduleInc.gridy = 0;
-		  panelParameterInput.add(lblScheduleInc, gbc_lblScheduleInc);
-		  
+//		  JLabel lblScheduleInc = new JLabel("schedule increment (minutes)");
+//		  GridBagConstraints gbc_lblScheduleInc = new GridBagConstraints();
+//		  gbc_lblScheduleInc.anchor = GridBagConstraints.WEST;
+//		  gbc_lblScheduleInc.insets = new Insets(0, 0, 5, 0);
+//		  gbc_lblScheduleInc.gridx = 1;
+//		  gbc_lblScheduleInc.gridy = 0;
+//		  panelParameterInput.add(lblScheduleInc, gbc_lblScheduleInc);
+//		  
 		  comboBlockSize = new JComboBox<Integer>();
 		  comboBlockSize.addItemListener(new ItemListener() {
 		  	public void itemStateChanged(ItemEvent ie) {
@@ -831,15 +442,19 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  textSolutionOutput.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
+
+	
 	public void actionPerformed(ActionEvent ae){
 		if (ae.getActionCommand().equals("Run")){
-	//TODO not read in schedules every time run button is pushed? in initialize instead?		
 			//schedules=Scheduler.readSchedulesFromFile("bible_prep_schedule_spring_16.csv");
-			schedules=Scheduler.readSchedulesFromFile(dataFile);
+			//schedules=Scheduler.readSchedulesFromFile(dataFile);
+			schedules=readSchedulesFromFile(dataFile);
 
-			if (schedules==null)return;
+			if (schedules.size()==0){
+				System.out.println("schedules array is empty");
+				return;}
 			Schedule s=schedules.get(0);
-			schedSize=s.getSchedule().length;
+			//schedSize=s.getSchedule().length;
 			int i=0;
 			for (int slot:s.getSchedule()){if (slot==2)i++;}
 			int[] numSlotsPerDay=new int[i+1];
@@ -854,159 +469,159 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				}
 			}
 			numSlotsPerDay[i]=j;  //final entry in array
-//TODO create button on form to read in csv file then disable checkboxes when num days are checked
-			increment=(int)comboIncrement.getSelectedItem();
-			int numDaysChecked=0;
-			String dayString= "";
-			ArrayList<Day> days=new ArrayList<Day>();
-			preferredMask =new int[schedSize];
+			//increment=(int)comboIncrement.getSelectedItem();
+			//int numDaysChecked=0;
+			//String dayString= "";
+			//ArrayList<Day> days=new ArrayList<Day>();
+			//preferredMask =new int[schedSize];
 			int lastIndex=0;
-				if (chckbxMonday.isSelected()) {
-					if (numSlotsPerDay.length<=numDaysChecked){
-						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-
-						return;
-					}
-					//int hour = (int)spnrMonStartHr.getValue();
-					//if (spnrMonStartAM.getValue().equals("PM")) hour+=12;
-					//Time start=new Time(hour, (int)spnrMonStartMin.getValue());
-					Time start = (Time)spnrMonStartHr.getValue();
-					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
-					Day monday=new Day(increment, start, end, "Monday");
-					days.add(monday);
-					dayString+=monday.toString()+start+end;
-					Time prefStart=(Time)spnrMonPrefStartHr.getValue();
-					Time prefEnd=(Time)spnrMonPrefEndHr.getValue();
-					Time t=start;
-					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
-						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
-						else preferredMask[index]=0;
-						t=t.nextTime(increment);
-					}
-					lastIndex+=numSlotsPerDay[numDaysChecked];
-					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
-					lastIndex++;
-					numDaysChecked++;
-				}
-				if (chckbxTuesday.isSelected()) {
-					if (numSlotsPerDay.length<=numDaysChecked){
-						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-
-						return;
-					}
-					//int hour = (int)spnrTueStartHr.getValue();
-					//if (spnrTueStartAM.getValue().equals("PM")) hour+=12;
-					Time start=(Time)spnrTueStartHr.getValue(); 
-					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
-					Day tuesday=new Day(increment, start, end, "Tuesday");
-					days.add(tuesday);
-					dayString+=tuesday.toString()+start+end;
-					Time prefStart=(Time)spnrTuePrefStartHr.getValue();
-					Time prefEnd=(Time)spnrTuePrefEndHr.getValue();
-					Time t=start;
-					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
-						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
-						else preferredMask[index]=0;
-						t=t.nextTime(increment);
-					}
-					lastIndex+=numSlotsPerDay[numDaysChecked];
-					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
-					lastIndex++;
-					numDaysChecked++;
-				
-				}
-				if (chckbxWednesday.isSelected()){
-					if (numSlotsPerDay.length<=numDaysChecked){
-						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-
-						return;
-					}
-					//int hour = (int)spnrWedStartHr.getValue();
-					//if (spnrWedStartAM.getValue().equals("PM")) hour+=12;
-					Time start=(Time)spnrWedStartHr.getValue();
-					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
-					Day wednesday=new Day(increment, start, end, "Wednesday");
-					days.add(wednesday);
-					dayString+=wednesday.toString()+start+end;
-					Time prefStart=(Time)spnrWedPrefStartHr.getValue();
-					Time prefEnd=(Time)spnrWedPrefEndHr.getValue();
-					Time t=start;
-					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
-						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
-						else preferredMask[index]=0;
-						t=t.nextTime(increment);
-					}
-					lastIndex+=numSlotsPerDay[numDaysChecked];
-					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
-					lastIndex++;
-					numDaysChecked++;
-				}
-				if (chckbxThursday.isSelected()){
-					if (numSlotsPerDay.length<=numDaysChecked){
-						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-						return;
-					}
-					//int hour = (int)spnrThursStartHr.getValue();
-					//if (spnrThursStartAM.getValue().equals("PM")) hour+=12;
-					Time start=(Time)spnrThursStartHr.getValue();
-					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
-					Day thursday=new Day(increment, start, end, "Thursday");
-					days.add(thursday);
-					dayString+=thursday.toString()+start+end;
-					Time prefStart=(Time)spnrThursPrefStartHr.getValue();
-					Time prefEnd=(Time)spnrThursPrefEndHr.getValue();
-					Time t=start;
-					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
-						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
-						else preferredMask[index]=0;
-						t=t.nextTime(increment);
-					}
-					lastIndex+=numSlotsPerDay[numDaysChecked];
-					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
-					lastIndex++;
-					numDaysChecked++;
-				}
-				if (chckbxFriday.isSelected()){
-					if (numSlotsPerDay.length<=numDaysChecked){
-						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-
-						return;
-					}
-					//int hour = (int)spnrFriStartHr.getValue();
-					//if (spnrFriStartAM.getValue().equals("PM")) hour+=12;
-					Time start=(Time)spnrFriStartHr.getValue();
-					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
-					Day friday=new Day(increment, start, end, "Friday");
-					days.add(friday);
-					dayString+=friday.toString()+start+end;
-					Time prefStart=(Time)spnrFriPrefStartHr.getValue();
-					Time prefEnd=(Time)spnrFriPrefEndHr.getValue();
-					Time t=start;
-					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
-						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
-						else preferredMask[index]=0;
-						t=t.nextTime(increment);
-						
-					}
-					lastIndex+=numSlotsPerDay[numDaysChecked];
-					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
-					lastIndex++;
-					numDaysChecked++;
-				}
+//				if (chckbxMonday.isSelected()) {
+//					if (numSlotsPerDay.length<=numDaysChecked){
+//						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+//						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+//
+//						return;
+//					}
+//					//int hour = (int)spnrMonStartHr.getValue();
+//					//if (spnrMonStartAM.getValue().equals("PM")) hour+=12;
+//					//Time start=new Time(hour, (int)spnrMonStartMin.getValue());
+//					Time start = (Time)spnrMonStartHr.getValue();
+//					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
+//					Day monday=new Day(increment, start, end, "Monday");
+//					days.add(monday);
+//					dayString+=monday.toString()+start+end;
+//					Time prefStart=(Time)spnrMonPrefStartHr.getValue();
+//					Time prefEnd=(Time)spnrMonPrefEndHr.getValue();
+//					Time t=start;
+//					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
+//						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
+//						else preferredMask[index]=0;
+//						t=t.nextTime(increment);
+//					}
+//					lastIndex+=numSlotsPerDay[numDaysChecked];
+//					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
+//					lastIndex++;
+//					numDaysChecked++;
+//				}
+//				if (chckbxTuesday.isSelected()) {
+//					if (numSlotsPerDay.length<=numDaysChecked){
+//						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+//						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+//
+//						return;
+//					}
+//					//int hour = (int)spnrTueStartHr.getValue();
+//					//if (spnrTueStartAM.getValue().equals("PM")) hour+=12;
+//					Time start=(Time)spnrTueStartHr.getValue(); 
+//					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
+//					Day tuesday=new Day(increment, start, end, "Tuesday");
+//					days.add(tuesday);
+//					dayString+=tuesday.toString()+start+end;
+//					Time prefStart=(Time)spnrTuePrefStartHr.getValue();
+//					Time prefEnd=(Time)spnrTuePrefEndHr.getValue();
+//					Time t=start;
+//					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
+//						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
+//						else preferredMask[index]=0;
+//						t=t.nextTime(increment);
+//					}
+//					lastIndex+=numSlotsPerDay[numDaysChecked];
+//					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
+//					lastIndex++;
+//					numDaysChecked++;
+//				
+//				}
+//				if (chckbxWednesday.isSelected()){
+//					if (numSlotsPerDay.length<=numDaysChecked){
+//						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+//						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+//
+//						return;
+//					}
+//					//int hour = (int)spnrWedStartHr.getValue();
+//					//if (spnrWedStartAM.getValue().equals("PM")) hour+=12;
+//					Time start=(Time)spnrWedStartHr.getValue();
+//					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
+//					Day wednesday=new Day(increment, start, end, "Wednesday");
+//					days.add(wednesday);
+//					dayString+=wednesday.toString()+start+end;
+//					Time prefStart=(Time)spnrWedPrefStartHr.getValue();
+//					Time prefEnd=(Time)spnrWedPrefEndHr.getValue();
+//					Time t=start;
+//					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
+//						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
+//						else preferredMask[index]=0;
+//						t=t.nextTime(increment);
+//					}
+//					lastIndex+=numSlotsPerDay[numDaysChecked];
+//					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
+//					lastIndex++;
+//					numDaysChecked++;
+//				}
+//				if (chckbxThursday.isSelected()){
+//					if (numSlotsPerDay.length<=numDaysChecked){
+//						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+//						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+//						return;
+//					}
+//					//int hour = (int)spnrThursStartHr.getValue();
+//					//if (spnrThursStartAM.getValue().equals("PM")) hour+=12;
+//					Time start=(Time)spnrThursStartHr.getValue();
+//					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
+//					Day thursday=new Day(increment, start, end, "Thursday");
+//					days.add(thursday);
+//					dayString+=thursday.toString()+start+end;
+//					Time prefStart=(Time)spnrThursPrefStartHr.getValue();
+//					Time prefEnd=(Time)spnrThursPrefEndHr.getValue();
+//					Time t=start;
+//					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
+//						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
+//						else preferredMask[index]=0;
+//						t=t.nextTime(increment);
+//					}
+//					lastIndex+=numSlotsPerDay[numDaysChecked];
+//					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
+//					lastIndex++;
+//					numDaysChecked++;
+//				}
+//				if (chckbxFriday.isSelected()){
+//					if (numSlotsPerDay.length<=numDaysChecked){
+//						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
+//						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+//						return;
+//					}
+//					//int hour = (int)spnrFriStartHr.getValue();
+//					//if (spnrFriStartAM.getValue().equals("PM")) hour+=12;
+//					Time start=(Time)spnrFriStartHr.getValue();
+//					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
+//					Day friday=new Day(increment, start, end, "Friday");
+//					days.add(friday);
+//					dayString+=friday.toString()+start+end;
+//					Time prefStart=(Time)spnrFriPrefStartHr.getValue();
+//					Time prefEnd=(Time)spnrFriPrefEndHr.getValue();
+//					Time t=start;
+//					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
+//						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
+//						else preferredMask[index]=0;
+//						t=t.nextTime(increment);
+//						
+//					}
+//					lastIndex+=numSlotsPerDay[numDaysChecked];
+//					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
+//					lastIndex++;
+//					numDaysChecked++;
+//				}
 			
 			//if (numslots.length!=num)textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-			if (numSlotsPerDay.length!=numDaysChecked) {
-				JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-				return;
-				}
-			else textSolutionOutput.append("number of day checked: "+numDaysChecked+" "+sldrSessions.getValue()+"  "+increment
-					+"\n"+dayString+"\n"+schedules.get(0).getName());
-			times=Scheduler.createTimeArray(days,schedSize);
+//			if (numSlotsPerDay.length!=numDaysChecked) {
+//				JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
+//				return;
+//				}
+//			else textSolutionOutput.append("number of day checked: "+numDaysChecked+" "+sldrSessions.getValue()+"  "+increment
+//					+"\n"+dayString+"\n"+schedules.get(0).getName());
+			//times=createTimeArray(days);
+			//times=Scheduler.createTimeArray(days,schedSize);
+
 			Tree solutionTree=new Tree(null, new Session(-1));
 			ArrayList<Schedule> schedulesCopy=(ArrayList<Schedule>)schedules.clone();
 			Scheduler.sortSchedules(schedulesCopy,(int)comboBlockSize.getSelectedItem());
@@ -1016,7 +631,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			textSolutionOutput.append(printString);
 			int[] possibleMask=new int[preferredMask.length];
 			do {
-				Scheduler.createTree(schedulesCopy, solutionTree,possibleMask,minStudents,schedSize,blockSize);
+				Scheduler.createTree(schedulesCopy, solutionTree,possibleMask,minStudents,schedSize,blockSize,maxStudents);
 				if (!solutionTree.hasLeaves()) {
 					System.out.println("Impossible schedule, "+schedulesCopy.get(0).getName()+"removed");
 					schedulesCopy.remove(0);
@@ -1052,7 +667,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			sldrPrefTime.setValue(5);
 			sldrSessions.setValue(5);
 			comboBlockSize.setSelectedIndex(2);
-			comboIncrement.setSelectedIndex(1);
+			//comboIncrement.setSelectedIndex(1);
 			comboMaxSessions.setSelectedIndex(4);
 			comboMinStudents.setSelectedIndex(3);
 			textSolutionOutput.setText("number of day checked: 0");
@@ -1090,116 +705,12 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	}
 	
 	public void itemStateChanged(ItemEvent ie){
-		if (chckbxTuesday.isSelected())	panelTuesdayTimes.setVisible(true);
-		if (!chckbxTuesday.isSelected()) panelTuesdayTimes.setVisible(false);
-		if (chckbxMonday.isSelected())	panelMonTimes.setVisible(true);
-		if (!chckbxMonday.isSelected()) panelMonTimes.setVisible(false);
-		if (chckbxWednesday.isSelected())	panelWedTimes.setVisible(true);
-		if (!chckbxWednesday.isSelected()) panelWedTimes.setVisible(false);
-		if (chckbxThursday.isSelected())	panelThursTimes.setVisible(true);
-		if (!chckbxThursday.isSelected()) panelThursTimes.setVisible(false);
-		if (chckbxFriday.isSelected())	panelFriTimes.setVisible(true);
-		if (!chckbxFriday.isSelected()) panelFriTimes.setVisible(false);
 		
 	}
 	//Code for checkboxes for starting and ending times for each day
 	@Override
 	public void stateChanged(ChangeEvent ce) {
-		//*****MONDAY***************************************
-		if((ce.getSource()).equals(spnrMonStartHr)){
-			if (((Time)spnrMonStartHr.getValue()).compareTo((Time)spnrMonPrefStartHr.getValue())>0){
-				spnrMonPrefStartHr.setValue(spnrMonStartHr.getValue());
-			}
-		}
-		else if((ce.getSource()).equals(spnrMonPrefStartHr)){
-			if (((Time)spnrMonPrefStartHr.getValue()).compareTo((Time)spnrMonStartHr.getValue())<0){
-				spnrMonPrefStartHr.setValue(spnrMonStartHr.getValue());
-			}
-			else if (((Time)spnrMonPrefStartHr.getValue()).compareTo((Time)spnrMonPrefEndHr.getValue())>0){
-				spnrMonPrefStartHr.setValue(spnrMonPrefEndHr.getValue());
-			}
-		}
-		else if (ce.getSource().equals(spnrMonPrefEndHr)){
-			if (((Time)spnrMonPrefStartHr.getValue()).compareTo((Time)spnrMonPrefEndHr.getValue())>=0){
-				spnrMonPrefEndHr.setValue(spnrMonPrefStartHr.getValue());
-			}
-		}
-		//*****TUESDAY**************************************
-		else if((ce.getSource()).equals(spnrTueStartHr)){
-			if (((Time)spnrTueStartHr.getValue()).compareTo((Time)spnrTuePrefStartHr.getValue())>0){
-				spnrTuePrefStartHr.setValue(spnrTueStartHr.getValue());
-			}
-		}
-		else if((ce.getSource()).equals(spnrTuePrefStartHr)){
-			if (((Time)spnrTuePrefStartHr.getValue()).compareTo((Time)spnrTueStartHr.getValue())<0){
-				spnrTuePrefStartHr.setValue(spnrTueStartHr.getValue());
-			}
-			else if (((Time)spnrTuePrefStartHr.getValue()).compareTo((Time)spnrTuePrefEndHr.getValue())>0){
-				spnrTuePrefStartHr.setValue(spnrTuePrefEndHr.getValue());
-			}
-		}
-		else if (ce.getSource().equals(spnrTuePrefEndHr)){
-			if (((Time)spnrTuePrefStartHr.getValue()).compareTo((Time)spnrTuePrefEndHr.getValue())>=0){
-				spnrTuePrefEndHr.setValue(spnrTuePrefStartHr.getValue());
-			}
-		}
-		//*****WEDNESDAY***************************************
-		else if((ce.getSource()).equals(spnrWedStartHr)){
-			if (((Time)spnrWedStartHr.getValue()).compareTo((Time)spnrWedPrefStartHr.getValue())>0){
-				spnrWedPrefStartHr.setValue(spnrWedStartHr.getValue());
-			}
-		}
-		else if((ce.getSource()).equals(spnrWedPrefStartHr)){
-			if (((Time)spnrWedPrefStartHr.getValue()).compareTo((Time)spnrWedStartHr.getValue())<0){
-				spnrWedPrefStartHr.setValue(spnrWedStartHr.getValue());
-			}
-			else if (((Time)spnrWedPrefStartHr.getValue()).compareTo((Time)spnrWedPrefEndHr.getValue())>0){
-				spnrWedPrefStartHr.setValue(spnrWedPrefEndHr.getValue());
-			}
-		}
-		else if (ce.getSource().equals(spnrWedPrefEndHr)){
-			if (((Time)spnrWedPrefStartHr.getValue()).compareTo((Time)spnrWedPrefEndHr.getValue())>=0){
-				spnrWedPrefEndHr.setValue(spnrWedPrefStartHr.getValue());
-			}
-		}
-		//*****THURSDAY***************************************
-		else if((ce.getSource()).equals(spnrThursStartHr)){
-			if (((Time)spnrThursStartHr.getValue()).compareTo((Time)spnrThursPrefStartHr.getValue())>0){
-				spnrThursPrefStartHr.setValue(spnrThursStartHr.getValue());
-			}
-		}
-		else if((ce.getSource()).equals(spnrThursPrefStartHr)){
-			if (((Time)spnrThursPrefStartHr.getValue()).compareTo((Time)spnrThursStartHr.getValue())<0){
-				spnrThursPrefStartHr.setValue(spnrThursStartHr.getValue());
-			}
-			else if (((Time)spnrThursPrefStartHr.getValue()).compareTo((Time)spnrThursPrefEndHr.getValue())>0){
-				spnrThursPrefStartHr.setValue(spnrThursPrefEndHr.getValue());
-			}
-		}
-		else if (ce.getSource().equals(spnrThursPrefEndHr)){
-			if (((Time)spnrThursPrefStartHr.getValue()).compareTo((Time)spnrThursPrefEndHr.getValue())>=0){
-				spnrThursPrefEndHr.setValue(spnrThursPrefStartHr.getValue());
-			}
-		}
-		//*****FRIDAY***************************************
-		else if((ce.getSource()).equals(spnrFriStartHr)){
-			if (((Time)spnrFriStartHr.getValue()).compareTo((Time)spnrFriPrefStartHr.getValue())>0){
-				spnrFriPrefStartHr.setValue(spnrFriStartHr.getValue());
-			}
-		}
-		else if((ce.getSource()).equals(spnrFriPrefStartHr)){
-			if (((Time)spnrFriPrefStartHr.getValue()).compareTo((Time)spnrFriStartHr.getValue())<0){
-				spnrFriPrefStartHr.setValue(spnrFriStartHr.getValue());
-			}
-			else if (((Time)spnrFriPrefStartHr.getValue()).compareTo((Time)spnrFriPrefEndHr.getValue())>0){
-				spnrFriPrefStartHr.setValue(spnrFriPrefEndHr.getValue());
-			}
-		}
-		else if (ce.getSource().equals(spnrFriPrefEndHr)){
-			if (((Time)spnrFriPrefStartHr.getValue()).compareTo((Time)spnrFriPrefEndHr.getValue())>=0){
-				spnrFriPrefEndHr.setValue(spnrFriPrefStartHr.getValue());
-			}
-		}
+
 	}
 	
 	public void createSolutions(Tree t,ArrayList<Session> sessionList){
@@ -1237,7 +748,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				Collections.sort(sol.getSessions());
 				for (Session session:sol.getSessions()){
 					int index=session.time;
-	//				System.out.println("\t"+times[index]);
+					//System.out.println("\t"+times[index]);
 					textSolutionOutput.append("\t"+times[index]+"\n");;
 					
 					//print ratio of must attend to can attend
@@ -1254,4 +765,164 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			}
 		}
 	}
+	
+	/**
+	 * gets student schedules from a csv file chosen by user.
+	 * uses file to determine number of days, increment, preferredMask, & times array
+	 * @param csvFile file to read schedules from. Should have a header row and include name, email, days and times
+	 * @return returns student schedules in an ArrayList of Schedules
+	 */
+	public ArrayList<Schedule> readSchedulesFromFile (File csvFile){
+		//TODO make sure only read in and count columns with schedule data - stop when no more times in header
+		//TODO how to stop reading in data when names run out
+		//TODO make sure file is csv and in correct format
+		//System.out.println("in readSchedulesFromFile");
+		 ArrayList<Schedule> schedules=new ArrayList<Schedule>();
+		    boolean foundHeaders=false;
+		    int nameColumn=-1, emailColumn=-1;
+		    String[] headerRow = null;
+		    int[] dayIndices = new int[5];
+		 try{
+			 Scanner scanner = new Scanner(csvFile);
+			 while (scanner.hasNextLine()){
+				 //TODO learn how to check for empty data
+				String line = scanner.nextLine();
+				String dayName ="";
+				//if headers found & columns known, go ahead and read data in
+				if(foundHeaders && nameColumn!=-1 &&emailColumn!=-1 && dayIndices!=null){ 
+					//System.out.println("reading in schedules");
+				    String[] fields = line.split(",");
+					if (fields[nameColumn].isEmpty()) continue;
+				    int arraySize=headerRow.length;
+				    //schedSize=arraySize-dayIndices[0]+1; //size of line read in minus index where data starts
+				    int[] slots=new int[schedSize];
+				    int value;
+				    int slot=0;
+				    //System.out.println("schedule size "+schedSize);
+				    //System.out.println("fields length "+fields.length);
+				    //System.out.println("headers length "+headerRow.length);
+				    if (fields.length<headerRow.length||fields[dayIndices[0]+1].isEmpty()){
+				    	System.out.println("empty schedule for: "+fields[nameColumn]);
+				    }
+				    else{
+				    	for (int i=dayIndices[0];i<arraySize;i++){
+				    		//System.out.println("fields["+i+"]:"+fields[i]);
+					    	value=Integer.parseInt(fields[i]);
+					    	//Real code is commented out below
+					    	//if (value==0 || value==1 || value==2) slots[slot]=value;
+					    	if (value==0) slots[slot]=1;
+					    	else if (value==1) slots[slot]=0;
+					    	else if (value==2) slots[slot]=value;
+					    	slot++;
+					    	// this code is incorrect because file was setup incorrectly in spring 2016 switch 1 & 0
+					    	// if (fields[i].equals("0"))value=1;	
+					    	//else value=2;
+					    	//slots[i-2]=value;
+					    	}
+				        //scanner.useDelimiter(",");
+				        //create the schedule
+				        Schedule studentSchedule=new SimpleSchedule(fields[nameColumn], fields[emailColumn], schedSize);
+				        studentSchedule.setSchedule(slots);
+				        studentSchedule.determineRank(BibleStudySchedulerWindow.blockSize);
+				        //add schedule to list
+				        schedules.add(studentSchedule);
+				    }
+				}
+				else if (!foundHeaders){ 
+					if (line.contains("name")&&line.contains("email")) {
+						//System.out.println("reading in headers");
+						foundHeaders = true;
+						headerRow = line.split(",");
+						for (int x=0; x<headerRow.length;x++){
+							if (headerRow[x].equalsIgnoreCase("name")) nameColumn=x;
+							else if (headerRow[x].equalsIgnoreCase("email")) emailColumn=x;
+						}
+						int i =0;
+						int j=0;
+						//int k=0;
+						schedSize=0;
+						boolean dayFound=false;
+						//System.out.println("Creating time array:");
+						//preferredMask=new int[schedSize];
+						while (i<headerRow.length){
+							if (headerRow[i].contains("day")) {
+								dayFound=true;
+								//dayName=headerRow[i];
+								dayIndices[j]=i;
+								j++;
+								schedSize++;
+								//preferredMask[k]=2;
+								//times[k]="***********";
+								//k++;
+								//System.out.println(times[k]);
+							}
+							if (dayFound && headerRow[i].contains(":")){
+								
+								schedSize++;
+								//times[k]=dayName+" "+headerRow[i];
+								//preferredMask[k]=0;
+								//k++;
+								//System.out.println(times[k]);
+
+							}
+							i++;
+						}
+					}
+				}
+			 }
+			 if (foundHeaders) {
+				 int k=0;
+				 //schedSize=headerRow.length-dayIndices[0]+1;
+				 preferredMask = new int[schedSize];
+				 times = new String[schedSize];
+				 String day="";
+
+				 for (int i=dayIndices[0];i<headerRow.length;i++){
+					 times[k]=headerRow[i];
+					 if (headerRow[i].contains("day")){ preferredMask[k]=2; times[k]="********"; day=headerRow[i];}
+					 else {preferredMask[k]=0; times[k]=day+" "+headerRow[i];}
+					 //System.out.println(times[k]);
+
+					 k++;
+				 }
+				 Time startTime=new Time(headerRow[dayIndices[0]+1]);
+				 Time nextTime = new Time(headerRow[dayIndices[0]+2]);
+				 increment = startTime.timeDifference(nextTime);
+				 //System.out.println("increment: "+increment);
+			 }
+	         scanner.close();
+	         return schedules;
+		 }
+		 catch (FileNotFoundException e){
+			 System.out.println("File not found");
+		 }
+		 return null;
+	}
+	
+//	public String[] createTimeArray(ArrayList<Day> days){
+//		int index=0;
+//		String[] times=new String[schedSize];
+//		//TODO check that number of slots in student arrays is same as number of slots user said were in schedule
+//		for (Day d:days){
+//			int increment=d.getSlotIncrement();
+//			Time time=d.getStartTime();
+//			//System.out.println(time);
+//			String dayName=d.getName();
+//			int slotNum=d.getSlotNumber();
+//			for (int j=0;j<slotNum;j++){
+//				
+//				times[index]=dayName+" "+time.toString();
+//				System.out.println(times[index]);
+//
+//				time=time.nextTime(increment);
+//				index++;
+//			}
+//			if (index<schedSize){
+//				times[index]="********";
+//				System.out.println(times[index]);
+//				index++;
+//			}
+//		}
+//		return times;
+//	}
 }

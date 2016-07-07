@@ -126,14 +126,19 @@ public class Tree {
 	 * @param indent how far to indent next level of tree
 	 */
 	public static void printTree (Tree t, int indent) {
+		//System.out.println("in print tree...");
 	    StringBuilder ind = new StringBuilder();
 	    for (int i = 0; i < indent; i++)
 	        ind.append("       ");
+	    //if (t==null)System.out.println("tree is null");
+
 	    if (t==null)return;
+	    
 	    // print the Node;
 	    //
 	    System.out.print( ind);
 	    if (!(t.session==null)) {
+	    	//System.out.println("in printTree if statement");
 	    	t.session.print();
 	    	if (t.isEnd) System.out.println(" END");
 	    	if (t.isDead)System.out.println(" DEAD");

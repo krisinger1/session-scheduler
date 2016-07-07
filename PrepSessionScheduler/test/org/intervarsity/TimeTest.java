@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 public class TimeTest extends TestCase {
 	public void testTime() {
+		
 		Time t1=new Time(10,30);
 		assertEquals(10, t1.getHour());
 		assertEquals(30, t1.getMinute());
@@ -25,6 +26,12 @@ public class TimeTest extends TestCase {
 		assertEquals("1:00 am", t1.toString());
 		t1=new Time(1, 15,"p");
 		assertEquals("1:15 pm", t1.toString());
+		t1=new Time("12:45 pm");
+		assertEquals("12:45 pm", t1.toString());
+		t1=new Time("2:45 pm");
+		assertEquals("2:45 pm", t1.toString());
+		t1=new Time("12:00 am");
+		assertEquals("12:00 am", t1.toString());
 	}
 	
 	public void testGetHour(){

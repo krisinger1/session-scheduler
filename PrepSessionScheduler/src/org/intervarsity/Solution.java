@@ -112,7 +112,7 @@ public class Solution implements Comparable<Solution>{
 			if (can>maxCanBalance) maxCanBalance=can;
 
 		}
-		System.out.println(maxDifference+"");
+		//System.out.println(maxDifference+"");
 		if (maxNumSessions==0)rank=m1;
 		else rank= m1*getNumSessions()/maxNumSessions;
 		if (maxDifference==0) rank+=m2;

@@ -51,7 +51,7 @@ public class Session implements Comparable<Session>{
 	 * Prints to console names of all students who can attend this session	
 	 */
 	public void print(){
-		System.out.print(time+":");
+		System.out.print(time+" can attend:");
 		for (Schedule s:members)System.out.println("\t"+s.getName()+"\t"+s.getEmail());
 		System.out.println("");
 
@@ -61,7 +61,7 @@ public class Session implements Comparable<Session>{
 	 * Prints to console names of all students who must attend this session
 	 */
 	public void printMustAttend(){
-		System.out.print(time+":");
+		System.out.print(time+" must attend:");
 		for (Schedule s:membersMustAttend)System.out.println("\t"+s.getName());
 		System.out.println("");
 
