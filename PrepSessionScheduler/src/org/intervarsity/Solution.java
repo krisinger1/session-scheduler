@@ -203,6 +203,7 @@ public class Solution implements Comparable<Solution>{
 					sessionFound=session;
 					numFound++;
 				}
+				
 			}
 			//if only one session fits, also add to mustAttend list
 			if (numFound==1) sessionFound.addMustAttend(schedule);

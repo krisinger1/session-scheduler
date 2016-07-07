@@ -1,10 +1,7 @@
 package org.intervarsity;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Scanner;
 
 
 public class Scheduler {
@@ -12,7 +9,6 @@ public class Scheduler {
 	static ArrayList<Schedule> schedules ;
 	static ArrayList<Solution> solutions=new ArrayList<Solution>();
 	static Tree solutionTree;
-	//static int blockSize=3; //number of slots needed
 	static ArrayList<Day> days=new ArrayList<Day>();
 
 	/**
@@ -78,13 +74,6 @@ public class Scheduler {
 						for (int j=0;j<blockSize;j++){ //block out a blockSize section at "index" so no overlapping sessions
 							newMask[index+j]=1;
 						}
-						//for (int i=0;i<newMask.length;i++)System.out.print(newMask[i]);
-						//System.out.println();
-						//newMask[index]=1;
-						//newMask[index+1]=1;
-						//newMask[index+2]=1;
-
-						//for (int i=0;i<blockSize;i++){newMask[index+i]=1;}
 						session.members.addAll(tempList);
 						smallerList.removeAll(tempList);					
 						createTree(smallerList,solutionLeaf,newMask,minSessionSize,SCHED_SIZE,blockSize,maxStudents);
@@ -101,135 +90,4 @@ public class Scheduler {
 		}
 		return;
 	}
-	
-	/**
-	 * Read in schedules from a .csv file.
-	 * [0]Name,[1]email,[2+]0=empty 1=full 2=break for new day 
-	 * @param filename - name of the file to read from
-	 * @return schedules from file as an ArrayList<Schedule>
-	 */
-	/*public static ArrayList<Schedule> readSchedulesFromFile (String filename){
-		File csvFile=new File(filename);
-		 ArrayList<Schedule> schedules=new ArrayList<Schedule>();
-		 try{
-			 Scanner scanner = new Scanner(csvFile);
-			 while (scanner.hasNextLine()){
-				 //TODO learn how to check for empty data
-				String line = scanner.nextLine();
-			    String[] fields = line.split(",");
-			    int arraySize=fields.length;
-			    int schedSize=arraySize-2;
-			    int[] slots=new int[schedSize];
-			    int value;
-			    for (int i=2;i<arraySize;i++){
-			    	// this code is incorrect because file was setup incorrectly in spring 2016 switch 1 & 0
-			    	if (fields[i].equals("1")) value=0;
-			    	else if (fields[i].equals("0"))value=1;	
-			    	else value=2;
-			    	slots[i-2]=value;
-			    	}
-		        scanner.useDelimiter(",");
-		        //create the schedule
-		        Schedule studentSchedule=new SimpleSchedule(fields[0], fields[1], schedSize);
-		        studentSchedule.setSchedule(slots);
-		        studentSchedule.determineRank(BibleStudySchedulerWindow.blockSize);
-		        //add schedule to list
-		        schedules.add(studentSchedule);
-			 }
-	         scanner.close();
-	         return schedules;
-		 }
-		 catch (FileNotFoundException e){
-			 System.out.println("File not found");
-		 }
-		 return null;
-	}*/
-	
-//	public static ArrayList<Schedule> readSchedulesFromFile (File csvFile){
-//		//TODO make sure file is csv and in correct format
-//		 ArrayList<Schedule> schedules=new ArrayList<Schedule>();
-//		    boolean foundHeaders=false;
-//		    int nameColumn, emailColumn, headerRow;
-//		    int[] dayIndices =  null;
-//		 try{
-//			 Scanner scanner = new Scanner(csvFile);
-//			 while (scanner.hasNextLine()){
-//				 //TODO learn how to check for empty data
-//				String line = scanner.nextLine();
-//				if (!foundHeaders){
-//					if (line.contains("name")&&line.contains("email")) {
-//						foundHeaders = true;
-//						String[] fields = line.split(",");
-//						int i =0;
-//						int j=0;
-//						boolean dayFound=false;
-//						while (i<fields.length){
-//							if (fields[i].contains("day")) {
-//								dayFound=true;
-//								dayIndices[j]=i;
-//								j++;
-//							}
-//							i++;
-//						}
-//						
-//					}
-//				}
-//			    String[] fields = line.split(",");
-//			    int arraySize=fields.length;
-//			    int schedSize=arraySize-2;
-//			    int[] slots=new int[schedSize];
-//			    int value;
-//			    for (int i=2;i<arraySize;i++){
-//			    	// this code is incorrect because file was setup incorrectly in spring 2016 switch 1 & 0
-//			    	if (fields[i].equals("1")) value=0;
-//			    	else if (fields[i].equals("0"))value=1;	
-//			    	else value=2;
-//			    	slots[i-2]=value;
-//			    	}
-//		        scanner.useDelimiter(",");
-//		        //create the schedule
-//		        Schedule studentSchedule=new SimpleSchedule(fields[0], fields[1], schedSize);
-//		        studentSchedule.setSchedule(slots);
-//		        studentSchedule.determineRank(BibleStudySchedulerWindow.blockSize);
-//		        //add schedule to list
-//		        schedules.add(studentSchedule);
-//			 }
-//	         scanner.close();
-//	         return schedules;
-//		 }
-//		 catch (FileNotFoundException e){
-//			 System.out.println("File not found");
-//		 }
-//		 return null;
-//	}
-	
-	
-	
-//	public static String[] createTimeArray(ArrayList<Day> days, int schedSize){
-//		int index=0;
-//		String[] times=new String[schedSize];
-//		//TODO check that number of slots in student arrays is same as number of slots user said were in schedule
-//		for (Day d:days){
-//			int increment=d.getSlotIncrement();
-//			Time time=d.getStartTime();
-//			//System.out.println(time);
-//			String dayName=d.getName();
-//			int slotNum=d.getSlotNumber();
-//			for (int j=0;j<slotNum;j++){
-//				
-//				times[index]=dayName+" "+time.toString();
-//				System.out.println(times[index]);
-//
-//				time=time.nextTime(increment);
-//				index++;
-//			}
-//			if (index<schedSize){
-//				times[index]="********";
-//				System.out.println(times[index]);
-//				index++;
-//			}
-//		}
-//		return times;
-//	}
-	
 }
