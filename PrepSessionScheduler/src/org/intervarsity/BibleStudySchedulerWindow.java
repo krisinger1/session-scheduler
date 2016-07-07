@@ -65,13 +65,8 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	private JLabel lblcan;
 	private JLabel lblmust;
 	private JLabel lblResults;
-	private JPanel panel,panelTuesdayTimes,panelMonTimes,panelWedTimes,panelThursTimes,panelFriTimes;
-	private JComboBox<Integer> comboMinStudents, comboMaxSessions,comboIncrement,comboBlockSize;
-	private JSpinner spnrMonStartHr,spnrMonPrefStartHr,spnrMonPrefEndHr,
-			spnrTueStartHr,spnrTuePrefStartHr,spnrTuePrefEndHr,
-			spnrWedStartHr,spnrWedPrefStartHr,spnrWedPrefEndHr,
-			spnrThursStartHr,spnrThursPrefStartHr,spnrThursPrefEndHr,
-			spnrFriStartHr,spnrFriPrefStartHr,spnrFriPrefEndHr;
+	private JPanel panel;
+	private JComboBox<Integer> comboMinStudents, comboMaxSessions,comboMaxStudents,comboBlockSize;
 	private JScrollPane scrollPane;
 	public static int blockSize;
 	private int maxSessions;
@@ -80,7 +75,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	// don't want 30+ students in a session
 	//TODO make max students a selector in window
 	private int maxStudents = 25;
-	private int maxSolutionsToPrint=20; 
+	private int maxSolutionsToPrint=40; 
 	private int increment=30;
 	private boolean formChanged=false;
 	private JFileChooser chooser = new JFileChooser();
@@ -339,29 +334,29 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  gbl_panelParameterInput.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		  panelParameterInput.setLayout(gbl_panelParameterInput);
 		  
-//		  comboIncrement = new JComboBox<Integer>();
-//		  comboIncrement.addItemListener(new ItemListener() {
-//			public void itemStateChanged(ItemEvent ie) {
-//				increment=(int)comboIncrement.getSelectedItem();
-//				formChanged=true;
-//			}
-//		});
-//		  GridBagConstraints gbc_comboIncrement = new GridBagConstraints();
-//		  gbc_comboIncrement.insets = new Insets(0, 0, 5, 5);
-//		  gbc_comboIncrement.gridx = 0;
-//		  gbc_comboIncrement.gridy = 0;
-//		  panelParameterInput.add(comboIncrement, gbc_comboIncrement);
-//		  comboIncrement.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {15, 30, 60}));
-//		  comboIncrement.setSelectedIndex(1);
+		  comboMaxStudents = new JComboBox<Integer>();
+		  comboMaxStudents.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent ie) {
+				maxStudents=(int)comboMaxStudents.getSelectedItem();
+				formChanged=true;
+			}
+		});
+		  GridBagConstraints gbc_comboIncrement = new GridBagConstraints();
+		  gbc_comboIncrement.insets = new Insets(0, 0, 5, 5);
+		  gbc_comboIncrement.gridx = 0;
+		  gbc_comboIncrement.gridy = 0;
+		  panelParameterInput.add(comboMaxStudents, gbc_comboIncrement);
+		  comboMaxStudents.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {15,20,25,30,35}));
+		  comboMaxStudents.setSelectedIndex(3);
 		  
-//		  JLabel lblScheduleInc = new JLabel("schedule increment (minutes)");
-//		  GridBagConstraints gbc_lblScheduleInc = new GridBagConstraints();
-//		  gbc_lblScheduleInc.anchor = GridBagConstraints.WEST;
-//		  gbc_lblScheduleInc.insets = new Insets(0, 0, 5, 0);
-//		  gbc_lblScheduleInc.gridx = 1;
-//		  gbc_lblScheduleInc.gridy = 0;
-//		  panelParameterInput.add(lblScheduleInc, gbc_lblScheduleInc);
-//		  
+		  JLabel lblScheduleInc = new JLabel("max # students per session");
+		  GridBagConstraints gbc_lblScheduleInc = new GridBagConstraints();
+		  gbc_lblScheduleInc.anchor = GridBagConstraints.WEST;
+		  gbc_lblScheduleInc.insets = new Insets(0, 0, 5, 0);
+		  gbc_lblScheduleInc.gridx = 1;
+		  gbc_lblScheduleInc.gridy = 0;
+		  panelParameterInput.add(lblScheduleInc, gbc_lblScheduleInc);
+		  
 		  comboBlockSize = new JComboBox<Integer>();
 		  comboBlockSize.addItemListener(new ItemListener() {
 		  	public void itemStateChanged(ItemEvent ie) {
@@ -469,158 +464,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				}
 			}
 			numSlotsPerDay[i]=j;  //final entry in array
-			//increment=(int)comboIncrement.getSelectedItem();
-			//int numDaysChecked=0;
-			//String dayString= "";
-			//ArrayList<Day> days=new ArrayList<Day>();
-			//preferredMask =new int[schedSize];
-			int lastIndex=0;
-//				if (chckbxMonday.isSelected()) {
-//					if (numSlotsPerDay.length<=numDaysChecked){
-//						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-//						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-//
-//						return;
-//					}
-//					//int hour = (int)spnrMonStartHr.getValue();
-//					//if (spnrMonStartAM.getValue().equals("PM")) hour+=12;
-//					//Time start=new Time(hour, (int)spnrMonStartMin.getValue());
-//					Time start = (Time)spnrMonStartHr.getValue();
-//					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
-//					Day monday=new Day(increment, start, end, "Monday");
-//					days.add(monday);
-//					dayString+=monday.toString()+start+end;
-//					Time prefStart=(Time)spnrMonPrefStartHr.getValue();
-//					Time prefEnd=(Time)spnrMonPrefEndHr.getValue();
-//					Time t=start;
-//					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
-//						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
-//						else preferredMask[index]=0;
-//						t=t.nextTime(increment);
-//					}
-//					lastIndex+=numSlotsPerDay[numDaysChecked];
-//					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
-//					lastIndex++;
-//					numDaysChecked++;
-//				}
-//				if (chckbxTuesday.isSelected()) {
-//					if (numSlotsPerDay.length<=numDaysChecked){
-//						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-//						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-//
-//						return;
-//					}
-//					//int hour = (int)spnrTueStartHr.getValue();
-//					//if (spnrTueStartAM.getValue().equals("PM")) hour+=12;
-//					Time start=(Time)spnrTueStartHr.getValue(); 
-//					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
-//					Day tuesday=new Day(increment, start, end, "Tuesday");
-//					days.add(tuesday);
-//					dayString+=tuesday.toString()+start+end;
-//					Time prefStart=(Time)spnrTuePrefStartHr.getValue();
-//					Time prefEnd=(Time)spnrTuePrefEndHr.getValue();
-//					Time t=start;
-//					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
-//						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
-//						else preferredMask[index]=0;
-//						t=t.nextTime(increment);
-//					}
-//					lastIndex+=numSlotsPerDay[numDaysChecked];
-//					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
-//					lastIndex++;
-//					numDaysChecked++;
-//				
-//				}
-//				if (chckbxWednesday.isSelected()){
-//					if (numSlotsPerDay.length<=numDaysChecked){
-//						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-//						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-//
-//						return;
-//					}
-//					//int hour = (int)spnrWedStartHr.getValue();
-//					//if (spnrWedStartAM.getValue().equals("PM")) hour+=12;
-//					Time start=(Time)spnrWedStartHr.getValue();
-//					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
-//					Day wednesday=new Day(increment, start, end, "Wednesday");
-//					days.add(wednesday);
-//					dayString+=wednesday.toString()+start+end;
-//					Time prefStart=(Time)spnrWedPrefStartHr.getValue();
-//					Time prefEnd=(Time)spnrWedPrefEndHr.getValue();
-//					Time t=start;
-//					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
-//						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
-//						else preferredMask[index]=0;
-//						t=t.nextTime(increment);
-//					}
-//					lastIndex+=numSlotsPerDay[numDaysChecked];
-//					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
-//					lastIndex++;
-//					numDaysChecked++;
-//				}
-//				if (chckbxThursday.isSelected()){
-//					if (numSlotsPerDay.length<=numDaysChecked){
-//						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-//						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-//						return;
-//					}
-//					//int hour = (int)spnrThursStartHr.getValue();
-//					//if (spnrThursStartAM.getValue().equals("PM")) hour+=12;
-//					Time start=(Time)spnrThursStartHr.getValue();
-//					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
-//					Day thursday=new Day(increment, start, end, "Thursday");
-//					days.add(thursday);
-//					dayString+=thursday.toString()+start+end;
-//					Time prefStart=(Time)spnrThursPrefStartHr.getValue();
-//					Time prefEnd=(Time)spnrThursPrefEndHr.getValue();
-//					Time t=start;
-//					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
-//						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
-//						else preferredMask[index]=0;
-//						t=t.nextTime(increment);
-//					}
-//					lastIndex+=numSlotsPerDay[numDaysChecked];
-//					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
-//					lastIndex++;
-//					numDaysChecked++;
-//				}
-//				if (chckbxFriday.isSelected()){
-//					if (numSlotsPerDay.length<=numDaysChecked){
-//						//textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-//						JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-//						return;
-//					}
-//					//int hour = (int)spnrFriStartHr.getValue();
-//					//if (spnrFriStartAM.getValue().equals("PM")) hour+=12;
-//					Time start=(Time)spnrFriStartHr.getValue();
-//					Time end=start.nextTime(increment*numSlotsPerDay[numDaysChecked]);
-//					Day friday=new Day(increment, start, end, "Friday");
-//					days.add(friday);
-//					dayString+=friday.toString()+start+end;
-//					Time prefStart=(Time)spnrFriPrefStartHr.getValue();
-//					Time prefEnd=(Time)spnrFriPrefEndHr.getValue();
-//					Time t=start;
-//					for (int index=lastIndex;index<(numSlotsPerDay[numDaysChecked]+lastIndex);index++){
-//						if (t.compareTo(prefStart)<0||t.compareTo(prefEnd)>=0) preferredMask[index]=1;
-//						else preferredMask[index]=0;
-//						t=t.nextTime(increment);
-//						
-//					}
-//					lastIndex+=numSlotsPerDay[numDaysChecked];
-//					if (lastIndex<schedSize)preferredMask[lastIndex]=2;
-//					lastIndex++;
-//					numDaysChecked++;
-//				}
-			
-			//if (numslots.length!=num)textSolutionOutput.setText("Please choose "+numslots.length+"days.");
-//			if (numSlotsPerDay.length!=numDaysChecked) {
-//				JOptionPane.showMessageDialog(null, "Please choose "+numSlotsPerDay.length+" days.");
-//				return;
-//				}
-//			else textSolutionOutput.append("number of day checked: "+numDaysChecked+" "+sldrSessions.getValue()+"  "+increment
-//					+"\n"+dayString+"\n"+schedules.get(0).getName());
-			//times=createTimeArray(days);
-			//times=Scheduler.createTimeArray(days,schedSize);
 
 			Tree solutionTree=new Tree(null, new Session(-1));
 			ArrayList<Schedule> schedulesCopy=(ArrayList<Schedule>)schedules.clone();
@@ -667,7 +510,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			sldrPrefTime.setValue(5);
 			sldrSessions.setValue(5);
 			comboBlockSize.setSelectedIndex(2);
-			//comboIncrement.setSelectedIndex(1);
+			comboMaxStudents.setSelectedIndex(3);
 			comboMaxSessions.setSelectedIndex(4);
 			comboMinStudents.setSelectedIndex(3);
 			textSolutionOutput.setText("number of day checked: 0");
@@ -677,7 +520,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		
 		else if (ae.getActionCommand().equals("Choose file")){
 				
-			//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
 			boolean okFile=false;
 			int option = 0;
 			while (option != JFileChooser.CANCEL_OPTION && !okFile){
@@ -716,11 +558,16 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	public void createSolutions(Tree t,ArrayList<Session> sessionList){
 //TODO do not include solutions if not enough students or too many sessions
 		if (t.isEnd) {
+			boolean goodSolution=true;
 			Solution solution=new Solution();
 			//ArrayList<Session> sessionListClone = (ArrayList<Session>) sessionList.clone();
 			solution.setSessions(sessionList);
 			solution.findAllMembers(schedules, blockSize);
-			solutions.add(solution);
+			for (Session s :solution.getSessions()){ //check parameters to make sure solution satisfies
+				if (s.members.size()<minStudents)goodSolution=false;
+				else if (solution.getSessions().size()>maxSessions)goodSolution=false;
+			}
+			if (goodSolution) solutions.add(solution);
 			}
 		else for (Tree leaf:t.leaves){
 			int time=leaf.session.time;
@@ -738,7 +585,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	public void printSolutionsToOutputWindow(){
 		//limit number of solutions to print by maxSolutionsToPrint or all if smaller
 		for (int i=0;i<maxSolutionsToPrint && i<solutions.size();i++){
-			if (solutions.get(i).getNumSessions()<=maxSessions){
+			//if (solutions.get(i).getNumSessions()<=maxSessions){
 				textSolutionOutput.append("\n");
 				Solution sol=solutions.get(i);
 				textSolutionOutput.append("*******Solution "+i+"********\n");
@@ -762,7 +609,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					//session.printMustAttend();
 					//System.out.println();
 				}
-			}
+			//}
 		}
 	}
 	
@@ -847,23 +694,12 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 						while (i<headerRow.length){
 							if (headerRow[i].contains("day")) {
 								dayFound=true;
-								//dayName=headerRow[i];
 								dayIndices[j]=i;
 								j++;
 								schedSize++;
-								//preferredMask[k]=2;
-								//times[k]="***********";
-								//k++;
-								//System.out.println(times[k]);
 							}
 							if (dayFound && headerRow[i].contains(":")){
-								
 								schedSize++;
-								//times[k]=dayName+" "+headerRow[i];
-								//preferredMask[k]=0;
-								//k++;
-								//System.out.println(times[k]);
-
 							}
 							i++;
 						}
@@ -899,30 +735,5 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		 return null;
 	}
 	
-//	public String[] createTimeArray(ArrayList<Day> days){
-//		int index=0;
-//		String[] times=new String[schedSize];
-//		//TODO check that number of slots in student arrays is same as number of slots user said were in schedule
-//		for (Day d:days){
-//			int increment=d.getSlotIncrement();
-//			Time time=d.getStartTime();
-//			//System.out.println(time);
-//			String dayName=d.getName();
-//			int slotNum=d.getSlotNumber();
-//			for (int j=0;j<slotNum;j++){
-//				
-//				times[index]=dayName+" "+time.toString();
-//				System.out.println(times[index]);
-//
-//				time=time.nextTime(increment);
-//				index++;
-//			}
-//			if (index<schedSize){
-//				times[index]="********";
-//				System.out.println(times[index]);
-//				index++;
-//			}
-//		}
-//		return times;
-//	}
+
 }
