@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
+
+import javax.swing.JOptionPane;
 /**
  * A Tree of possible session options
  * @author Kristin
@@ -192,10 +194,10 @@ public class Tree {
 			printTreeToFile(t, indent, writer);
 			writer.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, "File not found. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, "Unsupported encoding exception. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	}

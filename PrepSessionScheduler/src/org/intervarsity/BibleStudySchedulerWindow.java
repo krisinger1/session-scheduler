@@ -71,9 +71,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	public static int blockSize;
 	private int maxSessions;
 	private int minStudents;
-	//TODO fix code to not allow more than maxStudents per session to force more solutions - 
-	// don't want 30+ students in a session
-	//TODO make max students a selector in window
 	private int maxStudents = 25;
 	private int maxSolutionsToPrint=40; 
 	private int increment=30;
@@ -527,7 +524,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				if(option == JFileChooser.APPROVE_OPTION){
 					//String folder = (String)chooser.getSelectedFile( ).getAbsolutePath();
 					dataFile = chooser.getSelectedFile();
-					if (dataFile.getName().endsWith(".csv")){
+					if (dataFile.getName().endsWith(".csv")){  //make sure user chooses a .csv file
 						btnRun.setEnabled(true);
 						frame.getContentPane().add(lblFileChosen);
 						lblFileChosen.setBounds(575, 425, 275, 23);
@@ -556,7 +553,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	}
 	
 	public void createSolutions(Tree t,ArrayList<Session> sessionList){
-//TODO do not include solutions if not enough students or too many sessions
 		if (t.isEnd) {
 			boolean goodSolution=true;
 			Solution solution=new Solution();
@@ -621,9 +617,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	 */
 	public ArrayList<Schedule> readSchedulesFromFile (File csvFile){
 		//TODO make sure only read in and count columns with schedule data - stop when no more times in header
-		//TODO how to stop reading in data when names run out
-		//TODO make sure file is csv and in correct format
-		//System.out.println("in readSchedulesFromFile");
 		 ArrayList<Schedule> schedules=new ArrayList<Schedule>();
 		    boolean foundHeaders=false;
 		    int nameColumn=-1, emailColumn=-1;
@@ -639,7 +632,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				if(foundHeaders && nameColumn!=-1 &&emailColumn!=-1 && dayIndices!=null){ 
 					//System.out.println("reading in schedules");
 				    String[] fields = line.split(",");
-					if (fields[nameColumn].isEmpty()) continue;
+					if (fields[nameColumn].isEmpty()) continue; //if no name then skip this row
 				    int arraySize=headerRow.length;
 				    //schedSize=arraySize-dayIndices[0]+1; //size of line read in minus index where data starts
 				    int[] slots=new int[schedSize];

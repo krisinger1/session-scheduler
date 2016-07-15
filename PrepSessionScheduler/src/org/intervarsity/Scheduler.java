@@ -62,7 +62,7 @@ public class Scheduler {
 							tempList.add(s);
 						}
 					}
-					//TODO check for minimum session size elsewhere based on "can" come from whole arraylist of schedules
+					
 					//if (tempList.size()>=minSessionSize){ //if enough people can come
 						foundOne=true;
 						Session session =new Session(index);
