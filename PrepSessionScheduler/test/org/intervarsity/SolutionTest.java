@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 public class SolutionTest extends TestCase {
-	
+
 	Session s1,s2,s3,s4,s5;
-	ArrayList<Session> sessions=new ArrayList<Session>(); 
+	ArrayList<Session> sessions=new ArrayList<Session>();
 	int[] sched1,sched2,sched3;
 	ArrayList<Schedule> schedules=new ArrayList<Schedule>();
-	
+
 	private void setup(){
 		s1=new Session(3,true);
 		s2=new Session(2,false);
@@ -36,7 +36,7 @@ public class SolutionTest extends TestCase {
 
 
 }
-	
+
 	public void testSolution() {
 		Solution sol1=new Solution();
 		assertFalse(sol1.getSessions()==null);
@@ -80,6 +80,44 @@ public class SolutionTest extends TestCase {
 		assertEquals(0,s3.members.size());
 		assertEquals(2,s4.members.size());
 		assertEquals(2,s5.members.size());
+
+	}
+
+	public void testIsSimilar(){
+		setup();
+		int mask[] ={0,0,0,0,0,0,0,0,0,0};
+		ArrayList<Session> sessions1=new ArrayList<Session>();
+		Solution sol1 = new Solution();
+		sessions1.add(s2);
+		sessions1.add(s1);
+		sessions1.add(s5);
+		sol1.setSessions(sessions1);
+
+		ArrayList<Session> sessions2=new ArrayList<Session>();
+		Solution sol2 = new Solution();
+		sessions2.add(s2);
+		sessions2.add(s1);
+		sessions2.add(s4);
+		sol2.setSessions(sessions2);
+
+		ArrayList<Session> sessions3=new ArrayList<Session>();
+		Solution sol3 = new Solution();
+		sessions3.add(s2);
+		sessions3.add(s4);
+		sessions3.add(s3);
+		sol3.setSessions(sessions3);
+
+		ArrayList<Session> sessions4=new ArrayList<Session>();
+		Solution sol4 = new Solution();
+		sessions4.add(s2);
+		sessions4.add(s4);
+		sessions4.add(s3);
+		sessions4.add(s1);
+		sol4.setSessions(sessions4);
+
+		assertTrue(sol1.isSimilar(sol2));  // similar
+		assertFalse(sol1.isSimilar(sol3)); // too far apart
+		assertFalse(sol1.isSimilar(sol4)); //different # sessions
 
 	}
 
