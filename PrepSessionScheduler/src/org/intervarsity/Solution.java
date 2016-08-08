@@ -13,14 +13,16 @@ import java.util.ArrayList;
 public class Solution implements Comparable<Solution>{
 	private ArrayList<Session> sessions;
 	private double rank;
+	private ArrayList<Solution> similarSolutions;
 
 	/**
 	 * constructor
-	 * initially an empty list of sessions with rank -1
+	 * initially an empty list of sessions with rank -1and no similar solutions
 	 */
 	public Solution(){
 		sessions=new ArrayList<Session>();
 		rank=-1;
+		similarSolutions=new ArrayList<Solution>();
 	}
 
 	/**
@@ -29,6 +31,22 @@ public class Solution implements Comparable<Solution>{
 	 */
 	public void setSessions(ArrayList<Session> sessions){
 		this.sessions=sessions;
+	}
+
+	public void addSimilarSolution(Solution similar){
+		similarSolutions.add(similar);
+	}
+
+	public ArrayList<Solution> getSimilarSolutions(){
+		return similarSolutions;
+	}
+
+	public String similarSolutionsToString(){
+		String text="";
+		for (Solution sol:similarSolutions){
+			text+="\n\t"+sol.toString();
+		}
+		return text;
 	}
 
 	/**
@@ -221,6 +239,14 @@ public class Solution implements Comparable<Solution>{
 		System.out.println();
 	}
 
+	public String toString(){
+		String text="";
+		for (Session s:sessions){
+			text +="\t"+s.time;
+		}
+		return text;
+	}
+
 	/**
 	 * compare 2 solutions by rank
 	 */
@@ -228,6 +254,17 @@ public class Solution implements Comparable<Solution>{
 		if (rank<s.getRank()) return -1;
 		else if (rank>s.getRank()) return 1;
 		else return 0;
+	}
+	
+	public boolean isSame(Solution sol){
+		if (this.getNumSessions()!=sol.getNumSessions()) return false;
+		for (Session s:this.sessions){
+			int i= this.sessions.indexOf(s);
+			int thisTime =s.time;
+			int otherTime = sol.getSessions().get(i).time;
+			if (thisTime!=otherTime) return false;
+		}
+		return true;
 	}
 
 	/**

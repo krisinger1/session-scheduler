@@ -72,13 +72,14 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	private int maxSessions;
 	private int minStudents;
 	private int maxStudents = 25;
-	private int maxSolutionsToPrint=40; 
+	private int maxSolutionsToPrint=40;
 	private int increment=30;
 	private boolean formChanged=false;
 	private JFileChooser chooser = new JFileChooser();
 	private File dataFile;
 	private JButton btnRun = new JButton("Run");
 	private JLabel lblFileChosen = new JLabel();
+	private Color bgColor = new Color(0,206,216);
 
 
 
@@ -114,56 +115,55 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			possibleTimes.add(t);
 			t=t.nextTime(increment);
 		}
-		
-		frame = new JFrame();
-		frame.getContentPane().setBackground(new Color(50, 196, 196));
 
-		//frame.getContentPane().setBackground(new Color(176, 196, 222));
+		frame = new JFrame();
+		frame.getContentPane().setBackground(bgColor);
+
 		frame.setBounds(25, 25, 1200, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
-		
-		JLabel lblWhichDaysDo = new JLabel("Select times for template used for student schedules:");
-		lblWhichDaysDo.setVerticalAlignment(SwingConstants.TOP);
-		lblWhichDaysDo.setBounds(10, 211, 359, 26);
-		frame.getContentPane().add(lblWhichDaysDo);
-		
+
+//		JLabel lblWhichDaysDo = new JLabel("Select times for template used for student schedules:");
+//		lblWhichDaysDo.setVerticalAlignment(SwingConstants.TOP);
+//		lblWhichDaysDo.setBounds(10, 211, 359, 26);
+//		frame.getContentPane().add(lblWhichDaysDo);
+//
 		btnRun.setBounds(723, 331, 133, 23);
 		btnRun.addActionListener(this);
 		frame.getContentPane().add(btnRun);
 		btnRun.setEnabled(false);
-		
+
 		JButton btnResetForm = new JButton("Reset Form");
 		btnResetForm.setBounds(723, 365, 133, 23);
 		frame.getContentPane().add(btnResetForm);
 		btnResetForm.addActionListener(this);
-		
+
 		JButton btnChooseFile= new JButton("Choose file");
 		btnChooseFile.setBounds(723, 399, 133, 23);
 		frame.getContentPane().add(btnChooseFile);
 		btnChooseFile.addActionListener(this);
-		
+
 		lblResults = new JLabel("Results:");
 		lblResults.setBounds(894, 12, 94, 14);
 		frame.getContentPane().add(lblResults);
-		
+
 		panel = new JPanel();
 		panel.setOpaque(false);
 		panel.setBounds(529, 54, 327, 244);
 		frame.getContentPane().add(panel);
 		panel.setLayout(null);
-		
+
 		JLabel lblNumSessions = new JLabel("#Sessions");
 		lblNumSessions.setBounds(10, 7, 73, 14);
 		panel.add(lblNumSessions);
-		
+
 		sldrSessions = new JSlider();
 		sldrSessions.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				fewestSessionsWeight=(double)sldrSessions.getValue();
 			}
 		});
-		
+
 		sldrSessions.setOpaque(false);
 		sldrSessions.setBounds(10, 32, 43, 200);
 		panel.add(sldrSessions);
@@ -174,14 +174,14 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		sldrSessions.setPaintTicks(true);
 		sldrSessions.setMaximum(10);
 		sldrSessions.setPaintLabels(true);
-		
+
 		lblPreferred = new JLabel("Preferred");
 		lblPreferred.setBounds(93, 7, 80, 14);
 		panel.add(lblPreferred);
-		
+
 		sldrPrefTime = new JSlider();
 		sldrPrefTime.addChangeListener(new ChangeListener() {
-			
+
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				preferredTimesWeight=(double)sldrPrefTime.getValue();
@@ -197,14 +197,14 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		sldrPrefTime.setOrientation(SwingConstants.VERTICAL);
 		sldrPrefTime.setMaximum(10);
 		sldrPrefTime.setMajorTickSpacing(1);
-		
+
 		lblcan = new JLabel("#Can");
 		lblcan.setBounds(183, 7, 64, 14);
 		panel.add(lblcan);
-		
+
 		sldrCan = new JSlider();
 		sldrCan.addChangeListener(new ChangeListener() {
-			
+
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				canComeWeight=(double)sldrCan.getValue();
@@ -220,14 +220,14 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		sldrCan.setOrientation(SwingConstants.VERTICAL);
 		sldrCan.setMaximum(10);
 		sldrCan.setMajorTickSpacing(1);
-		
+
 		lblmust = new JLabel("#Must");
 		lblmust.setBounds(273, 7, 44, 14);
 		panel.add(lblmust);
-		
+
 		sldrMust = new JSlider();
 		sldrMust.addChangeListener(new ChangeListener() {
-			
+
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				mustComeWeight=(double)sldrMust.getValue();
@@ -243,83 +243,83 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		sldrMust.setOrientation(SwingConstants.VERTICAL);
 		sldrMust.setMaximum(10);
 		sldrMust.setMajorTickSpacing(1);
-		
+
 		JSeparator separator = new JSeparator();
 		separator.setOrientation(SwingConstants.VERTICAL);
 		separator.setBounds(521, 37, 11, 613);
 		frame.getContentPane().add(separator);
-		 
-		 JPanel panel_3 = new JPanel();
-		 panel_3.setOpaque(false);
-		 panel_3.setBounds(7, 238, 418, 412);
-		 frame.getContentPane().add(panel_3);
-		 GridBagLayout gbl_panel_3 = new GridBagLayout();
-		 gbl_panel_3.columnWidths = new int[]{383, 0, 0};
-		 gbl_panel_3.rowHeights = new int[]{0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0};
-		 gbl_panel_3.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
-		 gbl_panel_3.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		 panel_3.setLayout(gbl_panel_3);
+
+//		 JPanel panel_3 = new JPanel();
+//		 panel_3.setOpaque(false);
+//		 panel_3.setBounds(7, 238, 418, 412);
+//		 frame.getContentPane().add(panel_3);
+//		 GridBagLayout gbl_panel_3 = new GridBagLayout();
+//		 gbl_panel_3.columnWidths = new int[]{383, 0, 0};
+//		 gbl_panel_3.rowHeights = new int[]{0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0};
+//		 gbl_panel_3.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+//		 gbl_panel_3.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+//		 panel_3.setLayout(gbl_panel_3);
 
 		 // table here for selecting times/days
-		 //table.getColumnModel().setColumnSelectionAllowed(true); 
-		 //table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); 
-		 String[] weekdays={"Monday","Tuesday","Wednesday","Thursday","Friday"};
-		 Integer[][] staffSchedule = new Integer[19][5];
-		 String[][] strTimes=new String[20][1];
-		 int k=0;
-		 for (Time slotTime:possibleTimes){
-			 strTimes[k][0]=slotTime.toString();
-			 k++;
-		 }
-		 for (int i=0;i<5;i++){
-			 for (int j=0;j<19;j++){
-				 staffSchedule[j][i] = 1;
-			 }
-		 }
-		 JTable tblWeek = new JTable(staffSchedule,weekdays);
-		 JTable tblTimes = new JTable(strTimes,new String[]{""});
-		 JScrollPane jscrlp = new JScrollPane(tblWeek);
-		 jscrlp.setBounds(64, 238, 418, 327);
-		 tblTimes.setBounds(7, 250, 57, 400);
-		 //tblWeek.setValueAt(0, 0, 0);
-		 tblWeek.getColumnModel().setColumnSelectionAllowed(true); 
-		 tblWeek.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); 
-		 tblWeek.setPreferredScrollableViewportSize(new Dimension(400,175));
-		 tblTimes.setBackground(new Color(50, 196, 196));
-		 tblTimes.setGridColor(new Color(50, 196, 196));
-		 tblTimes.setEnabled(false);
-		 frame.getContentPane().add(jscrlp);
-		 frame.add(tblTimes);
-		 ListSelectionModel lsmRow = tblWeek.getSelectionModel();
-		 JLabel jlab = new JLabel();
-		 jlab.setBounds(7, 500, 100, 30);
-		 jlab.setText("test");
-		 lsmRow.addListSelectionListener(new ListSelectionListener()
-		 {
-			 public void valueChanged(ListSelectionEvent le){
-				 //tblWeek.changeSelection(rowIndex, columnIndex, toggle, extend);
-				 int[] str = tblWeek.getSelectedRows();
-				 int selCol=tblWeek.getSelectedColumn();
-				 String theString="";
-				 for (int i=0; i<str.length;i++){
-					 theString += str[i]+" ";
-					 if (!lsmRow.getValueIsAdjusting()){
-					 //tblWeek.changeSelection(str[i], selCol, false, false);
-					 if (staffSchedule[(str[i])][selCol]==0) staffSchedule[(str[i])][selCol]=1;
-					 else if (staffSchedule[(str[i])][selCol]==1)staffSchedule[(str[i])][selCol]=0;}
-					 tblWeek.setSelectionBackground(Color.RED);
-				 }
+		 //table.getColumnModel().setColumnSelectionAllowed(true);
+		 //table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+//		 String[] weekdays={"Monday","Tuesday","Wednesday","Thursday","Friday"};
+//		 Integer[][] staffSchedule = new Integer[19][5];
+//		 String[][] strTimes=new String[20][1];
+//		 int k=0;
+//		 for (Time slotTime:possibleTimes){
+//			 strTimes[k][0]=slotTime.toString();
+//			 k++;
+//		 }
+//		 for (int i=0;i<5;i++){
+//			 for (int j=0;j<19;j++){
+//				 staffSchedule[j][i] = 1;
+//			 }
+//		 }
+//		 JTable tblWeek = new JTable(staffSchedule,weekdays);
+//		 JTable tblTimes = new JTable(strTimes,new String[]{""});
+//		 JScrollPane jscrlp = new JScrollPane(tblWeek);
+//		 jscrlp.setBounds(64, 238, 418, 327);
+//		 tblTimes.setBounds(7, 250, 57, 400);
+//		 //tblWeek.setValueAt(0, 0, 0);
+//		 tblWeek.getColumnModel().setColumnSelectionAllowed(true);
+//		 tblWeek.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+//		 tblWeek.setPreferredScrollableViewportSize(new Dimension(400,175));
+//		 tblTimes.setBackground(bgColor);
+//		 tblTimes.setGridColor(bgColor);
+//		 tblTimes.setEnabled(false);
+//		 frame.getContentPane().add(jscrlp);
+//		 frame.add(tblTimes);
+//		 ListSelectionModel lsmRow = tblWeek.getSelectionModel();
+//		 JLabel jlab = new JLabel();
+//		 jlab.setBounds(7, 500, 100, 30);
+//		 jlab.setText("test");
+//		 lsmRow.addListSelectionListener(new ListSelectionListener()
+//		 {
+//			 public void valueChanged(ListSelectionEvent le){
+//				 //tblWeek.changeSelection(rowIndex, columnIndex, toggle, extend);
+//				 int[] str = tblWeek.getSelectedRows();
+//				 int selCol=tblWeek.getSelectedColumn();
+//				 String theString="";
+//				 for (int i=0; i<str.length;i++){
+//					 theString += str[i]+" ";
+//					 if (!lsmRow.getValueIsAdjusting()){
+//					 //tblWeek.changeSelection(str[i], selCol, false, false);
+//					 if (staffSchedule[(str[i])][selCol]==0) staffSchedule[(str[i])][selCol]=1;
+//					 else if (staffSchedule[(str[i])][selCol]==1)staffSchedule[(str[i])][selCol]=0;}
+//					 tblWeek.setSelectionBackground(Color.RED);
+//				 }
+//
+//				 jlab.setText(theString);
+//			 }
+//		 });
+//		 frame.add(jlab);
 
-				 jlab.setText(theString);
-			 } 
-		 });
-		 frame.add(jlab);
-		 
 		 //add Done button
 
 
 //		   Parameter input section
-		  
+
 		  JPanel panelParameterInput = new JPanel();
 		  panelParameterInput.setOpaque(false);
 		  panelParameterInput.setBounds(10, 30, 384, 153);
@@ -330,7 +330,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  gbl_panelParameterInput.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
 		  gbl_panelParameterInput.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		  panelParameterInput.setLayout(gbl_panelParameterInput);
-		  
+
 		  comboMaxStudents = new JComboBox<Integer>();
 		  comboMaxStudents.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent ie) {
@@ -345,7 +345,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  panelParameterInput.add(comboMaxStudents, gbc_comboIncrement);
 		  comboMaxStudents.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {15,20,25,30,35}));
 		  comboMaxStudents.setSelectedIndex(3);
-		  
+
 		  JLabel lblScheduleInc = new JLabel("max # students per session");
 		  GridBagConstraints gbc_lblScheduleInc = new GridBagConstraints();
 		  gbc_lblScheduleInc.anchor = GridBagConstraints.WEST;
@@ -353,7 +353,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  gbc_lblScheduleInc.gridx = 1;
 		  gbc_lblScheduleInc.gridy = 0;
 		  panelParameterInput.add(lblScheduleInc, gbc_lblScheduleInc);
-		  
+
 		  comboBlockSize = new JComboBox<Integer>();
 		  comboBlockSize.addItemListener(new ItemListener() {
 		  	public void itemStateChanged(ItemEvent ie) {
@@ -368,8 +368,8 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  panelParameterInput.add(comboBlockSize, gbc_comboBlockSize);
 		  comboBlockSize.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {1,2,3,4,5}));
 		  comboBlockSize.setSelectedIndex(2);
-		  
-		  
+
+
 		  JLabel lblNumBocls = new JLabel("number of schedule blocks for session");
 		  GridBagConstraints gbc_lblNumBocls = new GridBagConstraints();
 		  gbc_lblNumBocls.anchor = GridBagConstraints.WEST;
@@ -377,7 +377,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  gbc_lblNumBocls.gridx = 1;
 		  gbc_lblNumBocls.gridy = 1;
 		  panelParameterInput.add(lblNumBocls, gbc_lblNumBocls);
-		  
+
 		  comboMaxSessions = new JComboBox<Integer>();
 		  comboMaxSessions.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent ie) {
@@ -392,7 +392,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  panelParameterInput.add(comboMaxSessions, gbc_comboMaxSessions);
 		  comboMaxSessions.setModel(new DefaultComboBoxModel(new Integer[] {1,2,3,4,5,6,7}));
 		  comboMaxSessions.setSelectedIndex(4);
-		  
+
 		  JLabel lblMaxSessions = new JLabel("maximum # sessions to schedule per week");
 		  GridBagConstraints gbc_lblMaxSessions = new GridBagConstraints();
 		  gbc_lblMaxSessions.anchor = GridBagConstraints.WEST;
@@ -400,7 +400,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  gbc_lblMaxSessions.gridx = 1;
 		  gbc_lblMaxSessions.gridy = 2;
 		  panelParameterInput.add(lblMaxSessions, gbc_lblMaxSessions);
-		  
+
 		  comboMinStudents = new JComboBox<Integer>();
 		  comboMinStudents.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent ie) {
@@ -415,27 +415,27 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		  panelParameterInput.add(comboMinStudents, gbc_comboMinStudents);
 		  comboMinStudents.setModel(new DefaultComboBoxModel(new Integer[] {1,2,3,4,5,6,7,8,9,10}));
 		  comboMinStudents.setSelectedIndex(3);
-		  
+
 		  JLabel lblMinStudents = new JLabel("minimum # students in a session");
 		  GridBagConstraints gbc_lblMinStudents = new GridBagConstraints();
 		  gbc_lblMinStudents.anchor = GridBagConstraints.WEST;
 		  gbc_lblMinStudents.gridx = 1;
 		  gbc_lblMinStudents.gridy = 3;
 		  panelParameterInput.add(lblMinStudents, gbc_lblMinStudents);
-		  
-		  
+
+
 		  scrollPane = new JScrollPane();
 		  scrollPane.setBounds(870, 42, 304, 579);
 		  frame.getContentPane().add(scrollPane);
-		  
+
 		  textSolutionOutput = new JTextArea();
 		  scrollPane.setViewportView(textSolutionOutput);
 		  textSolutionOutput.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		  textSolutionOutput.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
-	
 
-	
+
+
 	public void actionPerformed(ActionEvent ae){
 		if (ae.getActionCommand().equals("Run")){
 			//schedules=Scheduler.readSchedulesFromFile("bible_prep_schedule_spring_16.csv");
@@ -488,13 +488,43 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				textSolutionOutput.append(sol.getCanBalance()+"");
 			}
 			Collections.sort(solutions);
-			printSolutionsToOutputWindow();
-			//empty arraylists for next run
+			printSolutionsToOutputWindow(solutions);
+			//TODO collect nearly same solutions together after sorting
+			ArrayList<Solution> distinctSolutions = new ArrayList<Solution>();
+			// find similar solutions
+			for (Solution baseSolution:solutions){
+				for (Solution testSolution:solutions){
+					if (!baseSolution.isSame(testSolution)){
+						if (baseSolution.isSimilar(testSolution)){
+							baseSolution.addSimilarSolution(testSolution);
+							//distinctSolutions.remove(testSolution);
+						}
+					}
+				}
+			}
+			textSolutionOutput.append("****************************");
+			printSolutionsToOutputWindow(solutions);
+			textSolutionOutput.append("****************************");
+
 			//solutionTree=null;
+			
+			ArrayList<Solution> solutionsCopy = (ArrayList<Solution>)solutions.clone();
+			int index=0;
+			while (solutionsCopy.size()>0){
+				Solution sol=solutionsCopy.get(index);
+				//for (Solution s:sol.getSimilarSolutions()){
+				solutionsCopy.removeAll(sol.getSimilarSolutions());
+				solutionsCopy.remove(sol);
+				distinctSolutions.add(sol);
+				//index++;
+				//}
+			}
+			printSolutionsToOutputWindow(distinctSolutions);
+			
+			//empty arrayLists for next run
 			solutions.clear();
-			
-			
-			
+			distinctSolutions.clear();
+
 		}
 		else if (ae.getActionCommand().equals("Reset Form")){
 			chckbxMonday.setSelected(false);
@@ -514,9 +544,9 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			lblFileChosen.setText("");
 			btnRun.setEnabled(false);
 		}
-		
+
 		else if (ae.getActionCommand().equals("Choose file")){
-				
+
 			boolean okFile=false;
 			int option = 0;
 			while (option != JFileChooser.CANCEL_OPTION && !okFile){
@@ -542,16 +572,16 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			}
 		}
 	}
-	
+
 	public void itemStateChanged(ItemEvent ie){
-		
+
 	}
 	//Code for checkboxes for starting and ending times for each day
 	@Override
 	public void stateChanged(ChangeEvent ce) {
 
 	}
-	
+
 	public void createSolutions(Tree t,ArrayList<Session> sessionList){
 		if (t.isEnd) {
 			boolean goodSolution=true;
@@ -574,11 +604,11 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			ArrayList<Session> sessionListCopy=(ArrayList<Session>)sessionList.clone();
 			sessionListCopy.add(s);
 			createSolutions(leaf, sessionListCopy);
-			
+
 		}
 	}
-	
-	public void printSolutionsToOutputWindow(){
+
+	public void printSolutionsToOutputWindow(ArrayList<Solution> solutions){
 		//limit number of solutions to print by maxSolutionsToPrint or all if smaller
 		for (int i=0;i<maxSolutionsToPrint && i<solutions.size();i++){
 			//if (solutions.get(i).getNumSessions()<=maxSessions){
@@ -593,22 +623,23 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					int index=session.time;
 					//System.out.println("\t"+times[index]);
 					textSolutionOutput.append("\t"+times[index]+"\n");;
-					
+
 					//print ratio of must attend to can attend
 					//System.out.println(session.membersMustAttend.size()+"/"+session.members.size());
-					
+
 					//print names of those who can attend
 					session.print();
 					System.out.println();
-					
+
 					//print names of those who must attend:
 					//session.printMustAttend();
 					//System.out.println();
 				}
+				textSolutionOutput.append(sol.similarSolutionsToString());
 			//}
 		}
 	}
-	
+
 	/**
 	 * gets student schedules from a csv file chosen by user.
 	 * uses file to determine number of days, increment, preferredMask, & times array
@@ -629,7 +660,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				String line = scanner.nextLine();
 				String dayName ="";
 				//if headers found & columns known, go ahead and read data in
-				if(foundHeaders && nameColumn!=-1 &&emailColumn!=-1 && dayIndices!=null){ 
+				if(foundHeaders && nameColumn!=-1 &&emailColumn!=-1 && dayIndices!=null){
 					//System.out.println("reading in schedules");
 				    String[] fields = line.split(",");
 					if (fields[nameColumn].isEmpty()) continue; //if no name then skip this row
@@ -655,7 +686,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					    	else if (value==2) slots[slot]=value;
 					    	slot++;
 					    	// this code is incorrect because file was setup incorrectly in spring 2016 switch 1 & 0
-					    	// if (fields[i].equals("0"))value=1;	
+					    	// if (fields[i].equals("0"))value=1;
 					    	//else value=2;
 					    	//slots[i-2]=value;
 					    	}
@@ -668,7 +699,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				        schedules.add(studentSchedule);
 				    }
 				}
-				else if (!foundHeaders){ 
+				else if (!foundHeaders){
 					if (line.contains("name")&&line.contains("email")) {
 						//System.out.println("reading in headers");
 						foundHeaders = true;
@@ -727,6 +758,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		 }
 		 return null;
 	}
-	
+
 
 }
