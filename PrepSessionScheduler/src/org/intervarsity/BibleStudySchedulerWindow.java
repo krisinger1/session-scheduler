@@ -7,6 +7,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
@@ -488,7 +490,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				textSolutionOutput.append(sol.getCanBalance()+"");
 			}
 			Collections.sort(solutions);
-			printSolutionsToOutputWindow(solutions);
+			//printSolutionsToOutputWindow(solutions);
 			//TODO collect nearly same solutions together after sorting
 			ArrayList<Solution> distinctSolutions = new ArrayList<Solution>();
 			// find similar solutions
@@ -502,12 +504,12 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					}
 				}
 			}
-			textSolutionOutput.append("****************************");
-			printSolutionsToOutputWindow(solutions);
-			textSolutionOutput.append("****************************");
+//			textSolutionOutput.append("****************************");
+//			printSolutionsToOutputWindow(solutions);
+//			textSolutionOutput.append("****************************");
 
 			//solutionTree=null;
-			
+
 			ArrayList<Solution> solutionsCopy = (ArrayList<Solution>)solutions.clone();
 			int index=0;
 			while (solutionsCopy.size()>0){
@@ -520,7 +522,8 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				//}
 			}
 			printSolutionsToOutputWindow(distinctSolutions);
-			
+			printSingleSolutionToOutput(distinctSolutions.get(0));
+
 			//empty arrayLists for next run
 			solutions.clear();
 			distinctSolutions.clear();
@@ -608,6 +611,17 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		}
 	}
 
+	public void printSingleSolutionToOutput(Solution sol){
+
+		ArrayList<Session> sessions= sol.getSessions();
+		for (Session s:sessions){
+			ArrayList<Schedule> must=s.membersMustAttend;
+			ArrayList<Schedule> can=s.members;
+			textSolutionOutput.append(times[s.time]+":\n");
+			textSolutionOutput.append(s.toString());
+		}
+	}
+
 	public void printSolutionsToOutputWindow(ArrayList<Solution> solutions){
 		//limit number of solutions to print by maxSolutionsToPrint or all if smaller
 		for (int i=0;i<maxSolutionsToPrint && i<solutions.size();i++){
@@ -635,7 +649,19 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					//session.printMustAttend();
 					//System.out.println();
 				}
-				textSolutionOutput.append(sol.similarSolutionsToString());
+				ArrayList<Solution> similar = sol.getSimilarSolutions();
+				for (int j=0;j<similar.size();j++){
+					Solution similarSol=similar.get(j);
+					textSolutionOutput.append("\n");
+					Collections.sort(similarSol.getSessions());
+					for (Session session:similarSol.getSessions()){
+						int index=session.time;
+						textSolutionOutput.append(times[index]+"\n");
+					}
+					textSolutionOutput.append("\n");
+
+				}
+				//textSolutionOutput.append(sol.similarSolutionsToString());
 			//}
 		}
 	}
@@ -661,17 +687,22 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				String dayName ="";
 				//if headers found & columns known, go ahead and read data in
 				if(foundHeaders && nameColumn!=-1 &&emailColumn!=-1 && dayIndices!=null){
-					//System.out.println("reading in schedules");
+					System.out.println("reading in schedules "+nameColumn);
+					System.out.println(line);
 				    String[] fields = line.split(",");
+					System.out.println(fields.length);
+					if (fields.length==0) continue;
+					//if (fields[nameColumn].isEmpty()) continue; //if no name then skip this row
 					if (fields[nameColumn].isEmpty()) continue; //if no name then skip this row
-				    int arraySize=headerRow.length;
+
+					int arraySize=headerRow.length;
 				    //schedSize=arraySize-dayIndices[0]+1; //size of line read in minus index where data starts
 				    int[] slots=new int[schedSize];
 				    int value;
 				    int slot=0;
-				    //System.out.println("schedule size "+schedSize);
-				    //System.out.println("fields length "+fields.length);
-				    //System.out.println("headers length "+headerRow.length);
+				    System.out.println("schedule size "+schedSize);
+				    System.out.println("fields length "+fields.length);
+				    System.out.println("headers length "+headerRow.length);
 				    if (fields.length<headerRow.length||fields[dayIndices[0]+1].isEmpty()){
 				    	System.out.println("empty schedule for: "+fields[nameColumn]);
 				    }
@@ -680,10 +711,10 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				    		//System.out.println("fields["+i+"]:"+fields[i]);
 					    	value=Integer.parseInt(fields[i]);
 					    	//Real code is commented out below
-					    	//if (value==0 || value==1 || value==2) slots[slot]=value;
-					    	if (value==0) slots[slot]=1;
-					    	else if (value==1) slots[slot]=0;
-					    	else if (value==2) slots[slot]=value;
+					    	if (value==0 || value==1 || value==2) slots[slot]=value;
+					    	//if (value==0) slots[slot]=1;
+					    	//else if (value==1) slots[slot]=0;
+					    	//else if (value==2) slots[slot]=value;
 					    	slot++;
 					    	// this code is incorrect because file was setup incorrectly in spring 2016 switch 1 & 0
 					    	// if (fields[i].equals("0"))value=1;
@@ -737,7 +768,9 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				 times = new String[schedSize];
 				 String day="";
 
-				 for (int i=dayIndices[0];i<headerRow.length;i++){
+				 //for (int i=dayIndices[0];i<headerRow.length;i++){
+				 for (int i=dayIndices[0];i<dayIndices[0]+schedSize;i++){
+
 					 times[k]=headerRow[i];
 					 if (headerRow[i].contains("day")){ preferredMask[k]=2; times[k]="********"; day=headerRow[i];}
 					 else {preferredMask[k]=0; times[k]=day+" "+headerRow[i];}
@@ -759,5 +792,22 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		 return null;
 	}
 
+	public void printSolutionToFile(String filename, int numSolutions){
+		//TODO finish printSolutionsToFile
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(filename, "UTF-8");
+			for(int i=0; i<numSolutions;i++){
+
+			}
+			writer.close();
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "File not found. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			JOptionPane.showMessageDialog(null, "Unsupported encoding exception. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
+	}
 
 }

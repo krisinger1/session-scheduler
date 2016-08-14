@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  * Represents one session of a Bible prep.
- * includes time of the session. 
+ * includes time of the session.
  * and whether that is a preferred time for the staff running it.
  * has list of students' schedules who can attend at that time.
  * and a list of students' schedules who _must_ attend this particular session.
@@ -16,21 +16,21 @@ public class Session implements Comparable<Session>{
 	ArrayList<Schedule> membersMustAttend;
 	int time; //the index of the session on schedule
 	boolean preferred;
-	
+
 	public Session(int timeSlot){
 		members=new ArrayList<Schedule>();
 		membersMustAttend=new ArrayList<Schedule>();
 		time=timeSlot;
 		preferred=false;
 	}
-	
+
 	public Session(int timeSlot,boolean preferred){
 		members=new ArrayList<Schedule>();
 		membersMustAttend=new ArrayList<Schedule>();
 		time=timeSlot;
 		this.preferred=preferred;
 	}
-	
+
 	/**
 	 * Adds a student's schedule to the list of members for this session
 	 * @param s the schedule to be added
@@ -38,7 +38,7 @@ public class Session implements Comparable<Session>{
 	public void add(Schedule s){
 		members.add(s);
 	}
-	
+
 	/**
 	 * Adds a schedule of a student who can only attend this session and no other
 	 * @param s the schedule to be added
@@ -46,9 +46,9 @@ public class Session implements Comparable<Session>{
 	public void addMustAttend(Schedule s){
 		membersMustAttend.add(s);
 	}
-	
+
 	/**
-	 * Prints to console names of all students who can attend this session	
+	 * Prints to console names of all students who can attend this session
 	 */
 	public void print(){
 		System.out.print(time+" can attend:");
@@ -56,7 +56,7 @@ public class Session implements Comparable<Session>{
 		System.out.println("");
 
 	}
-	
+
 	/**
 	 * Prints to console names of all students who must attend this session
 	 */
@@ -66,23 +66,27 @@ public class Session implements Comparable<Session>{
 		System.out.println("");
 
 	}
-	
+
 	/**
-	 * Returns a string with time and names of all students who can attend this session
+	 * Returns a string with names of all students who can attend this session
+	 * Students who must attend are marked with *
 	 */
 	public String toString(){
-		String result=time+":";
-		for (Schedule s:members)result+=" "+s.getName()+" "+s.getEmail();
+		String result="";
+		for (Schedule s:members){
+			if (membersMustAttend.contains(s)) result+="*";
+			result+=" "+s.getName()+" "+s.getEmail()+"\n";
+		}
 		result+="\n";
 		return result;
 
 	}
-	
+
 	/**
 	 * Compares two sessions by their times
 	 * @param s session to compare to this session
-	 * @return 1 if this session is later than, 
-	 *  -1 if earlier, otherwise 0. 
+	 * @return 1 if this session is later than,
+	 *  -1 if earlier, otherwise 0.
 	 */
 	public int compareTo(Session s){
 		if (time>s.time) return 1;
