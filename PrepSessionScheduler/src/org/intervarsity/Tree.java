@@ -17,13 +17,13 @@ public class Tree {
 	Session session;
 	boolean isDead=false;
 	boolean isEnd=false;
-	
+
 	public Tree(Tree parent, Session session){
 		this.parent=parent;
 		this.session=session;
 		leaves=new LinkedList<Tree>();
 	}
-	
+
 	/**
 	 * Determines if this node has any leaves
 	 * @return true if there is at least one leaf, false otherwise
@@ -32,7 +32,7 @@ public class Tree {
 		if (leaves.size()>0) return true;
 		else return false;
 	}
-	
+
 	/**
 	 * Adds a leaf to this node
 	 * @param leaf the leaf to add to the tree at this node
@@ -40,7 +40,7 @@ public class Tree {
 	public void addLeaf(Tree leaf){
 		leaves.add(leaf);
 	}
-	
+
 	/**
 	 * removes leaf from this node and recursively removes all of leaf's leaves
 	 * @param leaf the leaf to remove from tree
@@ -56,9 +56,9 @@ public class Tree {
 			//printTree(this, 0);
 		}
 	}
-	
+
 	/**
-	 * Determines if all leaves of this node are dead - 
+	 * Determines if all leaves of this node are dead -
 	 * meaning they do not provide a viable solution
 	 * @return true if all leaves are dead, otherwise false
 	 */
@@ -68,10 +68,10 @@ public class Tree {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Removes branches from tree that do not lead to usable solutions
-	 * 
+	 *
 	 */
 	public void pruneTree(){
 		if (isEnd) return;
@@ -89,15 +89,15 @@ public class Tree {
 				Tree leaf=leaves.get(i);
 				if (!leaf.isDead) {
 					leaf.pruneTree();
-					
+
 					}
 				if (leaf.isDead) removeLeaf(leaf);
 				else i++;
 		}
 		if (!hasLeaves()) isDead=true;
-		
+
 	}
-	
+
 	/**
 	 * Prints to console all descendants of this node with session info
 	 */
@@ -106,7 +106,7 @@ public class Tree {
 			t.session.print();
 			System.out.println("");
 			if (t.leaves.size()>0)
-			{	
+			{
 				System.out.print("leaves of ");
 				t.session.print();
 				t.printLeaves();
@@ -121,7 +121,7 @@ public class Tree {
 		if (session!=null) {System.out.print("node");session.print();}
 		printLeaves();
 	}*/
-	
+
 	/**
 	 * Prints to console entire tree in a readable way
 	 * @param t the Tree object to print
@@ -135,7 +135,7 @@ public class Tree {
 	    //if (t==null)System.out.println("tree is null");
 
 	    if (t==null)return;
-	    
+
 	    // print the Node;
 	    //
 	    System.out.print( ind);
@@ -152,7 +152,7 @@ public class Tree {
 	        printTree( leaf, indent+1);
 	    }
 	}
-	
+
 	/**
 	 * Prints to file entire tree in a readable way
 	 * used by printSolutionToFile
@@ -180,7 +180,7 @@ public class Tree {
 	        printTreeToFile( leaf, indent+1,writer);
 	    }
 	}
-	
+
 	/**
 	 * Prints solutions tree to file specified in filename
 	 * @param t solution tree to print
@@ -201,7 +201,7 @@ public class Tree {
 			e.printStackTrace();
 		}
 	}
-	
+
 	//TODO is this code even correct for anything? Looks like infinite recursion
 	/*private static String printRankedSolution(Tree t, String solution){
 		if(t.isEnd){
@@ -214,7 +214,7 @@ public class Tree {
 		}
 		return solution;
 	}
-	
+
 	public static void printRankedSolutionToFile(Tree t,String filename){
 		PrintWriter writer;
 		try {

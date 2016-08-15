@@ -51,6 +51,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	private ArrayList<Schedule> schedules;
 	public static int schedSize;
 	private ArrayList<Time> possibleTimes=new ArrayList<Time>();
+	private int[] baseMask;
 	private int[] preferredMask;
 	private JFrame frame;
 	private JCheckBox chckbxMonday,chckbxTuesday,chckbxWednesday,chckbxThursday,chckbxFriday;
@@ -469,9 +470,9 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			Scheduler.sortSchedules(schedulesCopy,(int)comboBlockSize.getSelectedItem());
 			//textSolutionOutput.setText(schedulesCopy.toString());
 			String printString="Mask:\n";
-			for (int k=0;k<preferredMask.length;k++){printString+="\n"+preferredMask[k]+" "+times[k];}
+			for (int k=0;k<baseMask.length;k++){printString+="\n"+baseMask[k]+" "+times[k];}
 			textSolutionOutput.append(printString);
-			int[] possibleMask=new int[preferredMask.length];
+			int[] possibleMask=new int[baseMask.length];
 			do {
 				Scheduler.createTree(schedulesCopy, solutionTree,possibleMask,minStudents,schedSize,blockSize,maxStudents);
 				if (!solutionTree.hasLeaves()) {
@@ -612,13 +613,14 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	}
 
 	public void printSingleSolutionToOutput(Solution sol){
-
+		sol.findAllMembers(schedules, blockSize);
 		ArrayList<Session> sessions= sol.getSessions();
 		for (Session s:sessions){
 			ArrayList<Schedule> must=s.membersMustAttend;
 			ArrayList<Schedule> can=s.members;
 			textSolutionOutput.append(times[s.time]+":\n");
 			textSolutionOutput.append(s.toString());
+			s.printMustAttend();
 		}
 	}
 
@@ -642,8 +644,8 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					//System.out.println(session.membersMustAttend.size()+"/"+session.members.size());
 
 					//print names of those who can attend
-					session.print();
-					System.out.println();
+					//session.print();
+					//System.out.println();
 
 					//print names of those who must attend:
 					//session.printMustAttend();
@@ -764,7 +766,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			 if (foundHeaders) {
 				 int k=0;
 				 //schedSize=headerRow.length-dayIndices[0]+1;
-				 preferredMask = new int[schedSize];
+				 baseMask = new int[schedSize];
 				 times = new String[schedSize];
 				 String day="";
 
@@ -772,8 +774,8 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				 for (int i=dayIndices[0];i<dayIndices[0]+schedSize;i++){
 
 					 times[k]=headerRow[i];
-					 if (headerRow[i].contains("day")){ preferredMask[k]=2; times[k]="********"; day=headerRow[i];}
-					 else {preferredMask[k]=0; times[k]=day+" "+headerRow[i];}
+					 if (headerRow[i].contains("day")){ baseMask[k]=2; times[k]="********"; day=headerRow[i];}
+					 else {baseMask[k]=0; times[k]=day+" "+headerRow[i];}
 					 //System.out.println(times[k]);
 
 					 k++;
@@ -782,6 +784,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				 Time nextTime = new Time(headerRow[dayIndices[0]+2]);
 				 increment = startTime.timeDifference(nextTime);
 				 //System.out.println("increment: "+increment);
+				 initPreferredMask();
 			 }
 	         scanner.close();
 	         return schedules;
@@ -808,6 +811,10 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			JOptionPane.showMessageDialog(null, "Unsupported encoding exception. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
+	}
+	
+	public void initPreferredMask(){
+		preferredMask=baseMask.clone();
 	}
 
 }
