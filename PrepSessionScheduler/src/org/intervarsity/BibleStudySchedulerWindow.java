@@ -1,6 +1,7 @@
 package org.intervarsity;
 
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -14,12 +15,15 @@ import javax.swing.JFrame;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
@@ -31,12 +35,17 @@ import javax.swing.SpinnerListModel;
 import javax.swing.JSlider;
 import java.awt.Cursor;
 import java.awt.Component;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.JSeparator;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -44,17 +53,21 @@ import java.awt.Insets;
 
 import javax.swing.JScrollPane;
 import java.awt.Dimension;
+
+
+
 //TODO print solutions to file
-public class BibleStudySchedulerWindow implements ActionListener,ItemListener,ChangeListener{
+public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	private ArrayList<Solution> solutions=new ArrayList<Solution>();
+	private ArrayList<Solution> distinctSolutions;
 	private String[] times;
 	private ArrayList<Schedule> schedules;
 	public static int schedSize;
-	private ArrayList<Time> possibleTimes=new ArrayList<Time>();
+	//private ArrayList<Time> possibleTimes=new ArrayList<Time>();
 	private int[] baseMask;
 	private int[] preferredMask;
 	private JFrame frame;
-	private JCheckBox chckbxMonday,chckbxTuesday,chckbxWednesday,chckbxThursday,chckbxFriday;
+	//private JCheckBox chckbxMonday,chckbxTuesday,chckbxWednesday,chckbxThursday,chckbxFriday;
 	private JTextArea textSolutionOutput;
 	private JSlider sldrSessions;
 	private double fewestSessionsWeight=5;
@@ -75,7 +88,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	private int maxSessions;
 	private int minStudents;
 	private int maxStudents = 25;
-	private int maxSolutionsToPrint=40;
+	private int maxSolutionsToPrint=10;
 	private int increment=30;
 	private boolean formChanged=false;
 	private JFileChooser chooser = new JFileChooser();
@@ -83,6 +96,9 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	private JButton btnRun = new JButton("Run");
 	private JLabel lblFileChosen = new JLabel();
 	private Color bgColor = new Color(0,206,216);
+	private JLabel lblResultsTbl;
+	private JTable solutionTable;
+	private JScrollPane scrollPane2;
 
 
 
@@ -113,11 +129,11 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		Time t=new Time(8, 0);
-		for (int i=1;i<21;i++){
-			possibleTimes.add(t);
-			t=t.nextTime(increment);
-		}
+//		Time t=new Time(8, 0);
+//		for (int i=1;i<21;i++){
+//			possibleTimes.add(t);
+//			t=t.nextTime(increment);
+//		}
 
 		frame = new JFrame();
 		frame.getContentPane().setBackground(bgColor);
@@ -125,34 +141,147 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		frame.setBounds(25, 25, 1200, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		
+		
+//		   Parameter input section
 
-//		JLabel lblWhichDaysDo = new JLabel("Select times for template used for student schedules:");
-//		lblWhichDaysDo.setVerticalAlignment(SwingConstants.TOP);
-//		lblWhichDaysDo.setBounds(10, 211, 359, 26);
-//		frame.getContentPane().add(lblWhichDaysDo);
-//
-		btnRun.setBounds(723, 331, 133, 23);
+		  JPanel panelParameterInput = new JPanel();
+		  panelParameterInput.setOpaque(false);
+		  panelParameterInput.setBounds(10, 30, 384, 153);
+		  frame.getContentPane().add(panelParameterInput);
+		  GridBagLayout gbl_panelParameterInput = new GridBagLayout();
+		  gbl_panelParameterInput.columnWidths = new int[]{0, 280, 0};
+		  gbl_panelParameterInput.rowHeights = new int[]{0, 0, 0, 0, 0};
+		  gbl_panelParameterInput.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		  gbl_panelParameterInput.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		  panelParameterInput.setLayout(gbl_panelParameterInput);
+
+		  // ********* Max students **********
+
+		  comboMaxStudents = new JComboBox<Integer>();
+		  comboMaxStudents.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent ie) {
+				maxStudents=(int)comboMaxStudents.getSelectedItem();
+				formChanged=true;
+			}
+		});
+		  GridBagConstraints gbc_comboIncrement = new GridBagConstraints();
+		  gbc_comboIncrement.insets = new Insets(0, 0, 5, 5);
+		  gbc_comboIncrement.gridx = 0;
+		  gbc_comboIncrement.gridy = 0;
+		  panelParameterInput.add(comboMaxStudents, gbc_comboIncrement);
+		  comboMaxStudents.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {15,20,25,30,35}));
+		  comboMaxStudents.setSelectedIndex(3);
+
+		  JLabel lblScheduleInc = new JLabel("max # students per session");
+		  GridBagConstraints gbc_lblScheduleInc = new GridBagConstraints();
+		  gbc_lblScheduleInc.anchor = GridBagConstraints.WEST;
+		  gbc_lblScheduleInc.insets = new Insets(0, 0, 5, 0);
+		  gbc_lblScheduleInc.gridx = 1;
+		  gbc_lblScheduleInc.gridy = 0;
+		  panelParameterInput.add(lblScheduleInc, gbc_lblScheduleInc);
+
+		  // ********* Block size **********
+
+		  comboBlockSize = new JComboBox<Integer>();
+		  comboBlockSize.addItemListener(new ItemListener() {
+		  	public void itemStateChanged(ItemEvent ie) {
+		  		blockSize=(int)comboBlockSize.getSelectedItem();
+		  		formChanged=true;
+		  	}
+		  });
+		  GridBagConstraints gbc_comboBlockSize = new GridBagConstraints();
+		  gbc_comboBlockSize.insets = new Insets(0, 0, 5, 5);
+		  gbc_comboBlockSize.gridx = 0;
+		  gbc_comboBlockSize.gridy = 1;
+		  panelParameterInput.add(comboBlockSize, gbc_comboBlockSize);
+		  comboBlockSize.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {1,2,3,4,5}));
+		  comboBlockSize.setSelectedIndex(2);
+
+
+		  JLabel lblNumBocls = new JLabel("number of schedule blocks for session");
+		  GridBagConstraints gbc_lblNumBocls = new GridBagConstraints();
+		  gbc_lblNumBocls.anchor = GridBagConstraints.WEST;
+		  gbc_lblNumBocls.insets = new Insets(0, 0, 5, 0);
+		  gbc_lblNumBocls.gridx = 1;
+		  gbc_lblNumBocls.gridy = 1;
+		  panelParameterInput.add(lblNumBocls, gbc_lblNumBocls);
+		  
+		  // ********* Max sessions **********
+
+		  comboMaxSessions = new JComboBox<Integer>();
+		  comboMaxSessions.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent ie) {
+				maxSessions=(int)comboMaxSessions.getSelectedItem();
+				formChanged=true;
+			}
+		});
+		  GridBagConstraints gbc_comboMaxSessions = new GridBagConstraints();
+		  gbc_comboMaxSessions.insets = new Insets(0, 0, 5, 5);
+		  gbc_comboMaxSessions.gridx = 0;
+		  gbc_comboMaxSessions.gridy = 2;
+		  panelParameterInput.add(comboMaxSessions, gbc_comboMaxSessions);
+		  comboMaxSessions.setModel(new DefaultComboBoxModel(new Integer[] {1,2,3,4,5,6,7}));
+		  comboMaxSessions.setSelectedIndex(4);
+
+		  JLabel lblMaxSessions = new JLabel("maximum # sessions to schedule per week");
+		  GridBagConstraints gbc_lblMaxSessions = new GridBagConstraints();
+		  gbc_lblMaxSessions.anchor = GridBagConstraints.WEST;
+		  gbc_lblMaxSessions.insets = new Insets(0, 0, 5, 0);
+		  gbc_lblMaxSessions.gridx = 1;
+		  gbc_lblMaxSessions.gridy = 2;
+		  panelParameterInput.add(lblMaxSessions, gbc_lblMaxSessions);
+
+		  
+		  // ********* Min students **********
+
+		  comboMinStudents = new JComboBox<Integer>();
+		  comboMinStudents.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent ie) {
+				minStudents=(int)comboMinStudents.getSelectedItem();
+				formChanged=true;
+			}
+		});
+		  GridBagConstraints gbc_comboMinStudents = new GridBagConstraints();
+		  gbc_comboMinStudents.insets = new Insets(0, 0, 0, 5);
+		  gbc_comboMinStudents.gridx = 0;
+		  gbc_comboMinStudents.gridy = 3;
+		  panelParameterInput.add(comboMinStudents, gbc_comboMinStudents);
+		  comboMinStudents.setModel(new DefaultComboBoxModel(new Integer[] {1,2,3,4,5,6,7,8,9,10}));
+		  comboMinStudents.setSelectedIndex(3);
+
+		  JLabel lblMinStudents = new JLabel("minimum # students in a session");
+		  GridBagConstraints gbc_lblMinStudents = new GridBagConstraints();
+		  gbc_lblMinStudents.anchor = GridBagConstraints.WEST;
+		  gbc_lblMinStudents.gridx = 1;
+		  gbc_lblMinStudents.gridy = 3;
+		  panelParameterInput.add(lblMinStudents, gbc_lblMinStudents);
+
+		// ********* Run button **********
+		btnRun.setBounds(110, 531, 133, 23);
 		btnRun.addActionListener(this);
 		frame.getContentPane().add(btnRun);
-		btnRun.setEnabled(false);
+		btnRun.setEnabled(false); // not enabled until file chosen
 
+
+		// ********* Reset button **********
 		JButton btnResetForm = new JButton("Reset Form");
-		btnResetForm.setBounds(723, 365, 133, 23);
+		btnResetForm.setBounds(110, 565, 133, 23);
 		frame.getContentPane().add(btnResetForm);
 		btnResetForm.addActionListener(this);
 
+		// ********* Choose file button **********
 		JButton btnChooseFile= new JButton("Choose file");
-		btnChooseFile.setBounds(723, 399, 133, 23);
+		btnChooseFile.setBounds(110, 599, 133, 23);
 		frame.getContentPane().add(btnChooseFile);
 		btnChooseFile.addActionListener(this);
 
-		lblResults = new JLabel("Results:");
-		lblResults.setBounds(894, 12, 94, 14);
-		frame.getContentPane().add(lblResults);
+		// ********* Sliders for weights **********
 
 		panel = new JPanel();
 		panel.setOpaque(false);
-		panel.setBounds(529, 54, 327, 244);
+		//panel.setBounds(529, 54, 327, 244);
+		panel.setBounds(29, 204, 327, 244);
 		frame.getContentPane().add(panel);
 		panel.setLayout(null);
 
@@ -249,7 +378,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 
 		JSeparator separator = new JSeparator();
 		separator.setOrientation(SwingConstants.VERTICAL);
-		separator.setBounds(521, 37, 11, 613);
+		separator.setBounds(370, 37, 11, 613);
 		frame.getContentPane().add(separator);
 
 //		 JPanel panel_3 = new JPanel();
@@ -318,133 +447,54 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 //		 });
 //		 frame.add(jlab);
 
-		 //add Done button
+		 //TODO add Done button
 
+		// *********Results in table form ***********
+		lblResultsTbl = new JLabel("Results:");
+		lblResultsTbl.setBounds(440, 12, 94, 14);
+		frame.getContentPane().add(lblResultsTbl);
 
-//		   Parameter input section
+		scrollPane2 = new JScrollPane();
+		scrollPane2.setBounds(440, 42, 350, 579);
+		
+		solutionTable= new JTable();
+		//solutionTable.
+		//solutionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		System.out.println(solutionTable.getSelectionModel().toString());
+		
+		
 
-		  JPanel panelParameterInput = new JPanel();
-		  panelParameterInput.setOpaque(false);
-		  panelParameterInput.setBounds(10, 30, 384, 153);
-		  frame.getContentPane().add(panelParameterInput);
-		  GridBagLayout gbl_panelParameterInput = new GridBagLayout();
-		  gbl_panelParameterInput.columnWidths = new int[]{0, 280, 0};
-		  gbl_panelParameterInput.rowHeights = new int[]{0, 0, 0, 0, 0};
-		  gbl_panelParameterInput.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		  gbl_panelParameterInput.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		  panelParameterInput.setLayout(gbl_panelParameterInput);
+		scrollPane2.setViewportView(solutionTable);
+		frame.getContentPane().add(scrollPane2);
 
-		  comboMaxStudents = new JComboBox<Integer>();
-		  comboMaxStudents.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent ie) {
-				maxStudents=(int)comboMaxStudents.getSelectedItem();
-				formChanged=true;
-			}
-		});
-		  GridBagConstraints gbc_comboIncrement = new GridBagConstraints();
-		  gbc_comboIncrement.insets = new Insets(0, 0, 5, 5);
-		  gbc_comboIncrement.gridx = 0;
-		  gbc_comboIncrement.gridy = 0;
-		  panelParameterInput.add(comboMaxStudents, gbc_comboIncrement);
-		  comboMaxStudents.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {15,20,25,30,35}));
-		  comboMaxStudents.setSelectedIndex(3);
+		
+		lblResults = new JLabel("Students for this solution:");
+		lblResults.setBounds(800, 312, 150, 14);
+		frame.getContentPane().add(lblResults);
 
-		  JLabel lblScheduleInc = new JLabel("max # students per session");
-		  GridBagConstraints gbc_lblScheduleInc = new GridBagConstraints();
-		  gbc_lblScheduleInc.anchor = GridBagConstraints.WEST;
-		  gbc_lblScheduleInc.insets = new Insets(0, 0, 5, 0);
-		  gbc_lblScheduleInc.gridx = 1;
-		  gbc_lblScheduleInc.gridy = 0;
-		  panelParameterInput.add(lblScheduleInc, gbc_lblScheduleInc);
-
-		  comboBlockSize = new JComboBox<Integer>();
-		  comboBlockSize.addItemListener(new ItemListener() {
-		  	public void itemStateChanged(ItemEvent ie) {
-		  		blockSize=(int)comboBlockSize.getSelectedItem();
-		  		formChanged=true;
-		  	}
-		  });
-		  GridBagConstraints gbc_comboBlockSize = new GridBagConstraints();
-		  gbc_comboBlockSize.insets = new Insets(0, 0, 5, 5);
-		  gbc_comboBlockSize.gridx = 0;
-		  gbc_comboBlockSize.gridy = 1;
-		  panelParameterInput.add(comboBlockSize, gbc_comboBlockSize);
-		  comboBlockSize.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {1,2,3,4,5}));
-		  comboBlockSize.setSelectedIndex(2);
-
-
-		  JLabel lblNumBocls = new JLabel("number of schedule blocks for session");
-		  GridBagConstraints gbc_lblNumBocls = new GridBagConstraints();
-		  gbc_lblNumBocls.anchor = GridBagConstraints.WEST;
-		  gbc_lblNumBocls.insets = new Insets(0, 0, 5, 0);
-		  gbc_lblNumBocls.gridx = 1;
-		  gbc_lblNumBocls.gridy = 1;
-		  panelParameterInput.add(lblNumBocls, gbc_lblNumBocls);
-
-		  comboMaxSessions = new JComboBox<Integer>();
-		  comboMaxSessions.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent ie) {
-				maxSessions=(int)comboMaxSessions.getSelectedItem();
-				formChanged=true;
-			}
-		});
-		  GridBagConstraints gbc_comboMaxSessions = new GridBagConstraints();
-		  gbc_comboMaxSessions.insets = new Insets(0, 0, 5, 5);
-		  gbc_comboMaxSessions.gridx = 0;
-		  gbc_comboMaxSessions.gridy = 2;
-		  panelParameterInput.add(comboMaxSessions, gbc_comboMaxSessions);
-		  comboMaxSessions.setModel(new DefaultComboBoxModel(new Integer[] {1,2,3,4,5,6,7}));
-		  comboMaxSessions.setSelectedIndex(4);
-
-		  JLabel lblMaxSessions = new JLabel("maximum # sessions to schedule per week");
-		  GridBagConstraints gbc_lblMaxSessions = new GridBagConstraints();
-		  gbc_lblMaxSessions.anchor = GridBagConstraints.WEST;
-		  gbc_lblMaxSessions.insets = new Insets(0, 0, 5, 0);
-		  gbc_lblMaxSessions.gridx = 1;
-		  gbc_lblMaxSessions.gridy = 2;
-		  panelParameterInput.add(lblMaxSessions, gbc_lblMaxSessions);
-
-		  comboMinStudents = new JComboBox<Integer>();
-		  comboMinStudents.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent ie) {
-				minStudents=(int)comboMinStudents.getSelectedItem();
-				formChanged=true;
-			}
-		});
-		  GridBagConstraints gbc_comboMinStudents = new GridBagConstraints();
-		  gbc_comboMinStudents.insets = new Insets(0, 0, 0, 5);
-		  gbc_comboMinStudents.gridx = 0;
-		  gbc_comboMinStudents.gridy = 3;
-		  panelParameterInput.add(comboMinStudents, gbc_comboMinStudents);
-		  comboMinStudents.setModel(new DefaultComboBoxModel(new Integer[] {1,2,3,4,5,6,7,8,9,10}));
-		  comboMinStudents.setSelectedIndex(3);
-
-		  JLabel lblMinStudents = new JLabel("minimum # students in a session");
-		  GridBagConstraints gbc_lblMinStudents = new GridBagConstraints();
-		  gbc_lblMinStudents.anchor = GridBagConstraints.WEST;
-		  gbc_lblMinStudents.gridx = 1;
-		  gbc_lblMinStudents.gridy = 3;
-		  panelParameterInput.add(lblMinStudents, gbc_lblMinStudents);
-
-
-		  scrollPane = new JScrollPane();
-		  scrollPane.setBounds(870, 42, 304, 579);
-		  frame.getContentPane().add(scrollPane);
-
-		  textSolutionOutput = new JTextArea();
-		  scrollPane.setViewportView(textSolutionOutput);
-		  textSolutionOutput.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		  textSolutionOutput.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(800, 342, 330, 279);
+		frame.getContentPane().add(scrollPane);
+		
+		textSolutionOutput = new JTextArea();
+		scrollPane.setViewportView(textSolutionOutput);
+		textSolutionOutput.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		textSolutionOutput.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 
 
-
+	// ******* handle button events ******************** 
 	public void actionPerformed(ActionEvent ae){
+		// ******************  Run button ***************
 		if (ae.getActionCommand().equals("Run")){
-			//schedules=Scheduler.readSchedulesFromFile("bible_prep_schedule_spring_16.csv");
-			//schedules=Scheduler.readSchedulesFromFile(dataFile);
-			schedules=readSchedulesFromFile(dataFile);
+			
+			//empty arrayLists for next run
+			solutions.clear();
+			textSolutionOutput.setText("");
 
+			// read schedules in from file
+			//TODO error handling for bad or file not found
+			schedules=readSchedulesFromFile(dataFile);
 			if (schedules.size()==0){
 				System.out.println("schedules array is empty");
 				return;}
@@ -469,14 +519,15 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			ArrayList<Schedule> schedulesCopy=(ArrayList<Schedule>)schedules.clone();
 			Scheduler.sortSchedules(schedulesCopy,(int)comboBlockSize.getSelectedItem());
 			//textSolutionOutput.setText(schedulesCopy.toString());
-			String printString="Mask:\n";
-			for (int k=0;k<baseMask.length;k++){printString+="\n"+baseMask[k]+" "+times[k];}
-			textSolutionOutput.append(printString);
+			//String printString="Mask:\n";
+			//for (int k=0;k<preferredMask.length;k++){printString+="\n"+preferredMask[k]+" "+times[k];}
+			//textSolutionOutput.append(printString);
 			int[] possibleMask=new int[baseMask.length];
 			do {
 				Scheduler.createTree(schedulesCopy, solutionTree,possibleMask,minStudents,schedSize,blockSize,maxStudents);
 				if (!solutionTree.hasLeaves()) {
-					System.out.println("Impossible schedule, "+schedulesCopy.get(0).getName()+"removed");
+					//System.out.println("Impossible schedule, "+schedulesCopy.get(0).getName()+"removed");
+					textSolutionOutput.append("Impossible schedule, "+schedulesCopy.get(0).getName()+"removed");
 					schedulesCopy.remove(0);
 				}
 			}		while (!solutionTree.hasLeaves());
@@ -485,15 +536,15 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 //TODO null pointer exception in create solutions..
 			createSolutions(solutionTree, new ArrayList<Session>());
 			///Scheduler.createSolutions(solutionTree, new ArrayList<Session>());
-			textSolutionOutput.append(fewestSessionsWeight+" "+preferredTimesWeight+" "+canComeWeight+" "+mustComeWeight);
+			//textSolutionOutput.append(fewestSessionsWeight+" "+preferredTimesWeight+" "+canComeWeight+" "+mustComeWeight);
 			for (Solution sol:solutions){
 				sol.calculateNormalizedRank(fewestSessionsWeight, preferredTimesWeight, canComeWeight, mustComeWeight,solutions);
-				textSolutionOutput.append(sol.getCanBalance()+"");
+				//textSolutionOutput.append(sol.getCanBalance()+"");
 			}
 			Collections.sort(solutions);
 			//printSolutionsToOutputWindow(solutions);
 			//TODO collect nearly same solutions together after sorting
-			ArrayList<Solution> distinctSolutions = new ArrayList<Solution>();
+			distinctSolutions = new ArrayList<Solution>();
 			// find similar solutions
 			for (Solution baseSolution:solutions){
 				for (Solution testSolution:solutions){
@@ -505,11 +556,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					}
 				}
 			}
-//			textSolutionOutput.append("****************************");
-//			printSolutionsToOutputWindow(solutions);
-//			textSolutionOutput.append("****************************");
-
-			//solutionTree=null;
 
 			ArrayList<Solution> solutionsCopy = (ArrayList<Solution>)solutions.clone();
 			int index=0;
@@ -522,20 +568,19 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				//index++;
 				//}
 			}
-			printSolutionsToOutputWindow(distinctSolutions);
-			printSingleSolutionToOutput(distinctSolutions.get(0));
+			//printSolutionsToOutputWindow(distinctSolutions);
+			//if (distinctSolutions.size()!=0) printSingleSolutionToOutput(distinctSolutions.get(0));
+			printSolutionsToTable(distinctSolutions);
 
-			//empty arrayLists for next run
-			solutions.clear();
-			distinctSolutions.clear();
+			
 
 		}
 		else if (ae.getActionCommand().equals("Reset Form")){
-			chckbxMonday.setSelected(false);
-			chckbxTuesday.setSelected(false);
-			chckbxWednesday.setSelected(false);
-			chckbxThursday.setSelected(false);
-			chckbxFriday.setSelected(false);
+//			chckbxMonday.setSelected(false);
+//			chckbxTuesday.setSelected(false);
+//			chckbxWednesday.setSelected(false);
+//			chckbxThursday.setSelected(false);
+//			chckbxFriday.setSelected(false);
 			sldrCan.setValue(5);
 			sldrMust.setValue(5);
 			sldrPrefTime.setValue(5);
@@ -544,9 +589,11 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			comboMaxStudents.setSelectedIndex(3);
 			comboMaxSessions.setSelectedIndex(4);
 			comboMinStudents.setSelectedIndex(3);
-			textSolutionOutput.setText("number of day checked: 0");
+			//textSolutionOutput.setText("number of days checked: 0");
 			lblFileChosen.setText("");
 			btnRun.setEnabled(false);
+			textSolutionOutput.setText("");
+			solutionTable=null;
 		}
 
 		else if (ae.getActionCommand().equals("Choose file")){
@@ -561,7 +608,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					if (dataFile.getName().endsWith(".csv")){  //make sure user chooses a .csv file
 						btnRun.setEnabled(true);
 						frame.getContentPane().add(lblFileChosen);
-						lblFileChosen.setBounds(575, 425, 275, 23);
+						lblFileChosen.setBounds(110, 630, 275, 23);
 						lblFileChosen.setText("File: "+dataFile.getName());
 						//fileChosen.setVisible(true);
 						okFile =true;
@@ -590,8 +637,12 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 		if (t.isEnd) {
 			boolean goodSolution=true;
 			Solution solution=new Solution();
+			ArrayList<Session> sessionListClone = new ArrayList<Session>();
 			//ArrayList<Session> sessionListClone = (ArrayList<Session>) sessionList.clone();
-			solution.setSessions(sessionList);
+			for (Session s:sessionList){
+				sessionListClone.add(new Session(s.time,s.preferred));
+			}
+			solution.setSessions(sessionListClone);
 			solution.findAllMembers(schedules, blockSize);
 			for (Session s :solution.getSessions()){ //check parameters to make sure solution satisfies
 				if (s.members.size()<minStudents)goodSolution=false;
@@ -601,9 +652,10 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			}
 		else for (Tree leaf:t.leaves){
 			int time=leaf.session.time;
-			boolean preferred;
-			if (preferredMask[time]==0) preferred=true;
-			else preferred = false;
+			boolean preferred=true;
+			for (int i=0;i<blockSize;i++){
+				if (preferredMask[time+i]==1) preferred=false;
+			}
 			Session s=new Session(time,preferred);
 			ArrayList<Session> sessionListCopy=(ArrayList<Session>)sessionList.clone();
 			sessionListCopy.add(s);
@@ -613,59 +665,120 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	}
 
 	public void printSingleSolutionToOutput(Solution sol){
-		sol.findAllMembers(schedules, blockSize);
+		//sol.findAllMembers(schedules, blockSize);
 		ArrayList<Session> sessions= sol.getSessions();
 		for (Session s:sessions){
-			ArrayList<Schedule> must=s.membersMustAttend;
-			ArrayList<Schedule> can=s.members;
 			textSolutionOutput.append(times[s.time]+":\n");
 			textSolutionOutput.append(s.toString());
-			s.printMustAttend();
 		}
 	}
 
 	public void printSolutionsToOutputWindow(ArrayList<Solution> solutions){
 		//limit number of solutions to print by maxSolutionsToPrint or all if smaller
 		for (int i=0;i<maxSolutionsToPrint && i<solutions.size();i++){
-			//if (solutions.get(i).getNumSessions()<=maxSessions){
 				textSolutionOutput.append("\n");
 				Solution sol=solutions.get(i);
 				textSolutionOutput.append("*******Solution "+i+"********\n");
 				textSolutionOutput.append(""+sol.getRank()+"\n");
-	//			System.out.println("*******Solution "+i+"********");
-	//			System.out.format("Rank: %.2f\n",sol.getRank());
 				Collections.sort(sol.getSessions());
 				for (Session session:sol.getSessions()){
 					int index=session.time;
-					//System.out.println("\t"+times[index]);
 					textSolutionOutput.append("\t"+times[index]+"\n");;
-
-					//print ratio of must attend to can attend
-					//System.out.println(session.membersMustAttend.size()+"/"+session.members.size());
-
-					//print names of those who can attend
-					//session.print();
-					//System.out.println();
-
-					//print names of those who must attend:
-					//session.printMustAttend();
-					//System.out.println();
 				}
+
 				ArrayList<Solution> similar = sol.getSimilarSolutions();
 				for (int j=0;j<similar.size();j++){
 					Solution similarSol=similar.get(j);
-					textSolutionOutput.append("\n");
+					textSolutionOutput.append("Variation "+j+"\n");
 					Collections.sort(similarSol.getSessions());
 					for (Session session:similarSol.getSessions()){
 						int index=session.time;
 						textSolutionOutput.append(times[index]+"\n");
 					}
 					textSolutionOutput.append("\n");
-
 				}
-				//textSolutionOutput.append(sol.similarSolutionsToString());
-			//}
 		}
+	}
+	
+	public void printSolutionsToTable(ArrayList<Solution> solutions){
+		String printString="";
+		String[][] solutionArray;
+		if (solutions.size()<maxSolutionsToPrint) solutionArray= new String[solutions.size()][2];
+		else solutionArray=new String[maxSolutionsToPrint][2];
+		//DefaultListModel listModel;
+	    MultiLineTableCellRenderer renderer = new MultiLineTableCellRenderer();
+
+		//JList<String> list;
+		for (int i=0;i<maxSolutionsToPrint && i<solutions.size();i++){
+			printString="";
+			//listModel= new DefaultListModel();
+			Solution sol=solutions.get(i);
+			solutionArray[i][0]="Solution "+i;
+			//textSolutionOutput.append(""+sol.getRank()+"\n");
+			Collections.sort(sol.getSessions());
+			for (Session session:sol.getSessions()){
+				int index=session.time;
+				printString+=times[index]+",";
+				//listModel.addElement("times[index]");
+			}
+			solutionArray[i][1]=printString;
+			//list = new JList(listModel);
+			//solutionTable.getColumnModel().getColumn(1).
+		}
+
+		solutionTable = new JTable(solutionArray,new String[]{"",""});
+	    solutionTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
+	    int height = (solutionTable.getFont().getSize()+8)*maxSessions;
+	    solutionTable.setRowHeight(height);
+		//solutionTable.setBounds(10, 10, 300, 300);
+	    solutionTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+			public void valueChanged(ListSelectionEvent le){
+				textSolutionOutput.setText("");
+				int row = solutionTable.getSelectedRow();
+				 if (!solutionTable.getSelectionModel().getValueIsAdjusting()){
+					printSingleSolutionToOutput(solutions.get(row));
+					 }
+			}
+		});
+		scrollPane2.setViewportView(solutionTable);
+	}
+	
+	public void openSolutionsWindow(Solution sol){
+//		JButton myButton = new JButton("Open new window");
+//		myButton.setBounds(10, 300, 150, 30);
+//		frame.add(myButton);
+//		JFrame newFrame = new JFrame("New Window");
+//		newFrame.setSize(500, 500);
+//		newFrame.getContentPane().setBackground(bgColor);
+//		newFrame.setLayout(new BorderLayout());
+////		JPanel newPanel = new JPanel();
+////		newPanel.setBounds(10,10,300,300);
+////		newPanel.setOpaque(false);
+////		newFrame.getContentPane().add(newPanel);
+//
+//		JScrollPane ascrollPane = new JScrollPane();
+//		ascrollPane.setBounds(10, 10, 300, 300);
+//		newFrame.getContentPane().add(ascrollPane);
+//		String[][] numbers= new String[][]{{"0"},{"1"},{"2"},{"3"}};
+//		JTable table = new JTable(numbers,new String[]{""});
+//		table.setBounds(10, 10, 300, 300);
+//		//JTable tblTimes = new JTable(strTimes,new String[]{""});
+//
+//		JTextArea output = new JTextArea();
+//		output.setBounds(10, 10, 100, 100);
+//		output.setText("Test");
+//		//newFrame.getContentPane().add(output);
+//		ascrollPane.setViewportView(table);
+//
+//		//add this line of code
+//		myButton.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				// open a new frame i.e window
+//				//newFrame.pack();
+//				
+//				newFrame.setVisible(true);
+//			}
+//		});
 	}
 
 	/**
@@ -686,13 +799,13 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			 while (scanner.hasNextLine()){
 				 //TODO learn how to check for empty data
 				String line = scanner.nextLine();
-				String dayName ="";
+				//String dayName ="";
 				//if headers found & columns known, go ahead and read data in
 				if(foundHeaders && nameColumn!=-1 &&emailColumn!=-1 && dayIndices!=null){
-					System.out.println("reading in schedules "+nameColumn);
-					System.out.println(line);
+					//System.out.println("reading in schedules "+nameColumn);
+					//System.out.println(line);
 				    String[] fields = line.split(",");
-					System.out.println(fields.length);
+					//System.out.println(fields.length);
 					if (fields.length==0) continue;
 					//if (fields[nameColumn].isEmpty()) continue; //if no name then skip this row
 					if (fields[nameColumn].isEmpty()) continue; //if no name then skip this row
@@ -702,27 +815,36 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 				    int[] slots=new int[schedSize];
 				    int value;
 				    int slot=0;
-				    System.out.println("schedule size "+schedSize);
-				    System.out.println("fields length "+fields.length);
-				    System.out.println("headers length "+headerRow.length);
-				    if (fields.length<headerRow.length||fields[dayIndices[0]+1].isEmpty()){
-				    	System.out.println("empty schedule for: "+fields[nameColumn]);
+				   // System.out.println("schedule size "+schedSize);
+				   // System.out.println("fields length "+fields.length);
+				    //System.out.println("headers length "+headerRow.length);
+				   // if (fields.length<headerRow.length||fields[dayIndices[0]+1].isEmpty()){
+				    boolean badSchedule = false;
+				    int j=dayIndices[0];
+				    while (badSchedule==false && j<arraySize){
+				    	if (fields[j].equals("")) {
+				    		badSchedule=true;
+				    	}
+				    	j++;
+				    }
+				    if (fields.length<headerRow.length || badSchedule){
+				    	JOptionPane.showMessageDialog(null, "Error in schedule for: "+ fields[nameColumn]+
+			   					 ". Empty cells. \n Ignoring for this run.","Message",JOptionPane.WARNING_MESSAGE);
+				    	System.out.println("bad schedule for: "+fields[nameColumn]);
 				    }
 				    else{
 				    	for (int i=dayIndices[0];i<arraySize;i++){
-				    		//System.out.println("fields["+i+"]:"+fields[i]);
-					    	value=Integer.parseInt(fields[i]);
-					    	//Real code is commented out below
+				    		if (fields[i].equals("")) {
+				    			value=0;
+				   			 	JOptionPane.showMessageDialog(null, "Error in schedule for: "+ fields[nameColumn]+
+				   					 ". Empty cell at "+i+" replaced with '0'.","Message",JOptionPane.WARNING_MESSAGE);
+
+				    		}
+				    		else value=Integer.parseInt(fields[i]);
 					    	if (value==0 || value==1 || value==2) slots[slot]=value;
-					    	//if (value==0) slots[slot]=1;
-					    	//else if (value==1) slots[slot]=0;
-					    	//else if (value==2) slots[slot]=value;
 					    	slot++;
-					    	// this code is incorrect because file was setup incorrectly in spring 2016 switch 1 & 0
-					    	// if (fields[i].equals("0"))value=1;
-					    	//else value=2;
-					    	//slots[i-2]=value;
-					    	}
+				    		
+					    }
 				        //scanner.useDelimiter(",");
 				        //create the schedule
 				        Schedule studentSchedule=new SimpleSchedule(fields[nameColumn], fields[emailColumn], schedSize);
@@ -743,11 +865,8 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 						}
 						int i =0;
 						int j=0;
-						//int k=0;
 						schedSize=0;
 						boolean dayFound=false;
-						//System.out.println("Creating time array:");
-						//preferredMask=new int[schedSize];
 						while (i<headerRow.length){
 							if (headerRow[i].contains("day")) {
 								dayFound=true;
@@ -777,7 +896,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 					 if (headerRow[i].contains("day")){ baseMask[k]=2; times[k]="********"; day=headerRow[i];}
 					 else {baseMask[k]=0; times[k]=day+" "+headerRow[i];}
 					 //System.out.println(times[k]);
-
 					 k++;
 				 }
 				 Time startTime=new Time(headerRow[dayIndices[0]+1]);
@@ -790,9 +908,14 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 	         return schedules;
 		 }
 		 catch (FileNotFoundException e){
-			 System.out.println("File not found");
+			 JOptionPane.showMessageDialog(null, "File not found. Please choose a different file.","Error",JOptionPane.ERROR_MESSAGE);
 		 }
 		 return null;
+	}
+	
+	public void handleBadFile(String error){
+		JOptionPane.showMessageDialog(null, "Problem with file "+dataFile+":"+error+" Please correct or choose a new file.","Error",JOptionPane.ERROR_MESSAGE);
+		lblFileChosen.setText("");
 	}
 
 	public void printSolutionToFile(String filename, int numSolutions){
@@ -812,9 +935,50 @@ public class BibleStudySchedulerWindow implements ActionListener,ItemListener,Ch
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void initPreferredMask(){
 		preferredMask=baseMask.clone();
+		int length=preferredMask.length;
+		for (int i=2;i<length;i++){
+			if (preferredMask[i]==2){
+				preferredMask[i-2]=1;
+				preferredMask[i-1]=1;
+				preferredMask[i+1]=1;
+				preferredMask[i+2]=1;
+			}
+		}
+		preferredMask[length-1]=1;
+		preferredMask[length-2]=1;
 	}
 
+	public class MultiLineTableCellRenderer extends JList<String> implements TableCellRenderer {
+
+	    /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		@Override
+	    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+	        //make multi line where the cell value is String[]
+//	        if (value instanceof String[]) {
+//	            setListData((String[]) value);
+//	        }
+			if (value instanceof String){
+				String[] data = ((String)value).split(",");
+				setListData(data);
+			}
+
+	        //cell backgroud color when selected
+	        if (isSelected) {
+	            setBackground(UIManager.getColor("Table.selectionBackground"));
+	        } else {
+	            setBackground(UIManager.getColor("Table.background"));
+	        }
+
+	        return this;
+	    }
+	}
+	
 }
+

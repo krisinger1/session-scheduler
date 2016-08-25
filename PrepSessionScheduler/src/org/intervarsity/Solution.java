@@ -207,7 +207,7 @@ public class Solution implements Comparable<Solution>{
 	 * @param blockSize number of blocks in schedule that need to be open for a session to fit
 	 */
 	public void findAllMembers(ArrayList<Schedule> schedules, int blockSize){
-		System.out.println(getRank());
+		//System.out.println(getRank());
 		for (Session session:sessions){ //clear out any schedules that were added while determining possible solutions
 			session.members.clear();
 			session.membersMustAttend.clear();
@@ -228,7 +228,7 @@ public class Solution implements Comparable<Solution>{
 
 			}
 			//if only one session fits, also add to mustAttend list
-			System.out.println(schedule.getName()+" "+numFound);
+			//System.out.println(schedule.getName()+" "+numFound);
 			if (numFound==1) sessionFound.addMustAttend(schedule);
 			//TODO error handling for this case
 			if (numFound==0) System.out.println("ERROR: no session found for schedule: "+schedule.getName());
