@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -98,7 +100,9 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	private Color bgColor = new Color(0,206,216);
 	private JLabel lblResultsTbl;
 	private JTable solutionTable;
+	private JTable variationTable;
 	private JScrollPane scrollPane2;
+	private JScrollPane variationScrollPane;
 
 
 
@@ -141,8 +145,8 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 		frame.setBounds(25, 25, 1200, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
-		
-		
+
+
 //		   Parameter input section
 
 		  JPanel panelParameterInput = new JPanel();
@@ -206,7 +210,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 		  gbc_lblNumBocls.gridx = 1;
 		  gbc_lblNumBocls.gridy = 1;
 		  panelParameterInput.add(lblNumBocls, gbc_lblNumBocls);
-		  
+
 		  // ********* Max sessions **********
 
 		  comboMaxSessions = new JComboBox<Integer>();
@@ -232,7 +236,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 		  gbc_lblMaxSessions.gridy = 2;
 		  panelParameterInput.add(lblMaxSessions, gbc_lblMaxSessions);
 
-		  
+
 		  // ********* Min students **********
 
 		  comboMinStudents = new JComboBox<Integer>();
@@ -456,18 +460,18 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 
 		scrollPane2 = new JScrollPane();
 		scrollPane2.setBounds(440, 42, 350, 579);
-		
+
 		solutionTable= new JTable();
 		//solutionTable.
 		//solutionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		System.out.println(solutionTable.getSelectionModel().toString());
-		
-		
+		//System.out.println(solutionTable.getSelectionModel().toString());
 
-		scrollPane2.setViewportView(solutionTable);
+
+
+		//scrollPane2.setViewportView(solutionTable);
 		frame.getContentPane().add(scrollPane2);
 
-		
+
 		lblResults = new JLabel("Students for this solution:");
 		lblResults.setBounds(800, 312, 150, 14);
 		frame.getContentPane().add(lblResults);
@@ -475,19 +479,22 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(800, 342, 330, 279);
 		frame.getContentPane().add(scrollPane);
-		
+
 		textSolutionOutput = new JTextArea();
 		scrollPane.setViewportView(textSolutionOutput);
 		textSolutionOutput.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		textSolutionOutput.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+
 	}
 
 
-	// ******* handle button events ******************** 
+	// ******* handle button events ********************
+
 	public void actionPerformed(ActionEvent ae){
 		// ******************  Run button ***************
 		if (ae.getActionCommand().equals("Run")){
-			
+
 			//empty arrayLists for next run
 			solutions.clear();
 			textSolutionOutput.setText("");
@@ -571,8 +578,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			//printSolutionsToOutputWindow(distinctSolutions);
 			//if (distinctSolutions.size()!=0) printSingleSolutionToOutput(distinctSolutions.get(0));
 			printSolutionsToTable(distinctSolutions);
-
-			
 
 		}
 		else if (ae.getActionCommand().equals("Reset Form")){
@@ -699,7 +704,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 				}
 		}
 	}
-	
+
 	public void printSolutionsToTable(ArrayList<Solution> solutions){
 		String printString="";
 		String[][] solutionArray;
@@ -730,19 +735,63 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	    solutionTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
 	    int height = (solutionTable.getFont().getSize()+8)*maxSessions;
 	    solutionTable.setRowHeight(height);
-		//solutionTable.setBounds(10, 10, 300, 300);
+
 	    solutionTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 			public void valueChanged(ListSelectionEvent le){
-				textSolutionOutput.setText("");
+				//textSolutionOutput.setText("");
 				int row = solutionTable.getSelectedRow();
 				 if (!solutionTable.getSelectionModel().getValueIsAdjusting()){
 					printSingleSolutionToOutput(solutions.get(row));
 					 }
 			}
 		});
+	    scrollPane2.setViewportView(solutionTable);
+	}
+
+	public void printVariationsToTable(ArrayList<Solution> variations){
+		String printString="";
+		String[][] solutionArray;
+		if (variations.size()<maxSolutionsToPrint) solutionArray= new String[variations.size()][2];
+		else solutionArray=new String[maxSolutionsToPrint][2];
+		//DefaultListModel listModel;
+	    MultiLineTableCellRenderer renderer = new MultiLineTableCellRenderer();
+
+		//JList<String> list;
+		for (int i=0;i<maxSolutionsToPrint && i<variations.size();i++){
+			printString="";
+			//listModel= new DefaultListModel();
+			Solution sol=variations.get(i);
+			solutionArray[i][0]="Solution "+i;
+			//textSolutionOutput.append(""+sol.getRank()+"\n");
+			Collections.sort(sol.getSessions());
+			for (Session session:sol.getSessions()){
+				int index=session.time;
+				printString+=times[index]+",";
+				//listModel.addElement("times[index]");
+			}
+			solutionArray[i][1]=printString;
+			//list = new JList(listModel);
+			//solutionTable.getColumnModel().getColumn(1).
+		}
+
+		solutionTable = new JTable(solutionArray,new String[]{"",""});
+	    solutionTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
+	    int height = (solutionTable.getFont().getSize()+8)*maxSessions;
+	    solutionTable.setRowHeight(height);
+
+	    solutionTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+			public void valueChanged(ListSelectionEvent le){
+				//textSolutionOutput.setText("");
+				int row = solutionTable.getSelectedRow();
+				 if (!solutionTable.getSelectionModel().getValueIsAdjusting()){
+					printSingleSolutionToOutput(variations.get(row));
+					 }
+			}
+		});
 		scrollPane2.setViewportView(solutionTable);
 	}
-	
+
+
 	public void openSolutionsWindow(Solution sol){
 //		JButton myButton = new JButton("Open new window");
 //		myButton.setBounds(10, 300, 150, 30);
@@ -775,7 +824,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 //			public void actionPerformed(ActionEvent e) {
 //				// open a new frame i.e window
 //				//newFrame.pack();
-//				
+//
 //				newFrame.setVisible(true);
 //			}
 //		});
@@ -843,7 +892,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 				    		else value=Integer.parseInt(fields[i]);
 					    	if (value==0 || value==1 || value==2) slots[slot]=value;
 					    	slot++;
-				    		
+
 					    }
 				        //scanner.useDelimiter(",");
 				        //create the schedule
@@ -912,7 +961,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 		 }
 		 return null;
 	}
-	
+
 	public void handleBadFile(String error){
 		JOptionPane.showMessageDialog(null, "Problem with file "+dataFile+":"+error+" Please correct or choose a new file.","Error",JOptionPane.ERROR_MESSAGE);
 		lblFileChosen.setText("");
@@ -954,7 +1003,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	public class MultiLineTableCellRenderer extends JList<String> implements TableCellRenderer {
 
 	    /**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 
@@ -979,6 +1028,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	        return this;
 	    }
 	}
-	
+
 }
 
