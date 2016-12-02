@@ -62,6 +62,7 @@ import java.awt.Dimension;
 public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	private ArrayList<Solution> solutions=new ArrayList<Solution>();
 	private ArrayList<Solution> distinctSolutions;
+	private Solution selectedSolution;
 	private String[] times;
 	private ArrayList<Schedule> schedules;
 	public static int schedSize;
@@ -83,6 +84,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	private JLabel lblcan;
 	private JLabel lblmust;
 	private JLabel lblResults;
+	private JLabel lblVarTbl;
 	private JPanel panel;
 	private JComboBox<Integer> comboMinStudents, comboMaxSessions,comboMaxStudents,comboBlockSize;
 	private JScrollPane scrollPane;
@@ -96,6 +98,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	private JFileChooser chooser = new JFileChooser();
 	private File dataFile;
 	private JButton btnRun = new JButton("Run");
+	private JButton btnSave = new JButton("Save");
 	private JLabel lblFileChosen = new JLabel();
 	private Color bgColor = new Color(0,206,216);
 	private JLabel lblResultsTbl;
@@ -276,9 +279,15 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 
 		// ********* Choose file button **********
 		JButton btnChooseFile= new JButton("Choose file");
-		btnChooseFile.setBounds(110, 599, 133, 23);
+		btnChooseFile.setBounds(110, 497, 133, 23);
 		frame.getContentPane().add(btnChooseFile);
 		btnChooseFile.addActionListener(this);
+		
+		// ********* Save Button *****************
+		btnSave.setBounds(800,531,133,23);
+		btnSave.addActionListener(this);
+		frame.getContentPane().add(btnSave);
+		btnSave.setEnabled(false); //not enabled till a solution chosen
 
 		// ********* Sliders for weights **********
 
@@ -460,16 +469,17 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 
 		scrollPane2 = new JScrollPane();
 		scrollPane2.setBounds(440, 42, 350, 579);
-
 		solutionTable= new JTable();
-		//solutionTable.
-		//solutionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		//System.out.println(solutionTable.getSelectionModel().toString());
-
-
-
-		//scrollPane2.setViewportView(solutionTable);
 		frame.getContentPane().add(scrollPane2);
+		
+		lblVarTbl = new JLabel("Variations:");
+		lblVarTbl.setBounds(800, 12, 94, 14);
+		frame.getContentPane().add(lblVarTbl);
+		
+		variationScrollPane= new JScrollPane();
+		variationScrollPane.setBounds(800,42,330,250);
+		variationTable = new JTable();
+		frame.getContentPane().add(variationScrollPane);
 
 
 		lblResults = new JLabel("Students for this solution:");
@@ -598,6 +608,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			lblFileChosen.setText("");
 			btnRun.setEnabled(false);
 			textSolutionOutput.setText("");
+			
 			solutionTable=null;
 		}
 
@@ -626,6 +637,9 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 					}
 				}
 			}
+		}
+		else if (ae.getActionCommand().equals("Save")){
+			printSolutionToFile("solution.csv",selectedSolution);
 		}
 	}
 
@@ -671,10 +685,43 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 
 	public void printSingleSolutionToOutput(Solution sol){
 		//sol.findAllMembers(schedules, blockSize);
+		textSolutionOutput.setText("");
 		ArrayList<Session> sessions= sol.getSessions();
 		for (Session s:sessions){
 			textSolutionOutput.append(times[s.time]+":\n");
 			textSolutionOutput.append(s.toString());
+		}
+	}
+	
+	public String getCsvSingleSolution(Solution sol){
+		ArrayList<Session> sessions = sol.getSessions();
+		String result = "";
+		for (Session sess:sessions){
+			ArrayList<Schedule> membersCanAttend = sess.members;
+			result+=times[sess.time]+":\n";
+			for (Schedule s:membersCanAttend){
+				if (sess.membersMustAttend.contains(s)) result+="*";
+				result+=s.getName()+","+s.getEmail()+"\n";
+			}
+			result+="\n";
+
+		}
+		return result;
+	}
+	
+	public void printSolutionToFile(String filename, Solution sol){
+		//TODO finish printSolutionsToFile
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(filename, "UTF-8");
+			writer.println(getCsvSingleSolution(sol));
+			writer.close();
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "File not found. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			JOptionPane.showMessageDialog(null, "Unsupported encoding exception. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
 		}
 	}
 
@@ -704,6 +751,8 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 				}
 		}
 	}
+	
+
 
 	public void printSolutionsToTable(ArrayList<Solution> solutions){
 		String printString="";
@@ -741,7 +790,10 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 				//textSolutionOutput.setText("");
 				int row = solutionTable.getSelectedRow();
 				 if (!solutionTable.getSelectionModel().getValueIsAdjusting()){
-					printSingleSolutionToOutput(solutions.get(row));
+					//printSingleSolutionToOutput(solutions.get(row));
+					 ArrayList<Solution> variations = solutions.get(row).getSimilarSolutions();
+					 variations.add(0, solutions.get(row));
+					 printVariationsToTable(variations);
 					 }
 			}
 		});
@@ -750,45 +802,41 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 
 	public void printVariationsToTable(ArrayList<Solution> variations){
 		String printString="";
-		String[][] solutionArray;
-		if (variations.size()<maxSolutionsToPrint) solutionArray= new String[variations.size()][2];
-		else solutionArray=new String[maxSolutionsToPrint][2];
-		//DefaultListModel listModel;
+		String[][] variationArray;
+		if (variations.size()<maxSolutionsToPrint) variationArray= new String[variations.size()][2];
+		else variationArray=new String[maxSolutionsToPrint][2];
 	    MultiLineTableCellRenderer renderer = new MultiLineTableCellRenderer();
 
-		//JList<String> list;
 		for (int i=0;i<maxSolutionsToPrint && i<variations.size();i++){
 			printString="";
-			//listModel= new DefaultListModel();
 			Solution sol=variations.get(i);
-			solutionArray[i][0]="Solution "+i;
+			variationArray[i][0]="Variation "+i;
 			//textSolutionOutput.append(""+sol.getRank()+"\n");
 			Collections.sort(sol.getSessions());
 			for (Session session:sol.getSessions()){
 				int index=session.time;
 				printString+=times[index]+",";
-				//listModel.addElement("times[index]");
 			}
-			solutionArray[i][1]=printString;
-			//list = new JList(listModel);
-			//solutionTable.getColumnModel().getColumn(1).
+			variationArray[i][1]=printString;
 		}
 
-		solutionTable = new JTable(solutionArray,new String[]{"",""});
-	    solutionTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
-	    int height = (solutionTable.getFont().getSize()+8)*maxSessions;
-	    solutionTable.setRowHeight(height);
+		variationTable = new JTable(variationArray,new String[]{"",""});
+	    variationTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
+	    int height = (variationTable.getFont().getSize()+8)*maxSessions;
+	    variationTable.setRowHeight(height);
 
-	    solutionTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+	    variationTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 			public void valueChanged(ListSelectionEvent le){
 				//textSolutionOutput.setText("");
-				int row = solutionTable.getSelectedRow();
-				 if (!solutionTable.getSelectionModel().getValueIsAdjusting()){
-					printSingleSolutionToOutput(variations.get(row));
+				int row = variationTable.getSelectedRow();
+				 if (!variationTable.getSelectionModel().getValueIsAdjusting()){
+					selectedSolution = variations.get(row);
+					printSingleSolutionToOutput(selectedSolution);
+					btnSave.setEnabled(true);
 					 }
 			}
 		});
-		scrollPane2.setViewportView(solutionTable);
+		variationScrollPane.setViewportView(variationTable);
 	}
 
 
@@ -967,23 +1015,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 		lblFileChosen.setText("");
 	}
 
-	public void printSolutionToFile(String filename, int numSolutions){
-		//TODO finish printSolutionsToFile
-		PrintWriter writer;
-		try {
-			writer = new PrintWriter(filename, "UTF-8");
-			for(int i=0; i<numSolutions;i++){
 
-			}
-			writer.close();
-		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "File not found. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			JOptionPane.showMessageDialog(null, "Unsupported encoding exception. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		}
-	}
 
 	public void initPreferredMask(){
 		preferredMask=baseMask.clone();

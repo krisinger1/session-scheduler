@@ -75,7 +75,7 @@ public class Session implements Comparable<Session>{
 		String result="";
 		for (Schedule s:members){
 			if (membersMustAttend.contains(s)) result+="*";
-			result+=" "+s.getName()+" "+s.getEmail()+"\n";
+			result+=" "+s.getName()+"\t\t "+s.getEmail()+"\n";
 		}
 		result+="\n";
 		return result;
