@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
+
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -47,6 +48,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.JSeparator;
 import java.awt.GridBagLayout;
@@ -65,6 +67,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	private Solution selectedSolution;
 	private String[] times;
 	private ArrayList<Schedule> schedules;
+	ArrayList<Schedule> schedulesCopy;
 	public static int schedSize;
 	//private ArrayList<Time> possibleTimes=new ArrayList<Time>();
 	private int[] baseMask;
@@ -282,9 +285,9 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 		btnChooseFile.setBounds(110, 497, 133, 23);
 		frame.getContentPane().add(btnChooseFile);
 		btnChooseFile.addActionListener(this);
-		
+
 		// ********* Save Button *****************
-		btnSave.setBounds(800,531,133,23);
+		btnSave.setBounds(1000,311,133,23);
 		btnSave.addActionListener(this);
 		frame.getContentPane().add(btnSave);
 		btnSave.setEnabled(false); //not enabled till a solution chosen
@@ -471,11 +474,11 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 		scrollPane2.setBounds(440, 42, 350, 579);
 		solutionTable= new JTable();
 		frame.getContentPane().add(scrollPane2);
-		
+
 		lblVarTbl = new JLabel("Variations:");
 		lblVarTbl.setBounds(800, 12, 94, 14);
 		frame.getContentPane().add(lblVarTbl);
-		
+
 		variationScrollPane= new JScrollPane();
 		variationScrollPane.setBounds(800,42,330,250);
 		variationTable = new JTable();
@@ -503,20 +506,23 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 
 	public void actionPerformed(ActionEvent ae){
 		// ******************  Run button ***************
+		//TODO move reading of schedules to choose file button and error check so no crash when format wrong
 		if (ae.getActionCommand().equals("Run")){
 
 			//empty arrayLists for next run
 			solutions.clear();
 			textSolutionOutput.setText("");
+			variationTable=null;
+			variationScrollPane.setViewportView(variationTable);
+			solutionTable=null;
+			scrollPane2.setViewportView(solutionTable);
 
 			// read schedules in from file
-			//TODO error handling for bad or file not found
 			schedules=readSchedulesFromFile(dataFile);
 			if (schedules.size()==0){
 				System.out.println("schedules array is empty");
 				return;}
 			Schedule s=schedules.get(0);
-			//schedSize=s.getSchedule().length;
 			int i=0;
 			for (int slot:s.getSchedule()){if (slot==2)i++;}
 			int[] numSlotsPerDay=new int[i+1];
@@ -533,7 +539,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			numSlotsPerDay[i]=j;  //final entry in array
 
 			Tree solutionTree=new Tree(null, new Session(-1));
-			ArrayList<Schedule> schedulesCopy=(ArrayList<Schedule>)schedules.clone();
+			schedulesCopy=(ArrayList<Schedule>)schedules.clone();
 			Scheduler.sortSchedules(schedulesCopy,(int)comboBlockSize.getSelectedItem());
 			//textSolutionOutput.setText(schedulesCopy.toString());
 			//String printString="Mask:\n";
@@ -543,12 +549,12 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			do {
 				Scheduler.createTree(schedulesCopy, solutionTree,possibleMask,minStudents,schedSize,blockSize,maxStudents);
 				if (!solutionTree.hasLeaves()) {
-					//System.out.println("Impossible schedule, "+schedulesCopy.get(0).getName()+"removed");
-					textSolutionOutput.append("Impossible schedule, "+schedulesCopy.get(0).getName()+"removed");
+					JOptionPane.showMessageDialog(null, "Impossible schedule removed. \nThere are no possible solutions containing \nthis schedule for given parameters.\n> "+schedulesCopy.get(0).getName(),"Impossible Schedule", JOptionPane.WARNING_MESSAGE);
+					//textSolutionOutput.append("Impossible schedule, "+schedulesCopy.get(0).getName()+" removed");
 					schedulesCopy.remove(0);
 				}
 			}		while (!solutionTree.hasLeaves());
-			Tree.printSolutionToFile(solutionTree, 0,"solution.txt");
+			//Tree.printSolutionToFile(solutionTree, 0,"solution.txt");
 			if (!(solutionTree==null)) solutionTree.pruneTree();
 //TODO null pointer exception in create solutions..
 			createSolutions(solutionTree, new ArrayList<Session>());
@@ -560,7 +566,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			}
 			Collections.sort(solutions);
 			//printSolutionsToOutputWindow(solutions);
-			//TODO collect nearly same solutions together after sorting
 			distinctSolutions = new ArrayList<Solution>();
 			// find similar solutions
 			for (Solution baseSolution:solutions){
@@ -607,9 +612,14 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			//textSolutionOutput.setText("number of days checked: 0");
 			lblFileChosen.setText("");
 			btnRun.setEnabled(false);
+			btnSave.setEnabled(false);
 			textSolutionOutput.setText("");
-			
+			variationTable=null;
+			variationScrollPane.setViewportView(variationTable);
 			solutionTable=null;
+			scrollPane2.setViewportView(solutionTable);
+
+
 		}
 
 		else if (ae.getActionCommand().equals("Choose file")){
@@ -617,11 +627,15 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			boolean okFile=false;
 			int option = 0;
 			while (option != JFileChooser.CANCEL_OPTION && !okFile){
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				        "CSV files", "csv");
+				chooser.setFileFilter(filter); // filter to show only .csv files
 				option = chooser.showOpenDialog(frame);
 				if(option == JFileChooser.APPROVE_OPTION){
 					//String folder = (String)chooser.getSelectedFile( ).getAbsolutePath();
 					dataFile = chooser.getSelectedFile();
-					if (dataFile.getName().endsWith(".csv")){  //make sure user chooses a .csv file
+					//make sure user chooses a .csv file since they can change the filter
+					if (dataFile.getName().endsWith(".csv")){
 						btnRun.setEnabled(true);
 						frame.getContentPane().add(lblFileChosen);
 						lblFileChosen.setBounds(110, 630, 275, 23);
@@ -639,7 +653,34 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			}
 		}
 		else if (ae.getActionCommand().equals("Save")){
-			printSolutionToFile("solution.csv",selectedSolution);
+			int option=0;
+			boolean saved=false;
+			File saveFile;
+			JFileChooser saveChooser =new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			        "CSV files", "csv");
+			saveChooser.setFileFilter(filter);
+			while (option != JFileChooser.CANCEL_OPTION && !saved){
+				option = saveChooser.showSaveDialog(frame);
+				if (option == JFileChooser.APPROVE_OPTION){
+					saveFile = saveChooser.getSelectedFile();
+
+					if (!saveFile.getName().endsWith(".csv")) saveFile=new File(saveFile.getPath()+".csv");
+					if (!saveFile.exists()){
+						printSolutionToFile(saveFile.getPath(),selectedSolution);
+						saved=true;
+						}
+					else {
+						int action = JOptionPane.showConfirmDialog(null, "File "+saveFile.getName()+" already exists. Overwrite?");
+						if (action==JOptionPane.OK_OPTION){
+							printSolutionToFile(saveFile.getPath(),selectedSolution);
+							saved=true;
+						}
+						else saved=false;
+					}
+				}
+			}
+			//printSolutionToFile("solution.csv",selectedSolution);
 		}
 	}
 
@@ -662,7 +703,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 				sessionListClone.add(new Session(s.time,s.preferred));
 			}
 			solution.setSessions(sessionListClone);
-			solution.findAllMembers(schedules, blockSize);
+			solution.findAllMembers(schedulesCopy, blockSize);
 			for (Session s :solution.getSessions()){ //check parameters to make sure solution satisfies
 				if (s.members.size()<minStudents)goodSolution=false;
 				else if (solution.getSessions().size()>maxSessions)goodSolution=false;
@@ -692,7 +733,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			textSolutionOutput.append(s.toString());
 		}
 	}
-	
+
 	public String getCsvSingleSolution(Solution sol){
 		ArrayList<Session> sessions = sol.getSessions();
 		String result = "";
@@ -708,9 +749,9 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 		}
 		return result;
 	}
-	
+
 	public void printSolutionToFile(String filename, Solution sol){
-		//TODO finish printSolutionsToFile
+		//TODO use dialog box to choose file to save to
 		PrintWriter writer;
 		try {
 			writer = new PrintWriter(filename, "UTF-8");
@@ -727,6 +768,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 
 	public void printSolutionsToOutputWindow(ArrayList<Solution> solutions){
 		//limit number of solutions to print by maxSolutionsToPrint or all if smaller
+
 		for (int i=0;i<maxSolutionsToPrint && i<solutions.size();i++){
 				textSolutionOutput.append("\n");
 				Solution sol=solutions.get(i);
@@ -751,10 +793,15 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 				}
 		}
 	}
-	
+
 
 
 	public void printSolutionsToTable(ArrayList<Solution> solutions){
+		if (solutions.size()==0) {
+			textSolutionOutput.append("No solutions found");
+			//TODO make this a dialog box for no solutions found
+			return;
+		}
 		String printString="";
 		String[][] solutionArray;
 		if (solutions.size()<maxSolutionsToPrint) solutionArray= new String[solutions.size()][2];
@@ -927,7 +974,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 				    if (fields.length<headerRow.length || badSchedule){
 				    	JOptionPane.showMessageDialog(null, "Error in schedule for: "+ fields[nameColumn]+
 			   					 ". Empty cells. \n Ignoring for this run.","Message",JOptionPane.WARNING_MESSAGE);
-				    	System.out.println("bad schedule for: "+fields[nameColumn]);
+				    	//System.out.println("bad schedule for: "+fields[nameColumn]);
 				    }
 				    else{
 				    	for (int i=dayIndices[0];i<arraySize;i++){
@@ -988,7 +1035,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 
 				 //for (int i=dayIndices[0];i<headerRow.length;i++){
 				 for (int i=dayIndices[0];i<dayIndices[0]+schedSize;i++){
-
+					 System.out.println(headerRow.length+" SchedSize "+schedSize+"k "+k+" i "+i);
 					 times[k]=headerRow[i];
 					 if (headerRow[i].contains("day")){ baseMask[k]=2; times[k]="********"; day=headerRow[i];}
 					 else {baseMask[k]=0; times[k]=day+" "+headerRow[i];}
