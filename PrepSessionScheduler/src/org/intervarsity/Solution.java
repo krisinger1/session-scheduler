@@ -215,7 +215,7 @@ public class Solution implements Comparable<Solution>{
 			//session.printMustAttend();
 
 		}
-		
+
 		for (Schedule schedule:schedules){
 			int numFound=0; //count how many sessions fit this schedule
 			Session sessionFound=null;
@@ -253,14 +253,18 @@ public class Solution implements Comparable<Solution>{
 	}
 
 	/**
-	 * compare 2 solutions by rank
+	 * compare a solution to another solution s by their ranks
+	 * @param s solution to compare to
+	 * @return 1 if this solution ranked higher, -1 if s is ranked higher, 0 if they are equal
+	 * @see calculateNormalizedRank 
+	 * @see calculateRank
 	 */
 	public int compareTo(Solution s){
 		if (rank<s.getRank()) return -1;
 		else if (rank>s.getRank()) return 1;
 		else return 0;
 	}
-	
+
 	public boolean isSame(Solution sol){
 		if (this.getNumSessions()!=sol.getNumSessions()) return false;
 		for (Session s:this.sessions){
@@ -274,8 +278,9 @@ public class Solution implements Comparable<Solution>{
 
 	/**
 	 * check for similarity of 2 solutions by session
-	 * @param s solution to compare to for similarity
-	 * @return
+	 * @param sol solution to compare to for similarity
+	 * @return true if solutions are similar - all sessions are 2 or fewer time slots apart from the comparison session
+	 *
 	 */
 	public boolean isSimilar(Solution sol){
 		//TODO finish isSimilar method
