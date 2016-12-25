@@ -1,8 +1,6 @@
-package org.intervarsity;
+package gui;
 
 import java.awt.EventQueue;
-
-import gui.MainFrame;
 
 public class SchedulerApp {
 
