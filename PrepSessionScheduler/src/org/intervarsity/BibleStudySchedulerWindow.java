@@ -115,18 +115,18 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					BibleStudySchedulerWindow window = new BibleStudySchedulerWindow();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					BibleStudySchedulerWindow window = new BibleStudySchedulerWindow();
+//					window.frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the application.
@@ -1035,7 +1035,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 
 				 //for (int i=dayIndices[0];i<headerRow.length;i++){
 				 for (int i=dayIndices[0];i<dayIndices[0]+schedSize;i++){
-					 System.out.println(headerRow.length+" SchedSize "+schedSize+"k "+k+" i "+i);
+					 //System.out.println(headerRow.length+" SchedSize "+schedSize+"k "+k+" i "+i);
 					 times[k]=headerRow[i];
 					 if (headerRow[i].contains("day")){ baseMask[k]=2; times[k]="********"; day=headerRow[i];}
 					 else {baseMask[k]=0; times[k]=day+" "+headerRow[i];}
