@@ -14,14 +14,20 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import controller.Controller;
+
 public class MainFrame extends JFrame {
 	private InputPanel inputPanel = new InputPanel();
 	private ResultsPanel resultsPanel = new ResultsPanel();
+	private StudentDataPanel studentDataPanel = new StudentDataPanel();
 	private int maxStudents;
 	private JFileChooser fileChooser;
+	private Controller controller;
 
 	public MainFrame(String title){
 		super(title);
+
+		controller = new Controller();
 
 		fileChooser = new JFileChooser();
 		fileChooser.setFileFilter(new MyFileFilter());
@@ -43,41 +49,44 @@ public class MainFrame extends JFrame {
 			}
 		});
 
-//		inputPanel.setParameterListener(new ParameterListener(){
-//
-//			@Override
-//			public void parameterChanged(int number,String name) {
-//				System.out.println(name+"from listener: "+number);
-//			}
-//
-//		});
+		studentDataPanel.setStudentFormListener(new StudentFormListener(){
 
-		add(inputPanel,BorderLayout.WEST);
+			@Override
+			public void StudentFormEventOccurred(StudentDataEvent e) {
+				controller.addStudent(e.getName(), e.getEmail());
+				System.out.println("main frame: "+e.getName()+" name");
+			}
+
+		});
+
+		inputPanel.setVisible(false);
+		//add(inputPanel,BorderLayout.WEST);
+		add(studentDataPanel,BorderLayout.WEST);
 		add(resultsPanel,BorderLayout.EAST);
 	}
-	
+
 	private JMenuBar createMenuBar(){
 		JMenuBar menuBar = new JMenuBar();
-		
-		
+
+
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem importMenuItem = new JMenuItem("Import File...");
 		JMenuItem exitItem = new JMenuItem("Exit");
 		fileMenu.add(importMenuItem);
 		fileMenu.addSeparator();
 		fileMenu.add(exitItem);
-		
-		 
+
+
 		importMenuItem.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				fileChooser.showOpenDialog(MainFrame.this);
 			}
-			
+
 		});
-		
-		
+
+
 		fileMenu.setMnemonic(KeyEvent.VK_F);
 		exitItem.setMnemonic(KeyEvent.VK_X);
 		exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,ActionEvent.CTRL_MASK));
@@ -86,23 +95,23 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-				int option = JOptionPane.showConfirmDialog(MainFrame.this, "Are you sure you want to exit?", 
+				int option = JOptionPane.showConfirmDialog(MainFrame.this, "Are you sure you want to exit?",
 						"Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
 				if (option==JOptionPane.OK_OPTION) System.exit(0); //Exit the program
 			}
-			
+
 		});
-		
+
 		JMenu otherMenu = new JMenu("Other");
 		JMenu subMenu = new JMenu("Sub Menu");
 		JMenuItem subMenuItem =new JMenuItem("Item");
 		subMenu.add(subMenuItem);
 		otherMenu.add(subMenu);
-		
-		
+
+
 		menuBar.add(fileMenu);
 		menuBar.add(otherMenu);
 		return menuBar;
-		
+
 	}
 }
