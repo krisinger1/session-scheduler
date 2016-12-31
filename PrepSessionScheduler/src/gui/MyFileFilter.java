@@ -12,13 +12,13 @@ public class MyFileFilter extends FileFilter{
 		String name = file.getName();
 		String extension = Utils.getFileExtension(name);
 		if (extension == null) return false;
-		else if (extension.equals("csv")) return true;
+		else if (extension.equals("stu")) return true;
 		else return false;
 	}
 
 	@Override
 	public String getDescription() {
-		return "Comma separated values file (*.csv)";
+		return "Comma separated values file (*.stu)";
 	}
 
 }

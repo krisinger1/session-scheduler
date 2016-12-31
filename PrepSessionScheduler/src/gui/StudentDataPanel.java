@@ -19,7 +19,6 @@ import org.intervarsity.Parameters;
 public class StudentDataPanel extends JPanel implements ActionListener{
 	private JTextField nameTxt;
 	private JTextField emailTxt;
-	private JScrollPane tableScrollPane;
 	private JButton addButton;
 	private StudentFormListener studentFormListener;
 
@@ -31,11 +30,12 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 
 		nameTxt=new JTextField(15);
 		emailTxt = new JTextField(15);
-		tableScrollPane = new JScrollPane();
 		addButton = new JButton("Add Student");
 
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Parameters.schemeColor1);
+
+		//////////////// Name ////////////////////////////
 		gc.gridx=0;
 		gc.gridy=0;
 		gc.insets= new Insets(0,0,0,5);
@@ -53,6 +53,8 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		gc.weighty=1;
 		add(nameTxt,gc);
 
+		/////////////////// Email /////////////////////////////
+
 		gc.gridx=0;
 		gc.gridy=1;
 		gc.anchor=GridBagConstraints.FIRST_LINE_END;
@@ -67,11 +69,13 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		gc.weighty=1;
 		add(emailTxt,gc);
 
+		///////////////////// Button ///////////////////////////
+
 		gc.gridx=1;
 		gc.gridy=2;
 		gc.weighty=20;
 		add(addButton,gc);
-		
+
 		addButton.addActionListener(this);
 
 	}
@@ -82,10 +86,15 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		StudentDataEvent event = new StudentDataEvent(this, nameTxt.getText(), emailTxt.getText());
-		if (studentFormListener != null){
-			studentFormListener.StudentFormEventOccurred(event);
-		}
-		
+			StudentDataEvent event = new StudentDataEvent(this, nameTxt.getText(), emailTxt.getText());
+			if (studentFormListener != null){
+				studentFormListener.StudentFormEventOccurred(event);
+			}
+			resetForm();
+	}
+
+	public void resetForm(){
+		nameTxt.setText("");
+		emailTxt.setText("");
 	}
 }

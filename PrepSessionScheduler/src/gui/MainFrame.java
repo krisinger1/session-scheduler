@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -20,6 +21,7 @@ public class MainFrame extends JFrame {
 	private InputPanel inputPanel = new InputPanel();
 	private ResultsPanel resultsPanel = new ResultsPanel();
 	private StudentDataPanel studentDataPanel = new StudentDataPanel();
+	private TablePanel tablePanel=new TablePanel();
 	private int maxStudents;
 	private JFileChooser fileChooser;
 	private Controller controller;
@@ -35,7 +37,7 @@ public class MainFrame extends JFrame {
 		setJMenuBar(createMenuBar());
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(1000,800));
-		setMinimumSize(new Dimension(500,500));
+		setMinimumSize(new Dimension(800,500));
 		//TODO learn how to use setImageIcon()
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
@@ -55,14 +57,18 @@ public class MainFrame extends JFrame {
 			public void StudentFormEventOccurred(StudentDataEvent e) {
 				controller.addStudent(e.getName(), e.getEmail());
 				System.out.println("main frame: "+e.getName()+" name");
+				tablePanel.refresh();
 			}
 
 		});
+
+		tablePanel.setData(controller.getStudents());
 
 		inputPanel.setVisible(false);
 		//add(inputPanel,BorderLayout.WEST);
 		add(studentDataPanel,BorderLayout.WEST);
 		add(resultsPanel,BorderLayout.EAST);
+		add(tablePanel,BorderLayout.CENTER);
 	}
 
 	private JMenuBar createMenuBar(){
@@ -71,8 +77,10 @@ public class MainFrame extends JFrame {
 
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem importMenuItem = new JMenuItem("Import File...");
+		JMenuItem exportMenuItem = new JMenuItem("Export file...");
 		JMenuItem exitItem = new JMenuItem("Exit");
 		fileMenu.add(importMenuItem);
+		fileMenu.add(exportMenuItem);
 		fileMenu.addSeparator();
 		fileMenu.add(exitItem);
 
@@ -81,7 +89,36 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				fileChooser.showOpenDialog(MainFrame.this);
+				int choice = fileChooser.showOpenDialog(MainFrame.this);
+				if (choice==JFileChooser.APPROVE_OPTION){
+					try {
+						controller.loadFromFile(fileChooser.getSelectedFile());
+						tablePanel.refresh();
+
+					} catch (IOException e) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Could not load file", "Error", JOptionPane.ERROR_MESSAGE);
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+
+		});
+
+		exportMenuItem.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int choice = fileChooser.showSaveDialog(MainFrame.this);
+				if (choice==JFileChooser.APPROVE_OPTION){
+					try {
+						controller.saveToFile(fileChooser.getSelectedFile());
+					} catch (IOException e) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Could not save file", "Error", JOptionPane.ERROR_MESSAGE);
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 
 		});
