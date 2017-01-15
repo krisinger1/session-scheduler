@@ -3,22 +3,25 @@ package gui;
 import java.util.EventObject;
 
 public class StudentDataEvent extends EventObject{
-	String name;
+	String FName;
+	String LName;
 	String email;
 
-	public StudentDataEvent(Object source,String name, String email) {
+	public StudentDataEvent(Object source,String FName, String LName, String email) {
 		super(source);
-		this.name=name;
+		this.FName=FName;
+		this.LName= LName;
 		this.email=email;
 
 	}
 
-	public String getName() {
-		return name;
+	public String getLName() {
+		return LName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setName(String FName, String LName) {
+		this.FName = FName;
+		this.LName=LName;
 	}
 
 	public String getEmail() {
@@ -27,6 +30,10 @@ public class StudentDataEvent extends EventObject{
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getFName() {
+		return FName;
 	}
 
 
