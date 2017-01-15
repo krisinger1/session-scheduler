@@ -2,19 +2,31 @@ package model;
 
 import java.io.Serializable;
 
-public class Student implements Serializable{
+public class Student implements Serializable, Comparable<Student>{
 	static private int count=0;
 	private int id;
-	private String name;
+	private String firstName;
+	private String lastName;
 	private String email;
 	//private int[] schedule;
+	StudentSchedule schedule;
 
-	public Student(String name, String email){
+	public Student(String firstName, String lastName, String email){
 		id = count;
-		this.name=name;
+		this.firstName=firstName;
+		this.lastName=lastName;
 		this.email=email;
 		//schedule=new int[50];
 		count++;
+	}
+
+	public void setSchedule(StudentSchedule schedule){
+		this.schedule=schedule;
+	}
+
+	public StudentSchedule getSchedule() throws NullPointerException{
+		if (schedule!= null) return schedule;
+		else throw new NullPointerException();
 	}
 
 	public int getId() {
@@ -25,12 +37,13 @@ public class Student implements Serializable{
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getFullName() {
+		return firstName+" "+lastName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setName(String firstName, String lastName) {
+		this.firstName = firstName;
+		this.lastName =  lastName;
 	}
 
 	public String getEmail() {
@@ -42,7 +55,15 @@ public class Student implements Serializable{
 	}
 
 	public String toString(){
-		return (name+" "+email);
+		return (getFullName()+" "+email);
+	}
+
+	@Override
+	public int compareTo(Student stu) {
+		int lastNameCompare = this.lastName.compareTo(stu.lastName);
+		if (lastNameCompare!=0) return lastNameCompare;
+		else return this.firstName.compareTo(stu.firstName);
+				
 	}
 
 //	public int[] getSchedule() {

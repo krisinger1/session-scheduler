@@ -9,7 +9,7 @@ import model.Student;
 public class StudentTableModel extends AbstractTableModel{
 	private List<Student> db;
 	private String[] colNames = {"Name","Email Address"};
-	
+
 
 	@Override
 	public String getColumnName(int column) {
@@ -35,7 +35,7 @@ public class StudentTableModel extends AbstractTableModel{
 		Student student = db.get(row);
 		switch(col){
 		case 0:
-			return student.getName();
+			return student.getFullName();
 		case 1:
 			return student.getEmail();
 		}
