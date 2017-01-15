@@ -2,6 +2,7 @@ package org.intervarsity;
 
 import java.util.ArrayList;
 
+
 /**
  * represents a single solution of sessions that allow all students to attend at east one session
  * solutions have a rank based on how well they meet certain criteria -
@@ -256,7 +257,7 @@ public class Solution implements Comparable<Solution>{
 	 * compare a solution to another solution s by their ranks
 	 * @param s solution to compare to
 	 * @return 1 if this solution ranked higher, -1 if s is ranked higher, 0 if they are equal
-	 * @see calculateNormalizedRank 
+	 * @see calculateNormalizedRank
 	 * @see calculateRank
 	 */
 	public int compareTo(Solution s){
