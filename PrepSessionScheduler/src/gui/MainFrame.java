@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -22,14 +23,19 @@ public class MainFrame extends JFrame {
 	private ResultsPanel resultsPanel = new ResultsPanel();
 	private StudentDataPanel studentDataPanel = new StudentDataPanel();
 	private TablePanel tablePanel=new TablePanel();
+	private PreferencesDialog preferencesDialog;
+	private Preferences preferences;
 	private int maxStudents;
 	private JFileChooser fileChooser;
 	private Controller controller;
+
 
 	public MainFrame(String title){
 		super(title);
 
 		controller = new Controller();
+		preferencesDialog = new PreferencesDialog(this);
+		preferences=Preferences.userRoot().node("db");
 
 		fileChooser = new JFileChooser();
 		fileChooser.setFileFilter(new MyFileFilter());
@@ -41,6 +47,23 @@ public class MainFrame extends JFrame {
 		//TODO learn how to use setImageIcon()
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
+
+		preferencesDialog.setPreferencesListener(new PreferencesListener() {
+
+			@Override
+			public void preferencesSet(String user, String password, int port) {
+				System.out.println(user+" "+password+" "+port);
+				preferences.put("user", user);
+				preferences.put("password", password);
+				preferences.putInt("port", port);
+			}
+		});
+
+		String user=preferences.get("user", "");
+		String password = preferences.get("password", "");
+		Integer port = preferences.getInt("port", 3306);
+		preferencesDialog.setDefaults(user, password, port);
+
 
 		inputPanel.setInputFormListener(new InputFormListener(){
 
@@ -55,14 +78,24 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void StudentFormEventOccurred(StudentDataEvent e) {
-				controller.addStudent(e.getName(), e.getEmail());
-				System.out.println("main frame: "+e.getName()+" name");
-				tablePanel.refresh();
+				if (!e.getFName().equals("") && !e.getLName().equals("")){
+					controller.addStudent(e.getFName(),e.getLName(), e.getEmail());
+					tablePanel.refresh();
+				}
 			}
 
 		});
 
 		tablePanel.setData(controller.getStudents());
+
+		tablePanel.setTableListener(new TableListener(){
+
+			@Override
+			public void rowDeleted(int row) {
+				controller.removeStudent(row);
+			}
+
+		});
 
 		inputPanel.setVisible(false);
 		//add(inputPanel,BorderLayout.WEST);
@@ -79,11 +112,22 @@ public class MainFrame extends JFrame {
 		JMenuItem importMenuItem = new JMenuItem("Import File...");
 		JMenuItem exportMenuItem = new JMenuItem("Export file...");
 		JMenuItem exitItem = new JMenuItem("Exit");
+		JMenuItem preferencesMenuItem = new JMenuItem("Preferences...");
 		fileMenu.add(importMenuItem);
 		fileMenu.add(exportMenuItem);
 		fileMenu.addSeparator();
+		fileMenu.add(preferencesMenuItem);
+		fileMenu.addSeparator();
 		fileMenu.add(exitItem);
 
+		preferencesMenuItem.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				preferencesDialog.setVisible(true);
+			}
+
+		});
 
 		importMenuItem.addActionListener(new ActionListener(){
 
@@ -125,6 +169,8 @@ public class MainFrame extends JFrame {
 
 
 		fileMenu.setMnemonic(KeyEvent.VK_F);
+		exportMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,ActionEvent.CTRL_MASK));
+		importMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,ActionEvent.CTRL_MASK));
 		exitItem.setMnemonic(KeyEvent.VK_X);
 		exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,ActionEvent.CTRL_MASK));
 

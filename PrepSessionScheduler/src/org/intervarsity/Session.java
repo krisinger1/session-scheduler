@@ -2,6 +2,7 @@ package org.intervarsity;
 
 import java.util.ArrayList;
 
+
 /**
  * Represents one session of a Bible prep.
  * includes time of the session.

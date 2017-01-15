@@ -12,7 +12,7 @@ public class Scheduler {
 	static ArrayList<Day> days=new ArrayList<Day>();
 
 	/**
-	 * sort and arraylist of Schedules from worst to best	
+	 * sort and arraylist of Schedules from worst to best
 	 * @param sList - an ArrayList of Schedule objects
 	 * @param blockSize - integer number of schedule blocks needed
 	 */
@@ -22,12 +22,12 @@ public class Scheduler {
 		}
 		Collections.sort(sList);
 	}
-		
+
 	/**
 	 * creates a tree of possible session combinations that cover all the schedules
-	 * and meet other restrictions 
+	 * and meet other restrictions
 	 * @param sList - list of schedules trying to put into a tree of solutions
-	 * @param parent - node of the tree we are starting from 
+	 * @param parent - node of the tree we are starting from
 	 * @param mask - integer array to mask off any not allowable schedule times
 	 * @param minSessionSize - int number of students required for a session to be a valid solution
 	 * @param SCHED_SIZE- integer number of total blocks in a schedule
@@ -62,7 +62,7 @@ public class Scheduler {
 							tempList.add(s);
 						}
 					}
-					
+
 					//if (tempList.size()>=minSessionSize){ //if enough people can come
 						foundOne=true;
 						Session session =new Session(index);
@@ -75,7 +75,7 @@ public class Scheduler {
 							newMask[index+j]=1;
 						}
 						session.members.addAll(tempList);
-						smallerList.removeAll(tempList);					
+						smallerList.removeAll(tempList);
 						createTree(smallerList,solutionLeaf,newMask,minSessionSize,SCHED_SIZE,blockSize,maxStudents);
 						//Tree.printTree(solutionLeaf, 0);
 					//}
