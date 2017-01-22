@@ -9,25 +9,40 @@ public class Student implements Serializable, Comparable<Student>{
 	private String lastName;
 	private String email;
 	//private int[] schedule;
-	StudentSchedule schedule;
+	//StudentSchedule schedule;
+	int[][] schedule;
 
-	public Student(String firstName, String lastName, String email){
+	public Student(String firstName, String lastName, String email, int[][] schedule){
 		id = count;
 		this.firstName=firstName;
 		this.lastName=lastName;
 		this.email=email;
+		this.schedule=schedule;
+//		for (int i=0; i<3;i++){
+//			for (int j=0; j<17;j++){
+//				schedule[i][j]=0;
+//			}
+//		}
 		//schedule=new int[50];
 		count++;
 	}
 
-	public void setSchedule(StudentSchedule schedule){
+	public Student(int id,String firstName, String lastName, String email, int[][] schedule){
+		this.id = id;
+		this.firstName=firstName;
+		this.lastName=lastName;
+		this.email=email;
 		this.schedule=schedule;
 	}
 
-	public StudentSchedule getSchedule() throws NullPointerException{
-		if (schedule!= null) return schedule;
-		else throw new NullPointerException();
-	}
+//	public void setSchedule(StudentSchedule schedule){
+//		this.schedule=schedule;
+//	}
+//
+//	public StudentSchedule getSchedule() throws NullPointerException{
+//		if (schedule!= null) return schedule;
+//		else throw new NullPointerException();
+//	}
 
 	public int getId() {
 		return id;
@@ -55,7 +70,7 @@ public class Student implements Serializable, Comparable<Student>{
 	}
 
 	public String toString(){
-		return (getFullName()+" "+email);
+		return (getFullName()+" "+email+" "+schedule[0][0]);
 	}
 
 	@Override
@@ -63,7 +78,20 @@ public class Student implements Serializable, Comparable<Student>{
 		int lastNameCompare = this.lastName.compareTo(stu.lastName);
 		if (lastNameCompare!=0) return lastNameCompare;
 		else return this.firstName.compareTo(stu.firstName);
-				
+
+	}
+
+	public String getFName() {
+		// TODO Auto-generated method stub
+		return firstName;
+	}
+
+	public String getLName(){
+		return lastName;
+	}
+
+	public int[][] getSchedule(){
+		return schedule;
 	}
 
 //	public int[] getSchedule() {

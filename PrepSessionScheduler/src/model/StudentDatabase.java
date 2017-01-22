@@ -22,13 +22,42 @@ public class StudentDatabase {
 	}
 
 	public void addStudent(Student student){
+		System.out.println(students.toString());
 		students.add(student);
+		System.out.println("database addStudent -->student: "+student.getSchedule()[0][0]+" "+student.getSchedule()[0][1]);
+		System.out.println(students.toString());
+
 	}
+	
+	public Student getStudent(int index){
+		return students.get(index);
+	}
+
+	public void removeStudent(int index) {
+		students.remove(index);
+	}
+
+	public void updateStudent(Student student){
+		int id = student.getId();
+		for (Student s:students){
+			if (s.getId()==student.getId()) {
+				System.out.println("updating student");
+				System.out.println("database updateStudent -->s: "+s.getId()+" "+s.getSchedule()[0][0]+" "+s.getSchedule()[0][1]);
+				System.out.println("database updateStudent -->student: "+id+" "+student.getSchedule()[0][0]+" "+student.getSchedule()[0][1]);
+				int index=students.indexOf(s);
+				students.set(index, student);
+				System.out.println("database updateStudent -->students: "+students.get(0).getId()+" "+students.get(0).getSchedule()[0][0]+" "+students.get(0).getSchedule());
+				System.out.println("database updateStudent -->students: "+students.get(1).getId()+" "+students.get(1).getSchedule()[0][0]+" "+students.get(1).getSchedule());
+				System.out.println(students.toString());
+			}
+		}
+	}
+
 
 	public List<Student> getStudents(){
 		return Collections.unmodifiableList(students); //prevent other classes from being able to modify the data
 	}
-	
+
 //////////////////// for actual database connection - learn later ////////////////////
 //	public void connect() throws Exception{
 //		try {
@@ -67,7 +96,10 @@ public class StudentDatabase {
 		ois.close();
 	}
 
-	public void removeStudent(int index) {
-		students.remove(index);
+	public String toString(){
+		String data ="";
+		for (Student s:students) data+=s.toString();
+		return data;
 	}
+	
 }

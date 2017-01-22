@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 
@@ -14,6 +16,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
 import controller.Controller;
@@ -23,6 +26,7 @@ public class MainFrame extends JFrame {
 	private ResultsPanel resultsPanel = new ResultsPanel();
 	private StudentDataPanel studentDataPanel = new StudentDataPanel();
 	private TablePanel tablePanel=new TablePanel();
+	private ScheduleInputPanel scheduleInputPanel=new ScheduleInputPanel();
 	private PreferencesDialog preferencesDialog;
 	private Preferences preferences;
 	private int maxStudents;
@@ -42,8 +46,8 @@ public class MainFrame extends JFrame {
 		//fileChooser.addChoosableFileFilter(new MyFileFilter());
 		setJMenuBar(createMenuBar());
 		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(1000,800));
-		setMinimumSize(new Dimension(800,500));
+		setPreferredSize(new Dimension(1500,1000));
+		setMinimumSize(new Dimension(1000,800));
 		//TODO learn how to use setImageIcon()
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
@@ -78,8 +82,16 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void StudentFormEventOccurred(StudentDataEvent e) {
-				if (!e.getFName().equals("") && !e.getLName().equals("")){
-					controller.addStudent(e.getFName(),e.getLName(), e.getEmail());
+				if (e.getId()==-1 && !e.getFName().equals("") && !e.getLName().equals("")){
+					System.out.println("StudentFormEvent: "+e.getSchedule()[0][0]+" "+e.getSchedule()[0][1]);
+					controller.addStudent(e.getFName(),e.getLName(), e.getEmail(),e.getSchedule());
+					System.out.println("after controller: "+controller.getStudents().get(0));
+
+					tablePanel.refresh();
+				}
+				else if (!e.getFName().equals("") && !e.getLName().equals("")){
+					controller.updateStudent(e.getId(), e.getFName(),e.getLName(), e.getEmail(),e.getSchedule());
+					System.out.println("StudentFormEvent: "+e.getSchedule()[0][0]+" "+e.getSchedule()[0][1]);
 					tablePanel.refresh();
 				}
 			}
@@ -95,13 +107,28 @@ public class MainFrame extends JFrame {
 				controller.removeStudent(row);
 			}
 
+			@Override
+			public void rowSelected(int row) {
+				studentDataPanel.populateForm(controller.getStudents().get(row));
+				System.out.println("rowSelected: "+controller.getStudents().get(row).toString());
+			}
+
 		});
+//		int[][] days = new int[3][17];
+//		for (int i=0;i<17;i++){
+//			for (int j=0;j<3;j++){
+//				days[j][i]=0;
+//			}
+//		}
+
+		//scheduleInputPanel.setData(days);
 
 		inputPanel.setVisible(false);
-		//add(inputPanel,BorderLayout.WEST);
+		add(inputPanel,BorderLayout.WEST);
 		add(studentDataPanel,BorderLayout.WEST);
-		add(resultsPanel,BorderLayout.EAST);
+		//add(resultsPanel,BorderLayout.EAST);
 		add(tablePanel,BorderLayout.CENTER);
+		//add(scheduleInputPanel,BorderLayout.EAST);
 	}
 
 	private JMenuBar createMenuBar(){

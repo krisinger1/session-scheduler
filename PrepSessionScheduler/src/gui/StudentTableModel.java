@@ -37,7 +37,8 @@ public class StudentTableModel extends AbstractTableModel{
 		case 0:
 			return student.getFullName();
 		case 1:
-			return student.getEmail();
+			//return student.getEmail();
+			return student.getSchedule()[0][0];
 		}
 		return null;
 	}

@@ -3,16 +3,25 @@ package gui;
 import java.util.EventObject;
 
 public class StudentDataEvent extends EventObject{
+	int id;
 	String FName;
 	String LName;
 	String email;
+	int [][] schedule;
 
-	public StudentDataEvent(Object source,String FName, String LName, String email) {
+	public StudentDataEvent(Object source,int id, String FName, String LName, String email, int[][] schedule) {
 		super(source);
+		this.id=id;
 		this.FName=FName;
 		this.LName= LName;
 		this.email=email;
+		this.schedule=schedule;
+		System.out.println("StudentDataEvent: "+schedule[0][0]+" "+schedule[0][1]);
 
+	}
+
+	public int getId(){
+		return this.id;
 	}
 
 	public String getLName() {
@@ -34,6 +43,14 @@ public class StudentDataEvent extends EventObject{
 
 	public String getFName() {
 		return FName;
+	}
+
+	public int[][] getSchedule(){
+		return schedule;
+	}
+
+	public void setSchedule(int[][] schedule){
+		this.schedule=schedule;
 	}
 
 

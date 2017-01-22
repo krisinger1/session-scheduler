@@ -41,6 +41,13 @@ public class TablePanel extends JPanel{
 					studentTable.getSelectionModel().setSelectionInterval(row, row);
 					tablePopup.show(studentTable, e.getX(), e.getY());
 				}
+				else if (e.getButton()==MouseEvent.BUTTON1){
+					int row= studentTable.getSelectedRow();
+					//int row=studentTable.rowAtPoint(e.getPoint());
+					//studentTable.getSelectionModel().setSelectionInterval(row, row);
+					System.out.println("TablePanel: row "+row+" selected");
+					studentTableListener.rowSelected(row);
+				}
 			}
 
 		});
@@ -72,6 +79,7 @@ public class TablePanel extends JPanel{
 
 	public void refresh(){
 		studentTableModel.fireTableDataChanged();
+		//studentTableModel.
 	}
 
 	public void setTableListener(TableListener listener) {

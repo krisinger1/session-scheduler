@@ -12,10 +12,21 @@ import model.StudentDatabase;
 public class Controller {
 	StudentDatabase db= new StudentDatabase();
 
-	public void addStudent(String firstName, String lastName, String email){
-		Student student = new Student(firstName, lastName, email);
-		db.addStudent(student);
+	public void addStudent(String firstName, String lastName, String email, int[][] schedule){
+		Student student = new Student(firstName, lastName, email,schedule);
 		System.out.println("controller: "+student);
+		//System.out.println("controller: "+db.getStudents().get(0));
+		System.out.println("controller db: "+db.toString());
+		db.addStudent(student);
+		System.out.println("controller db after: "+db.toString());
+
+
+	}
+
+	public void updateStudent(int id, String firstName, String lastName, String email, int[][] schedule){
+		Student student = new Student(id, firstName, lastName, email,schedule);
+		System.out.println("controller updateStudent: "+schedule[0][0]+" "+schedule[0][1]);
+		db.updateStudent(student);
 	}
 
 	public List<Student> getStudents(){
@@ -33,4 +44,5 @@ public class Controller {
 	public void removeStudent(int row) {
 		db.removeStudent(row);
 	}
+
 }
