@@ -20,17 +20,24 @@ public class ScheduleTableRenderer implements TableCellRenderer {
 		table.setGridColor(Color.LIGHT_GRAY);
 		table.setPreferredSize(new Dimension(250,450));
 		table.setMinimumSize(new Dimension(150,500));
+
+		String valueString = value.toString();
+		field.setText(valueString);
 		if (column!=0 && value!=null) {
-			String valueString = value.toString();
-			field.setText(valueString);
-			if (Integer.parseInt(valueString)==0) field.setBackground(Color.GREEN);
-			else if(Integer.parseInt(valueString)==1) field.setBackground(Color.RED);
-			else field.setBackground(Color.pink);
+			if (isSelected) {
+				if ((Integer)table.getValueAt(row, column)==1) field.setBackground(new Color(250,160,130));
+				else field.setBackground(new Color(90,230,90));
+			}
+			else{
+				if (Integer.parseInt(valueString)==0) field.setBackground(new Color(160,250,160));
+				else if(Integer.parseInt(valueString)==1) field.setBackground(new Color(250,190,160));
+				else field.setBackground(Color.LIGHT_GRAY);
+			}
 		}
 		else {
-			field.setText(value.toString());
 			field.setBackground(new Color(230, 230, 230));
 		}
+
 		return field;
 	}
 

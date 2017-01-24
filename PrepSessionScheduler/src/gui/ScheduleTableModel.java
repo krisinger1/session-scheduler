@@ -16,8 +16,8 @@ public class ScheduleTableModel extends AbstractTableModel{
 	@Override
 	public void setValueAt(Object value, int row, int col) {
 		if (days==null) return;
-
-		days[col-1][row]=Integer.parseInt((String) value);
+		days[col-1][row]=(Integer)value;
+		//days[col-1][row]=Integer.parseInt((String) value);
 		return;
 	}
 
@@ -34,7 +34,6 @@ public class ScheduleTableModel extends AbstractTableModel{
 	
 	public int[][] getData(){
 		return days;
-		//return days.clone();
 
 	}
 

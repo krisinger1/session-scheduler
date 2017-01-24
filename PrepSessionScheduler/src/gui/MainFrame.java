@@ -20,9 +20,13 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
 import controller.Controller;
+import unused.InputEvent;
+import unused.InputFormListener;
+import unused.InputPanel;
+import unused.ResultsPanel;
 
 public class MainFrame extends JFrame {
-	private InputPanel inputPanel = new InputPanel();
+	//private InputPanel inputPanel = new InputPanel();
 	private ResultsPanel resultsPanel = new ResultsPanel();
 	private StudentDataPanel studentDataPanel = new StudentDataPanel();
 	private TablePanel tablePanel=new TablePanel();
@@ -36,7 +40,6 @@ public class MainFrame extends JFrame {
 
 	public MainFrame(String title){
 		super(title);
-
 		controller = new Controller();
 		preferencesDialog = new PreferencesDialog(this);
 		preferences=Preferences.userRoot().node("db");
@@ -46,8 +49,8 @@ public class MainFrame extends JFrame {
 		//fileChooser.addChoosableFileFilter(new MyFileFilter());
 		setJMenuBar(createMenuBar());
 		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(1500,1000));
-		setMinimumSize(new Dimension(1000,800));
+		setPreferredSize(new Dimension(1500,700));
+		setMinimumSize(new Dimension(1000,700));
 		//TODO learn how to use setImageIcon()
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
@@ -67,16 +70,6 @@ public class MainFrame extends JFrame {
 		String password = preferences.get("password", "");
 		Integer port = preferences.getInt("port", 3306);
 		preferencesDialog.setDefaults(user, password, port);
-
-
-		inputPanel.setInputFormListener(new InputFormListener(){
-
-			@Override
-			public void inputFormEventOccurred(InputEvent ie) {
-				maxStudents=ie.getMaxStudents();
-				System.out.println("max students: "+maxStudents);
-			}
-		});
 
 		studentDataPanel.setStudentFormListener(new StudentFormListener(){
 
@@ -114,17 +107,9 @@ public class MainFrame extends JFrame {
 			}
 
 		});
-//		int[][] days = new int[3][17];
-//		for (int i=0;i<17;i++){
-//			for (int j=0;j<3;j++){
-//				days[j][i]=0;
-//			}
-//		}
 
-		//scheduleInputPanel.setData(days);
-
-		inputPanel.setVisible(false);
-		add(inputPanel,BorderLayout.WEST);
+//		inputPanel.setVisible(false);
+//		add(inputPanel,BorderLayout.WEST);
 		add(studentDataPanel,BorderLayout.WEST);
 		//add(resultsPanel,BorderLayout.EAST);
 		add(tablePanel,BorderLayout.CENTER);

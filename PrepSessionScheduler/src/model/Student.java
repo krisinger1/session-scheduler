@@ -24,7 +24,7 @@ public class Student implements Serializable, Comparable<Student>{
 //			}
 //		}
 		//schedule=new int[50];
-		count++;
+		//count++;
 	}
 
 	public Student(int id,String firstName, String lastName, String email, int[][] schedule){

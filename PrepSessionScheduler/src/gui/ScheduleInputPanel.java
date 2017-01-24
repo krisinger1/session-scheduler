@@ -1,28 +1,50 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.util.EventObject;
 
-import javax.swing.AbstractCellEditor;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.CellEditorListener;
-import javax.swing.table.TableCellEditor;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.intervarsity.Parameters;
 
 public class ScheduleInputPanel extends JPanel {
+	private boolean dirty=false;
 	private JTable scheduleTable;
 	private ScheduleTableModel scheduleTableModel;
-	//private ScheduleListener scheduleTableListener;
+	private ScheduleChangeListener scheduleChangeListener;
 
 	public ScheduleInputPanel(){
+
 		scheduleTableModel = new ScheduleTableModel();
 		scheduleTable = new JTable(scheduleTableModel);
+		scheduleTable.setCellSelectionEnabled(true);
 		scheduleTable.setDefaultRenderer(Object.class, new ScheduleTableRenderer());
+		scheduleTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		scheduleTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				dirty=true;
+				if (scheduleChangeListener!=null) scheduleChangeListener.scheduleChanged();
+				int rowIndexStart = scheduleTable.getSelectedRow();
+		         int rowIndexEnd = scheduleTable.getSelectionModel().getMaxSelectionIndex();
+		         int colIndexStart = scheduleTable.getSelectedColumn();
+		         int colIndexEnd = scheduleTable.getColumnModel().getSelectionModel().getMaxSelectionIndex();
+		         System.out.println(rowIndexStart+" "+rowIndexEnd+" "+colIndexStart+" "+colIndexEnd);
+				if (!e.getValueIsAdjusting()&&rowIndexStart>-1&&colIndexStart>0) {
+					for (int r=rowIndexStart;r<=rowIndexEnd;r++){
+						for (int c = colIndexStart;c<=colIndexEnd;c++){
+							toggleValueAt(r, c);
+						}
+					}
+				}
+			}
+		});
 
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(250,450));
@@ -33,6 +55,13 @@ public class ScheduleInputPanel extends JPanel {
 
 	}
 
+	public void toggleValueAt(int row, int col){
+		Integer value = (Integer) scheduleTable.getValueAt(row, col);
+		if (value==0) value=1;
+		else value=0;
+		scheduleTable.setValueAt(value, row, col);
+	}
+
 	public void setData(int[][] days){
 		scheduleTableModel.setData(days);
 	}
@@ -41,18 +70,16 @@ public class ScheduleInputPanel extends JPanel {
 		return scheduleTableModel.getData();
 	}
 
-//	public void clearSchedule(){
-//		int[][] days = new int[3][17];
-//		for (int i=0; i<3;i++){
-//			for (int j=0;j<17;j++){
-//				days[i][j]=0;
-//			}
-//		}
-//		scheduleTableModel.setData(days);
-//	}
+	public void clear(){
+		scheduleTable.clearSelection();
+	}
 
-	public void refresh(){
-		//scheduleTableModel.fireTableDataChanged();
+	public boolean isDirty(){
+		return dirty;
+	}
+
+	public void addScheduleChangeListener(ScheduleChangeListener listener) {
+		scheduleChangeListener=listener;
 	}
 
 }

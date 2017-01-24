@@ -1,22 +1,21 @@
 package gui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.intervarsity.Parameters;
 
@@ -30,10 +29,10 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 	private JTextField emailTxt;
 	private ScheduleInputPanel schedPanel;
 	int[][] days = new int[3][17];
-	private JButton addButton;
+	private JButton saveButton;
+	private JButton newButton;
 	private StudentFormListener studentFormListener;
-//	private JTable scheduleTable;
-//	private ScheduleTableModel scheduleTableModel;
+	private boolean dirty = false;
 
 	public StudentDataPanel(){
 		super();
@@ -46,27 +45,33 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		emailTxt = new JTextField(15);
 		schedPanel = new ScheduleInputPanel();
 		idLabel=new JLabel("ID= "+id);
-//		scheduleTableModel = new ScheduleTableModel();
-//		scheduleTable = new JTable(scheduleTableModel);
-//		scheduleTable.setDefaultRenderer(Object.class, new ScheduleTableRenderer());
 
-		
+		fNameTxt.getDocument().addDocumentListener(new MyDocumentListener());
+		lNameTxt.getDocument().addDocumentListener(new MyDocumentListener());
+		emailTxt.getDocument().addDocumentListener(new MyDocumentListener());
+		schedPanel.addScheduleChangeListener(new ScheduleChangeListener() {
 
-		//int[][] days = new int[3][17];
+			@Override
+			public void scheduleChanged() {
+				dirty=true;
+			    System.out.println("schedule dirty: "+ dirty);
+			    saveButton.setEnabled(true);
+			}
+		});
+
 		for (int i=0;i<17;i++){
 			for (int j=0;j<3;j++){
 				days[j][i]=0;
 			}
 		}
-		//scheduleTableModel.setData(days);
 
 		schedPanel.setData(days);
-		addButton = new JButton("Add Student");
-
+		saveButton = new JButton("Save Student");
+		saveButton.setEnabled(false);
+		newButton = new JButton("New");
 
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Parameters.schemeColor1);
-
 
 		//////////////// First Name ////////////////////////////
 		gc.gridx=0;
@@ -137,15 +142,22 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 
 		///////////////////// Button ///////////////////////////
 		gc.gridx=0;
-		gc.gridy++;	
-		add(idLabel,gc);
-		
+		gc.gridy++;
+		//add(idLabel,gc);
+		add(saveButton,gc);
+
 		gc.gridx=1;
 		//gc.gridy++;
 		gc.weighty=5;
-		add(addButton,gc);
+		add(newButton,gc);
 
-		addButton.addActionListener(this);
+		////////////////
+		gc.gridx=0;
+		gc.gridy++;
+		add(idLabel,gc);
+
+		saveButton.addActionListener(this);
+		newButton.addActionListener(this);
 		//TODO how to get ENTER key to trigger button event
 	}
 
@@ -155,12 +167,24 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if (e.getActionCommand()=="New"){
+			if (!dirty){
+				resetForm();
+			}
+			else {
+				int ans = JOptionPane.showConfirmDialog(this, "Data not saved. Continue anyway?", "Data not saved", JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE);
+				if (ans==JOptionPane.OK_OPTION) resetForm();
+			}
+		}
+		else if (e.getActionCommand()=="Save Student"){
 			StudentDataEvent event = new StudentDataEvent(this, id, fNameTxt.getText(), lNameTxt.getText(), emailTxt.getText(),schedPanel.getData() );
 			System.out.println("actionPerformed "+days[0][0]+" "+days[0][1]);
 			if (studentFormListener != null){
 				studentFormListener.StudentFormEventOccurred(event);
 			}
 			resetForm();
+
+		}
 	}
 
 	public void populateForm(Student student){
@@ -172,7 +196,9 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		days=student.getSchedule();
 		schedPanel.setData(days);
 		System.out.println("populateForm: "+days[0][0]+" "+days[0][1]);
-		schedPanel.refresh();
+		schedPanel.clear();
+		dirty=false;
+		saveButton.setEnabled(false);
 	}
 
 	public void resetForm(){
@@ -181,11 +207,34 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		fNameTxt.setText("");
 		lNameTxt.setText("");
 		emailTxt.setText("");
-//		for (int i=0;i<17;i++){
-//			for (int j=0;j<3;j++){
-//				//days[j][i]=0;
-//			}
-//		}
 		schedPanel.setData(new int[3][17]);
+		schedPanel.clear();
+		dirty=false;
+		saveButton.setEnabled(false);
+	}
+
+	private class MyDocumentListener implements DocumentListener{
+
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			dirty=true;
+		    System.out.println("dirty: "+ dirty);
+		    saveButton.setEnabled(true);
+		}
+
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			dirty=true;
+		    System.out.println("dirty: "+ dirty);
+		    saveButton.setEnabled(true);
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			dirty=true;
+		    System.out.println("dirty: "+ dirty);
+		    saveButton.setEnabled(true);
+		}
+
 	}
 }

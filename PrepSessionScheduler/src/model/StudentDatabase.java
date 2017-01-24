@@ -22,11 +22,20 @@ public class StudentDatabase {
 	}
 
 	public void addStudent(Student student){
+		student.setId(maxID()+1);
 		System.out.println(students.toString());
 		students.add(student);
 		System.out.println("database addStudent -->student: "+student.getSchedule()[0][0]+" "+student.getSchedule()[0][1]);
 		System.out.println(students.toString());
 
+	}
+	
+	private int maxID(){
+		int max=0;
+		for (Student student:students){
+			if (student.getId()>max) max = student.getId();
+		}
+		return max;
 	}
 	
 	public Student getStudent(int index){
@@ -47,7 +56,7 @@ public class StudentDatabase {
 				int index=students.indexOf(s);
 				students.set(index, student);
 				System.out.println("database updateStudent -->students: "+students.get(0).getId()+" "+students.get(0).getSchedule()[0][0]+" "+students.get(0).getSchedule());
-				System.out.println("database updateStudent -->students: "+students.get(1).getId()+" "+students.get(1).getSchedule()[0][0]+" "+students.get(1).getSchedule());
+				//System.out.println("database updateStudent -->students: "+students.get(1).getId()+" "+students.get(1).getSchedule()[0][0]+" "+students.get(1).getSchedule());
 				System.out.println(students.toString());
 			}
 		}
