@@ -26,10 +26,10 @@ public class ScheduleTableRenderer implements TableCellRenderer {
 		if (column!=0 && value!=null) {
 			if (isSelected) {
 				if ((Integer)table.getValueAt(row, column)==1) field.setBackground(new Color(250,160,130));
-				else field.setBackground(new Color(90,230,90));
+				else field.setBackground(new Color(100,230,90));
 			}
 			else{
-				if (Integer.parseInt(valueString)==0) field.setBackground(new Color(160,250,160));
+				if (Integer.parseInt(valueString)==0) field.setBackground(new Color(170,250,160));
 				else if(Integer.parseInt(valueString)==1) field.setBackground(new Color(250,190,160));
 				else field.setBackground(Color.LIGHT_GRAY);
 			}

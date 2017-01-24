@@ -31,6 +31,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 	int[][] days = new int[3][17];
 	private JButton saveButton;
 	private JButton newButton;
+	private JButton doneButton;
 	private StudentFormListener studentFormListener;
 	private boolean dirty = false;
 
@@ -69,6 +70,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		saveButton = new JButton("Save Student");
 		saveButton.setEnabled(false);
 		newButton = new JButton("New");
+		doneButton = new JButton("Done");
 
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Parameters.schemeColor1);
@@ -85,8 +87,10 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		add(new JLabel("First Name"),gc);
 
 		gc.anchor=GridBagConstraints.FIRST_LINE_START;
+		
 		gc.gridx=1;
 		gc.gridy=0;
+		gc.gridwidth=2;
 		gc.weightx=1;
 		gc.weighty=1;
 		add(fNameTxt,gc);
@@ -94,6 +98,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		//////////////// Last Name ////////////////////////////
 		gc.gridx=0;
 		gc.gridy++;
+		gc.gridwidth=1;
 		gc.insets= new Insets(0,0,0,5);
 
 		gc.weightx=1;
@@ -104,6 +109,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 
 		gc.anchor=GridBagConstraints.FIRST_LINE_START;
 		gc.gridx=1;
+		gc.gridwidth=2;
 		gc.weightx=1;
 		gc.weighty=1;
 		add(lNameTxt,gc);
@@ -113,12 +119,14 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		gc.gridx=0;
 		gc.gridy++;
 		gc.anchor=GridBagConstraints.FIRST_LINE_END;
+		gc.gridwidth=1;
 		gc.weightx=1;
 		gc.weighty=1;
 		add(new JLabel("Email"),gc);
 
 		gc.anchor=GridBagConstraints.FIRST_LINE_START;
 		gc.gridx=1;
+		gc.gridwidth=2;
 		gc.weightx=1;
 		gc.weighty=1;
 		add(emailTxt,gc);
@@ -128,28 +136,43 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		gc.gridx=0;
 		gc.gridy++;
 		gc.anchor=GridBagConstraints.FIRST_LINE_END;
+		gc.gridwidth=1;
 		gc.weightx=1;
 		gc.weighty=1;
 		add(new JLabel("Schedule"),gc);
-		//gc.gridwidth=2;
+		
+		
 		gc.gridx=1;
 		gc.gridy++;
+		gc.gridwidth=2;
 		gc.anchor=GridBagConstraints.FIRST_LINE_START;
-		gc.weightx=10;
-		gc.weighty=10;
+		gc.weightx=5;
+		gc.weighty=5;
 		add(schedPanel,gc);
 		//add(new JScrollPane(scheduleTable),gc);
 
 		///////////////////// Button ///////////////////////////
 		gc.gridx=0;
 		gc.gridy++;
+		gc.weighty=1;
+		gc.gridwidth=1;
 		//add(idLabel,gc);
 		add(saveButton,gc);
 
 		gc.gridx=1;
 		//gc.gridy++;
-		gc.weighty=5;
+		gc.weighty=1;
+		gc.gridwidth=1;
+		gc.anchor=GridBagConstraints.NORTH;
 		add(newButton,gc);
+		
+		gc.gridx=2;
+		//gc.gridy++;
+		gc.weighty=1;
+		gc.gridwidth=1;
+		gc.anchor=GridBagConstraints.FIRST_LINE_START;
+		//add(idLabel,gc);
+		add(doneButton,gc);
 
 		////////////////
 		gc.gridx=0;
@@ -158,6 +181,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 
 		saveButton.addActionListener(this);
 		newButton.addActionListener(this);
+		doneButton.addActionListener(this);
 		//TODO how to get ENTER key to trigger button event
 	}
 
@@ -177,13 +201,21 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 			}
 		}
 		else if (e.getActionCommand()=="Save Student"){
-			StudentDataEvent event = new StudentDataEvent(this, id, fNameTxt.getText(), lNameTxt.getText(), emailTxt.getText(),schedPanel.getData() );
-			System.out.println("actionPerformed "+days[0][0]+" "+days[0][1]);
-			if (studentFormListener != null){
-				studentFormListener.StudentFormEventOccurred(event);
+			if (!fNameTxt.getText().equals("") && !lNameTxt.getText().equals("")){
+				StudentDataEvent event = new StudentDataEvent(this, id, fNameTxt.getText(), lNameTxt.getText(), emailTxt.getText(),schedPanel.getData() );
+				System.out.println("actionPerformed "+days[0][0]+" "+days[0][1]);
+				if (studentFormListener != null){
+					studentFormListener.StudentFormEventOccurred(event);
+				}
+				resetForm();
 			}
-			resetForm();
-
+			else {
+				JOptionPane.showMessageDialog(this, "Please enter a first and last name.", "Warning", JOptionPane.OK_OPTION);
+			}
+		}
+		else if (e.getActionCommand()=="Done"){
+			//TODO implement Done button
+			System.out.println("Done button pressed");
 		}
 	}
 

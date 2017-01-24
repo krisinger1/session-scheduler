@@ -32,6 +32,7 @@ public class Controller {
 	public List<Student> getStudents(){
 		return db.getStudents();
 	}
+	
 
 	public void saveToFile(File file) throws IOException{
 		db.saveTofile(file);
