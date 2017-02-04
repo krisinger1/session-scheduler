@@ -18,9 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
-import org.intervarsity.Parameters;
-
 import controller.Controller;
+import model.Parameters;
 
 public class MainFrame extends JFrame {
 	private InputPanel inputPanel = new InputPanel();
@@ -94,6 +93,7 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void StudentFormEventOccurred(StudentDataEvent e) {
+				System.out.println("controller: StudentFormEventOccurred");
 				if (e.getId()==-1 && !e.getFName().equals("") && !e.getLName().equals("")){
 					System.out.println("StudentFormEvent: "+e.getSchedule()[0][0]+" "+e.getSchedule()[0][1]);
 					controller.addStudent(e.getFName(),e.getLName(), e.getEmail(),e.getSchedule());
@@ -103,7 +103,7 @@ public class MainFrame extends JFrame {
 				}
 				else if (!e.getFName().equals("") && !e.getLName().equals("")){
 					controller.updateStudent(e.getId(), e.getFName(),e.getLName(), e.getEmail(),e.getSchedule());
-					System.out.println("StudentFormEvent: "+e.getSchedule()[0][0]+" "+e.getSchedule()[0][1]);
+					System.out.println("StudentFormEvent update: "+e.getSchedule()[0][0]+" "+e.getSchedule()[0][1]);
 					tablePanel.refresh();
 				}
 			}
@@ -122,6 +122,28 @@ public class MainFrame extends JFrame {
 			public void rowSelected(int row) {
 				studentDataPanel.populateForm(controller.getStudents().get(row));
 				System.out.println("rowSelected: "+controller.getStudents().get(row).toString());
+			}
+		});
+
+////////////////// Input Panel ////////////////////////////////
+		inputPanel.setInputFormListener(new InputFormListener() {
+
+			@Override
+			public void inputFormEventOccurred(InputEvent event) {
+				System.out.println("input form event");
+				controller.runScheduler(event.getMaxStudents(), event.getMinStudents(),event.getMaxSessions(),event.getBlockSize());
+				resultsPanel.setSolutionsData(controller.getSolutions());
+				resultsPanel.refreshSolutions();
+			}
+		});
+
+////////////////// Results Panel //////////////////////////////
+		resultsPanel.setResultsTableListener(new ResultsTableListener() {
+
+			@Override
+			public void rowSelected(int row) {
+				System.out.println("in row selected...");
+				//resultsPanel.setVariationsData(controller.getVariations(row));
 			}
 		});
 

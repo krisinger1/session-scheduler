@@ -1,4 +1,4 @@
-package model;
+package unused;
 
 public abstract class Schedule implements Comparable<Schedule>{
 	private int rank;

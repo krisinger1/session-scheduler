@@ -11,19 +11,14 @@ public class Student implements Serializable, Comparable<Student>{
 	//private int[] schedule;
 	//StudentSchedule schedule;
 	int[][] schedule;
+	private int rank=-1;
 
 	public Student(String firstName, String lastName, String email, int[][] schedule){
-		id = count;
+//		id = count;
 		this.firstName=firstName;
 		this.lastName=lastName;
 		this.email=email;
 		this.schedule=schedule;
-//		for (int i=0; i<3;i++){
-//			for (int j=0; j<17;j++){
-//				schedule[i][j]=0;
-//			}
-//		}
-		//schedule=new int[50];
 		//count++;
 	}
 
@@ -34,15 +29,6 @@ public class Student implements Serializable, Comparable<Student>{
 		this.email=email;
 		this.schedule=schedule;
 	}
-
-//	public void setSchedule(StudentSchedule schedule){
-//		this.schedule=schedule;
-//	}
-//
-//	public StudentSchedule getSchedule() throws NullPointerException{
-//		if (schedule!= null) return schedule;
-//		else throw new NullPointerException();
-//	}
 
 	public int getId() {
 		return id;
@@ -69,20 +55,34 @@ public class Student implements Serializable, Comparable<Student>{
 		this.email = email;
 	}
 
+	public void setRank(int rank){
+		if (this.rank==-1) this.rank=rank;
+	}
+
+	public void calculateRank(int blockSize){
+		rank=numOpenBlocks(blockSize);
+	}
+
+	public int getRank(){
+		return rank;
+	}
+
 	public String toString(){
 		return (getFullName()+" "+email+" "+schedule[0][0]);
 	}
 
 	@Override
 	public int compareTo(Student stu) {
-		int lastNameCompare = this.lastName.compareTo(stu.lastName);
-		if (lastNameCompare!=0) return lastNameCompare;
-		else return this.firstName.compareTo(stu.firstName);
+//		int lastNameCompare = this.lastName.compareTo(stu.lastName);
+//		if (lastNameCompare!=0) return lastNameCompare;
+//		else return this.firstName.compareTo(stu.firstName);
+		if (rank>stu.getRank()) return 1;
+		else if (rank<stu.getRank()) return -1;
+		else return 0;
 
 	}
 
 	public String getFName() {
-		// TODO Auto-generated method stub
 		return firstName;
 	}
 
@@ -94,11 +94,46 @@ public class Student implements Serializable, Comparable<Student>{
 		return schedule;
 	}
 
-//	public int[] getSchedule() {
-//		return schedule;
-//	}
-//
-//	public void setSchedule(int[] schedule) {
-//		this.schedule = schedule;
-//	}
+	public boolean hasBlockOpen(TimeSlot timeSlot, int blockSize) {
+		int sum=0;
+		int day = timeSlot.getDay();
+		int index=timeSlot.getTime();
+		if ((index+blockSize)>schedule[day].length)return false;
+		for (int i=index;i<index+blockSize;i++){
+			sum+=schedule[day][i];
+		}
+		if (sum==0) return true;
+		else return false;
+	}
+
+	/**
+	 * find the first open block of size blocksize in the schedule
+	 * @param blockSize the number of consecutive open slots in schedule needed (0's)
+	 * @param startindex index to start searching from
+	 */
+	public TimeSlot findOpenBlock(TimeSlot startTimeSlot, int blockSize ){
+		int startTime = startTimeSlot.getTime();
+		int startDay = startTimeSlot.getDay();
+		for (int day=startDay;day<3;day++){
+			for (int time=startTime; time<schedule[day].length;time++){
+				TimeSlot testSlot = new TimeSlot(day, time);
+				if (schedule[day][time]==0 && hasBlockOpen(testSlot, blockSize)) return testSlot;
+			}
+		}
+		return null;
+	}
+
+	public int numOpenBlocks(int blockSize){
+		TimeSlot t;
+		int count=0;
+		for (int day=0;day<3;day++){
+			for (int time=0; time<schedule[day].length;time++){
+				t = new TimeSlot(day, time);
+				if (schedule[day][time]==0 && hasBlockOpen(t, blockSize)) count++;
+			}
+		}
+		return count;
+	}
+
+
 }

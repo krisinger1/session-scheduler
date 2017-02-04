@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -15,10 +16,13 @@ import java.util.List;
 
 
 public class StudentDatabase {
-	private List<Student> students;
+	private ArrayList<Student> students;
+
 
 	public StudentDatabase(){
-		students = new LinkedList<Student>();
+		students = new ArrayList<Student>();
+		//students.add(new Student("k", "l", "r", new int[3][17]));
+		students = new ArrayList<Student>();
 	}
 
 	public void addStudent(Student student){
@@ -29,7 +33,7 @@ public class StudentDatabase {
 		System.out.println(students.toString());
 
 	}
-	
+
 	private int maxID(){
 		int max=0;
 		for (Student student:students){
@@ -37,7 +41,7 @@ public class StudentDatabase {
 		}
 		return max;
 	}
-	
+
 	public Student getStudent(int index){
 		return students.get(index);
 	}
@@ -63,8 +67,13 @@ public class StudentDatabase {
 	}
 
 
-	public List<Student> getStudents(){
-		return Collections.unmodifiableList(students); //prevent other classes from being able to modify the data
+	public ArrayList<Student> getStudents(){
+		//return Collections.unmodifiableList(students); //prevent other classes from being able to modify the data
+		//List<Student> studentsCopy = new LinkedList<Student>(students);
+//		Collections.copy(studentsCopy, students);
+//		if (!studentsCopy.isEmpty())System.out.println("get studentsCopy: "+studentsCopy.get(0).toString());
+//		return studentsCopy;
+		return students;
 	}
 
 //////////////////// for actual database connection - learn later ////////////////////
@@ -110,5 +119,5 @@ public class StudentDatabase {
 		for (Student s:students) data+=s.toString();
 		return data;
 	}
-	
+
 }

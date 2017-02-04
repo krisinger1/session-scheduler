@@ -1,20 +1,23 @@
-package unused;
+package gui;
 
 import java.util.EventObject;
 
 public class InputEvent extends EventObject{
 
-	int maxStudents;
-	int minStudents;
-	int maxSessions;
-	int blockSize;
-	
-	public InputEvent(Object source, int maxStudents) {
+	private int maxStudents;
+	private int minStudents;
+	private int maxSessions;
+	private int blockSize;
+
+	public InputEvent(Object source, int maxStudents,int minStudents, int maxSessions, int blockSize) {
 		super(source);
 		this.maxStudents = maxStudents;
-		
+		this.minStudents=minStudents;
+		this.maxSessions=maxSessions;
+		this.blockSize=blockSize;
+
 	}
-	
+
 	public int getMaxStudents() {
 		return maxStudents;
 	}

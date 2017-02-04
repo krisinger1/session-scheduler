@@ -250,21 +250,21 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		@Override
 		public void changedUpdate(DocumentEvent e) {
 			dirty=true;
-		    System.out.println("dirty: "+ dirty);
+		    System.out.println("document listener changeupdate dirty: "+ dirty);
 		    saveButton.setEnabled(true);
 		}
 
 		@Override
 		public void insertUpdate(DocumentEvent e) {
 			dirty=true;
-		    System.out.println("dirty: "+ dirty);
+		    System.out.println("document listener insertupdate dirty: "+ dirty);
 		    saveButton.setEnabled(true);
 		}
 
 		@Override
 		public void removeUpdate(DocumentEvent e) {
 			dirty=true;
-		    System.out.println("dirty: "+ dirty);
+		    System.out.println("documentlistener removeupdate dirty: "+ dirty);
 		    saveButton.setEnabled(true);
 		}
 

@@ -619,8 +619,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			variationScrollPane.setViewportView(variationTable);
 			solutionTable=null;
 			scrollPane2.setViewportView(solutionTable);
-
-
 		}
 
 		else if (ae.getActionCommand().equals("Choose file")){

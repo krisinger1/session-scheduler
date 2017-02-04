@@ -78,8 +78,8 @@ public class TablePanel extends JPanel{
 	}
 
 	public void refresh(){
+		System.out.println("tablePanel refresh");
 		studentTableModel.fireTableDataChanged();
-		//studentTableModel.
 	}
 
 	public void setTableListener(TableListener listener) {

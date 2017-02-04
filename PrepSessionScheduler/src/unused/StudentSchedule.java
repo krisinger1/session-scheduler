@@ -1,4 +1,4 @@
-package model;
+package unused;
 
 public class StudentSchedule extends Schedule {
 

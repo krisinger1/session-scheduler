@@ -3,6 +3,7 @@ package model;
 import org.intervarsity.SimpleSchedule;
 
 import junit.framework.TestCase;
+import unused.StudentSchedule;
 
 public class StudentScheduleTest extends TestCase {
 	StudentSchedule s1,s2;

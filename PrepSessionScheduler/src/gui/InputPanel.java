@@ -31,9 +31,6 @@ import javax.swing.event.ChangeListener;
 import org.intervarsity.ParameterListener;
 import org.intervarsity.Parameters;
 
-import unused.InputEvent;
-import unused.InputFormListener;
-
 public class InputPanel extends JPanel implements ActionListener{
 //public class InputPanel extends JPanel implements ActionListener, ItemListener{
 	private JButton testButton = new JButton("test");
@@ -145,15 +142,22 @@ public class InputPanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		if (ae.getActionCommand()=="test"){
-			InputEvent event = new InputEvent(this, (int) maxStudentsSpinner.getValue());
+			int maxStudents = (int) maxStudentsSpinner.getValue();
+			System.out.println("input panel: maxstudents  "+maxStudents);
+
+			InputEvent event = new InputEvent(this, (int) maxStudentsSpinner.getValue(), (int) minStudentsSpinner.getValue(), (int) maxSessionsSpinner.getValue(), (int) blockSizeSpinner.getValue());
+			if (inputFormListener != null){
+				inputFormListener.inputFormEventOccurred(event);
+			}
+		}
+		else if (ae.getActionCommand()=="Run"){
+			System.out.println("Input Panel: Run Button pressed");
+
+			InputEvent event = new InputEvent(this, (int) maxStudentsSpinner.getValue(), (int) minStudentsSpinner.getValue(), (int) maxSessionsSpinner.getValue(), (int) blockSizeSpinner.getValue());
 			if (inputFormListener != null){
 				inputFormListener.inputFormEventOccurred(event);
 			}
 			int maxStudents = (int) maxStudentsSpinner.getValue();
-			System.out.println(maxStudents);
-		}
-		else if (ae.getActionCommand()=="Run"){
-			System.out.println("Run Button pressed");
 		}
 	}
 
