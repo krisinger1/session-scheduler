@@ -8,26 +8,37 @@ public class Student implements Serializable, Comparable<Student>{
 	private String firstName;
 	private String lastName;
 	private String email;
+	private String area;
 	//private int[] schedule;
 	//StudentSchedule schedule;
 	int[][] schedule;
 	private int rank=-1;
 
-	public Student(String firstName, String lastName, String email, int[][] schedule){
+	public Student(String firstName, String lastName, String email, String area, int[][] schedule){
 //		id = count;
 		this.firstName=firstName;
 		this.lastName=lastName;
 		this.email=email;
+		this.area=area;
 		this.schedule=schedule;
 		//count++;
 	}
 
-	public Student(int id,String firstName, String lastName, String email, int[][] schedule){
+	public Student(int id,String firstName, String lastName, String email, String area, int[][] schedule){
 		this.id = id;
 		this.firstName=firstName;
 		this.lastName=lastName;
 		this.email=email;
+		this.area=area;
 		this.schedule=schedule;
+	}
+
+	public String getArea() {
+		return area;
+	}
+
+	public void setArea(String area) {
+		this.area = area;
 	}
 
 	public int getId() {

@@ -47,8 +47,8 @@ public class ScheduleInputPanel extends JPanel {
 		});
 
 		setLayout(new BorderLayout());
-		setPreferredSize(new Dimension(250,450));
-		setMinimumSize(new Dimension(150,500));
+		setPreferredSize(new Dimension(250,370));
+		setMinimumSize(new Dimension(150,300));
 		setBackground(Parameters.schemeColor2);
 
 		add(new JScrollPane(scheduleTable),BorderLayout.CENTER);

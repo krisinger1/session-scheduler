@@ -7,17 +7,28 @@ public class StudentDataEvent extends EventObject{
 	String FName;
 	String LName;
 	String email;
+	String area;
+
 	int [][] schedule;
 
-	public StudentDataEvent(Object source,int id, String FName, String LName, String email, int[][] schedule) {
+	public StudentDataEvent(Object source,int id, String FName, String LName, String email, String area, int[][] schedule) {
 		super(source);
 		this.id=id;
 		this.FName=FName;
 		this.LName= LName;
 		this.email=email;
+		this.area=area;
 		this.schedule=schedule;
 		System.out.println("StudentDataEvent: "+schedule[0][0]+" "+schedule[0][1]);
 
+	}
+
+	public String getArea() {
+		return area;
+	}
+
+	public void setArea(String area) {
+		this.area = area;
 	}
 
 	public int getId(){

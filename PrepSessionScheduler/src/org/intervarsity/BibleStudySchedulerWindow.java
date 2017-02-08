@@ -61,7 +61,6 @@ import java.awt.Dimension;
 
 
 
-//TODO print solutions to file
 public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	private ArrayList<Solution> solutions=new ArrayList<Solution>();
 	private ArrayList<Solution> distinctSolutions;
@@ -464,7 +463,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 //		 });
 //		 frame.add(jlab);
 
-		 //TODO add Done button
 
 		// *********Results in table form ***********
 		lblResultsTbl = new JLabel("Results:");
@@ -507,7 +505,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 
 	public void actionPerformed(ActionEvent ae){
 		// ******************  Run button ***************
-		//TODO move reading of schedules to choose file button and error check so no crash when format wrong
 		if (ae.getActionCommand().equals("Run")){
 
 			//empty arrayLists for next run
@@ -557,7 +554,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 			}		while (!solutionTree.hasLeaves());
 			//Tree.printSolutionToFile(solutionTree, 0,"solution.txt");
 			if (!(solutionTree==null)) solutionTree.pruneTree();
-//TODO null pointer exception in create solutions..
 			createSolutions(solutionTree, new ArrayList<Session>());
 			///Scheduler.createSolutions(solutionTree, new ArrayList<Session>());
 			//textSolutionOutput.append(fewestSessionsWeight+" "+preferredTimesWeight+" "+canComeWeight+" "+mustComeWeight);
@@ -750,7 +746,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	}
 
 	public void printSolutionToFile(String filename, Solution sol){
-		//TODO use dialog box to choose file to save to
 		PrintWriter writer;
 		try {
 			writer = new PrintWriter(filename, "UTF-8");
@@ -798,7 +793,6 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	public void printSolutionsToTable(ArrayList<Solution> solutions){
 		if (solutions.size()==0) {
 			textSolutionOutput.append("No solutions found");
-			//TODO make this a dialog box for no solutions found
 			return;
 		}
 		String printString="";
@@ -931,7 +925,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 	 * @return returns student schedules in an ArrayList of Schedules
 	 */
 	public ArrayList<Schedule> readSchedulesFromFile (File csvFile){
-		//TODO make sure only read in and count columns with schedule data - stop when no more times in header
+		// make sure only read in and count columns with schedule data - stop when no more times in header
 		 ArrayList<Schedule> schedules=new ArrayList<Schedule>();
 		    boolean foundHeaders=false;
 		    int nameColumn=-1, emailColumn=-1;
@@ -940,7 +934,7 @@ public class BibleStudySchedulerWindow implements ActionListener,ChangeListener{
 		 try{
 			 Scanner scanner = new Scanner(csvFile);
 			 while (scanner.hasNextLine()){
-				 //TODO learn how to check for empty data
+				 // learn how to check for empty data
 				String line = scanner.nextLine();
 				//String dayName ="";
 				//if headers found & columns known, go ahead and read data in

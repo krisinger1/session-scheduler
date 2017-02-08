@@ -16,10 +16,10 @@ public class ScheduleTableRenderer implements TableCellRenderer {
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 		JTextField field = new JTextField();
 		field.setBorder(null);
-		table.setRowHeight(25);
+		table.setRowHeight(20);
 		table.setGridColor(Color.LIGHT_GRAY);
-		table.setPreferredSize(new Dimension(250,450));
-		table.setMinimumSize(new Dimension(150,500));
+		table.setPreferredSize(new Dimension(250,350));
+		table.setMinimumSize(new Dimension(150,300));
 
 		String valueString = value.toString();
 		field.setText(valueString);

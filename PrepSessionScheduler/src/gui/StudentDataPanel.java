@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -27,6 +28,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 	private JTextField fNameTxt;
 	private JTextField lNameTxt;
 	private JTextField emailTxt;
+	private JTextField areaTxt;
 	private ScheduleInputPanel schedPanel;
 	int[][] days = new int[3][17];
 	private JButton saveButton;
@@ -44,6 +46,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		fNameTxt=new JTextField(15);
 		lNameTxt=new JTextField(15);
 		emailTxt = new JTextField(15);
+		areaTxt = new JTextField(15);
 		schedPanel = new ScheduleInputPanel();
 		idLabel=new JLabel("ID= "+id);
 
@@ -87,7 +90,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		add(new JLabel("First Name"),gc);
 
 		gc.anchor=GridBagConstraints.FIRST_LINE_START;
-		
+
 		gc.gridx=1;
 		gc.gridy=0;
 		gc.gridwidth=2;
@@ -131,6 +134,22 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		gc.weighty=1;
 		add(emailTxt,gc);
 
+		/////////////////// Area /////////////////////////////
+
+		gc.gridx=0;
+		gc.gridy++;
+		gc.anchor=GridBagConstraints.FIRST_LINE_END;
+		gc.gridwidth=1;
+		gc.weightx=1;
+		gc.weighty=1;
+		add(new JLabel("Area"),gc);
+
+		gc.anchor=GridBagConstraints.FIRST_LINE_START;
+		gc.gridx=1;
+		gc.gridwidth=2;
+		gc.weightx=1;
+		gc.weighty=1;
+		add(areaTxt,gc);
 		/////////////////// Schedule /////////////////////////////
 
 		gc.gridx=0;
@@ -140,14 +159,14 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		gc.weightx=1;
 		gc.weighty=1;
 		add(new JLabel("Schedule"),gc);
-		
-		
+
+
 		gc.gridx=1;
 		gc.gridy++;
 		gc.gridwidth=2;
 		gc.anchor=GridBagConstraints.FIRST_LINE_START;
 		gc.weightx=5;
-		gc.weighty=5;
+		gc.weighty=3;
 		add(schedPanel,gc);
 		//add(new JScrollPane(scheduleTable),gc);
 
@@ -165,7 +184,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		gc.gridwidth=1;
 		gc.anchor=GridBagConstraints.NORTH;
 		add(newButton,gc);
-		
+
 		gc.gridx=2;
 		//gc.gridy++;
 		gc.weighty=1;
@@ -182,7 +201,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		saveButton.addActionListener(this);
 		newButton.addActionListener(this);
 		doneButton.addActionListener(this);
-		//TODO how to get ENTER key to trigger button event
+		//TODO how to get ENTER key to trigger button event - not sure this is possible here. needs to be from jframe
 	}
 
 	public void setStudentFormListener(StudentFormListener listener) {
@@ -202,8 +221,8 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		}
 		else if (e.getActionCommand()=="Save Student"){
 			if (!fNameTxt.getText().equals("") && !lNameTxt.getText().equals("")){
-				StudentDataEvent event = new StudentDataEvent(this, id, fNameTxt.getText(), lNameTxt.getText(), emailTxt.getText(),schedPanel.getData() );
-				System.out.println("actionPerformed "+days[0][0]+" "+days[0][1]);
+				StudentDataEvent event = new StudentDataEvent(this, id, fNameTxt.getText(), lNameTxt.getText(), emailTxt.getText(),areaTxt.getText(),schedPanel.getData() );
+				//System.out.println("actionPerformed "+days[0][0]+" "+days[0][1]);
 				if (studentFormListener != null){
 					studentFormListener.StudentFormEventOccurred(event);
 				}
@@ -225,9 +244,10 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		fNameTxt.setText(student.getFName());
 		lNameTxt.setText(student.getLName());
 		emailTxt.setText(student.getEmail());
+		areaTxt.setText(student.getArea());
 		days=student.getSchedule();
 		schedPanel.setData(days);
-		System.out.println("populateForm: "+days[0][0]+" "+days[0][1]);
+		//System.out.println("populateForm: "+days[0][0]+" "+days[0][1]);
 		schedPanel.clear();
 		dirty=false;
 		saveButton.setEnabled(false);
@@ -239,6 +259,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		fNameTxt.setText("");
 		lNameTxt.setText("");
 		emailTxt.setText("");
+		areaTxt.setText("");
 		schedPanel.setData(new int[3][17]);
 		schedPanel.clear();
 		dirty=false;
@@ -250,21 +271,21 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		@Override
 		public void changedUpdate(DocumentEvent e) {
 			dirty=true;
-		    System.out.println("document listener changeupdate dirty: "+ dirty);
+		    //System.out.println("document listener changeupdate dirty: "+ dirty);
 		    saveButton.setEnabled(true);
 		}
 
 		@Override
 		public void insertUpdate(DocumentEvent e) {
 			dirty=true;
-		    System.out.println("document listener insertupdate dirty: "+ dirty);
+		    //System.out.println("document listener insertupdate dirty: "+ dirty);
 		    saveButton.setEnabled(true);
 		}
 
 		@Override
 		public void removeUpdate(DocumentEvent e) {
 			dirty=true;
-		    System.out.println("documentlistener removeupdate dirty: "+ dirty);
+		    //System.out.println("documentlistener removeupdate dirty: "+ dirty);
 		    saveButton.setEnabled(true);
 		}
 

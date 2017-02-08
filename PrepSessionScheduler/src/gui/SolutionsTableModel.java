@@ -2,11 +2,11 @@ package gui;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+import model.Parameters;
 import model.Session;
 import model.Solution;
 import model.TimeSlot;
@@ -15,17 +15,7 @@ public class SolutionsTableModel extends AbstractTableModel implements TableMode
 
 	ArrayList<Solution> solutions= new ArrayList<Solution>();
 	String[] colNames = {"","Sessions"};
-
-	//temporary
-	public SolutionsTableModel(){
-//		String[] data = {"session 0","session2"};
-//		String[] data2 = {"session 1","session2"};
-//
-//		solutions.add(data);
-//		solutions.add(data2);
-
-		//solutions.add("solution 1");
-	}
+	String tableName;  // how should this data be described in column 0? "Solution"? "Variation"? etc...
 
 	@Override
 	public int getColumnCount() {
@@ -37,8 +27,9 @@ public class SolutionsTableModel extends AbstractTableModel implements TableMode
 		return solutions.size();
 	}
 
-	public void setData(ArrayList<Solution> solutions){
+	public void setData(ArrayList<Solution> solutions,String name){
 		this.solutions=solutions;
+		this.tableName=name;
 	}
 
 	@Override
@@ -54,19 +45,21 @@ public class SolutionsTableModel extends AbstractTableModel implements TableMode
 		//TODO also in "if" limit number of solutions to show
 		for (int i=0;i<solutions.size();i++){
 			String printString="";
-			//listModel= new DefaultListModel();
 			Solution sol=solutions.get(i);
-			solutionArray[i][0]="Solution "+i;
-			//textSolutionOutput.append(""+sol.getRank()+"\n");
+			solutionArray[i][0]=tableName+" "+i;
 			Collections.sort(sol.getSessions());
 			for (Session session:sol.getSessions()){
 				TimeSlot index=session.timeSlot;
-				printString+=index+",";
+				String day= Parameters.dayNames[index.getDay()];
+				String time=Parameters.timeSlotStrings[index.getTime()];
+				printString+=day+" "+time+",";
+
+				//printString+=index+",";
 			}
 			solutionArray[i][1]=printString;
 		}
 
-		if (col==0) return ("Solution "+row);
+		if (col==0) return (tableName+" "+row);
 		//else return (ArrayList<Session>)solutions.get(row).getSessions();
 		else return solutionArray[row][1];
 	}
