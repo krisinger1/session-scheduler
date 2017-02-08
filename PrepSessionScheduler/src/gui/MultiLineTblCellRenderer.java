@@ -9,6 +9,8 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
+import com.mysql.fabric.xmlrpc.base.Data;
+
 import model.Session;
 
 public class MultiLineTblCellRenderer extends JList<String> implements TableCellRenderer{
@@ -22,19 +24,22 @@ public class MultiLineTblCellRenderer extends JList<String> implements TableCell
 //        }
 		if (value instanceof String){
 			String[] data = ((String)value).split(",");
+			// set height of row based on how many lines printed in row
+	        table.setRowHeight((table.getFont().getSize()+8)*4);
 			setListData(data);
 		}
 //		if (value instanceof ArrayList<?>){
 //			System.out.println(" multilinerenderer in instanceof");
 //			Object[] data =((ArrayList<Session>) value).toArray();
 //		}
-//        
+//
         //cell background color when selected
         if (isSelected) {
             setBackground(UIManager.getColor("Table.selectionBackground"));
         } else {
             setBackground(UIManager.getColor("Table.background"));
         }
+
 
         return this;
     }

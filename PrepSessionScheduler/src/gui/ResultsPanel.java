@@ -37,15 +37,15 @@ public class ResultsPanel extends JPanel {
 		setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
 		setBackground(Parameters.schemeColor2);
-		//add(testButton);
 
 		MultiLineTblCellRenderer renderer = new MultiLineTblCellRenderer();
 		solutionsTable= new JTable(solutionsTableModel);
 
 		solutionsTable.setMaximumSize(new Dimension(400,100));
 		solutionsTable.getColumn("").setMaxWidth(100);
-		int rowHeight = (solutionsTable.getFont().getSize()+8)*2;
-		solutionsTable.setRowHeight(rowHeight);
+		//int rowHeight = (solutionsTable.getFont().getSize()+8)*4;
+
+		//solutionsTable.setRowHeight(rowHeight);
 		//solutionsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		solutionsTable.addMouseListener(new MouseAdapter() {
@@ -55,28 +55,18 @@ public class ResultsPanel extends JPanel {
 				if (e.getButton()==MouseEvent.BUTTON1){
 					super.mouseClicked(e);
 					int row=solutionsTable.rowAtPoint(e.getPoint());
-					System.out.println("in mouseclicked...");
+					//System.out.println("in mouseclicked...");
 					listener.rowSelected(row);
 				}
 			}
 
 		});
 
-//		solutionsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//
-//			@Override
-//			public void valueChanged(ListSelectionEvent event) {
-//				//System.out.println("in valuechanged...");
-//				//listener.rowSelected(solutionsTable.getSelectedRow());
-//			}
-//		});
-
-		//solutionsTable.getColumnModel().getColumn(1).setCellRenderer(renderer);
 		solutionsTable.getColumn("Sessions").setCellRenderer(renderer);
 
-		variationsTable = new JTable(solutionsTableModel);
+		variationsTable = new JTable(variationsTableModel);
 		//variationsTable = new JTable(variationsTableModel);
-		variationsTable.setRowHeight(rowHeight);
+		//variationsTable.setRowHeight(rowHeight);
 		variationsTable.getColumn("").setMaxWidth(100);
 		variationsTable.getColumn("Sessions").setCellRenderer(renderer);
 
@@ -133,12 +123,16 @@ public class ResultsPanel extends JPanel {
 		listener = resultsTableListener;
 	}
 	public void setVariationsData(ArrayList<Solution> variations) {
-		variationsTableModel.setData(variations);
+		variationsTableModel.setData(variations,"Variation");
 	}
 	public void setSolutionsData(ArrayList<Solution> solutions) {
-		solutionsTableModel.setData(solutions);
+		solutionsTableModel.setData(solutions,"Solution");
 	}
 	public void refreshSolutions(){
 		solutionsTableModel.fireTableDataChanged();
 	}
+	public void refreshVariations(){
+		variationsTableModel.fireTableDataChanged();
+	}
+
 }

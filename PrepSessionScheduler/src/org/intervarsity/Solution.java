@@ -231,7 +231,7 @@ public class Solution implements Comparable<Solution>{
 			//if only one session fits, also add to mustAttend list
 			//System.out.println(schedule.getName()+" "+numFound);
 			if (numFound==1) sessionFound.addMustAttend(schedule);
-			//TODO error handling for this case
+			//this should never happen....
 			if (numFound==0) System.out.println("ERROR: no session found for schedule: "+schedule.getName());
 		}
 	}
@@ -284,7 +284,6 @@ public class Solution implements Comparable<Solution>{
 	 *
 	 */
 	public boolean isSimilar(Solution sol){
-		//TODO finish isSimilar method
 		// if there aren't the same number of sessions, can't be similar
 		if (this.getNumSessions()!=sol.getNumSessions()) return false;
 		// compare each pair of sessions and see if they are more than 2 slots apart

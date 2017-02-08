@@ -27,11 +27,11 @@ public class ScheduleTableModel extends AbstractTableModel{
 	}
 
 	public void setData(int[][] timeSlots){
-		System.out.println("days[][] in model: "+days);
+		//System.out.println("days[][] in model: "+days);
 		this.days=timeSlots;
-		System.out.println("days[][] in model: "+days);
+		//System.out.println("days[][] in model: "+days);
 	}
-	
+
 	public int[][] getData(){
 		return days;
 

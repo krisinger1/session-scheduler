@@ -202,7 +202,7 @@ public class Tree {
 		}
 	}
 
-	//TODO is this code even correct for anything? Looks like infinite recursion
+	// is this code even correct for anything? Looks like infinite recursion
 	/*private static String printRankedSolution(Tree t, String solution){
 		if(t.isEnd){
 			solution+="\t"+t.session.time+"\n";
@@ -223,10 +223,8 @@ public class Tree {
 			writer.print(s);
 			writer.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}*/

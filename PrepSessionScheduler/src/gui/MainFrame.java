@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -96,13 +97,13 @@ public class MainFrame extends JFrame {
 				System.out.println("controller: StudentFormEventOccurred");
 				if (e.getId()==-1 && !e.getFName().equals("") && !e.getLName().equals("")){
 					System.out.println("StudentFormEvent: "+e.getSchedule()[0][0]+" "+e.getSchedule()[0][1]);
-					controller.addStudent(e.getFName(),e.getLName(), e.getEmail(),e.getSchedule());
+					controller.addStudent(e.getFName(),e.getLName(), e.getEmail(),e.getArea(),e.getSchedule());
 					System.out.println("after controller: "+controller.getStudents().get(0));
 
 					tablePanel.refresh();
 				}
 				else if (!e.getFName().equals("") && !e.getLName().equals("")){
-					controller.updateStudent(e.getId(), e.getFName(),e.getLName(), e.getEmail(),e.getSchedule());
+					controller.updateStudent(e.getId(), e.getFName(),e.getLName(), e.getEmail(),e.getArea(),e.getSchedule());
 					System.out.println("StudentFormEvent update: "+e.getSchedule()[0][0]+" "+e.getSchedule()[0][1]);
 					tablePanel.refresh();
 				}
@@ -121,7 +122,7 @@ public class MainFrame extends JFrame {
 			@Override
 			public void rowSelected(int row) {
 				studentDataPanel.populateForm(controller.getStudents().get(row));
-				System.out.println("rowSelected: "+controller.getStudents().get(row).toString());
+				//System.out.println("rowSelected: "+controller.getStudents().get(row).toString());
 			}
 		});
 
@@ -130,8 +131,9 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void inputFormEventOccurred(InputEvent event) {
-				System.out.println("input form event");
-				controller.runScheduler(event.getMaxStudents(), event.getMinStudents(),event.getMaxSessions(),event.getBlockSize());
+				//System.out.println("input form event");
+				controller.runScheduler(event.getMaxStudents(), event.getMinStudents(),event.getMaxSessions(),event.getBlockSize(),
+						event.getNumSessionsWeight(),event.getPreferredWeight(),event.getCanWeight(),event.getMustWeight());
 				resultsPanel.setSolutionsData(controller.getSolutions());
 				resultsPanel.refreshSolutions();
 			}
@@ -142,8 +144,10 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void rowSelected(int row) {
-				System.out.println("in row selected...");
-				//resultsPanel.setVariationsData(controller.getVariations(row));
+				//System.out.println("in row selected...");
+
+				resultsPanel.setVariationsData(controller.getVariations(row));
+				resultsPanel.refreshVariations();
 			}
 		});
 
@@ -213,7 +217,6 @@ public class MainFrame extends JFrame {
 						controller.saveToFile(fileChooser.getSelectedFile());
 					} catch (IOException e) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Could not save file", "Error", JOptionPane.ERROR_MESSAGE);
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

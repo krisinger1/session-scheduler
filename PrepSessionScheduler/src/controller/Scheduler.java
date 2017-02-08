@@ -15,10 +15,10 @@ import model.Tree;
 
 public class Scheduler {
 	public static void createTree(ArrayList<Student> studentList,Tree parent, int[][] mask, int blockSize, int maxStudents){
-		System.out.println("in createTree");
+		//System.out.println("in createTree");
 		if (studentList.size()==0) { //if no students left in list, then this solution branch complete
 			parent.isEnd=true;
-			System.out.println("Scheduler: END of branch");
+			//System.out.println("Scheduler: END of branch");
 
 			return;
 		}
@@ -33,19 +33,19 @@ public class Scheduler {
 
 			// start with worst schedule
 			Student worst=studentList.get(0);
-			System.out.println("Scheduler: worst schedule: "+worst.toString());
+			//System.out.println("Scheduler: worst schedule: "+worst.toString());
 
 			//new code
 			// while there are still students unassigned and there are still timeslots to try...
 			while (studentList.size()>0 && dayIndex<maxDay && timeIndex<maxTime-blockSize){
 				timeSlot=new TimeSlot(dayIndex, timeIndex);
-				System.out.println("Scheduler: timeslot in while "+timeSlot.toString());
+				//System.out.println("Scheduler: timeslot in while "+timeSlot.toString());
 				// find first open block in worst schedule
 				timeSlot= worst.findOpenBlock(timeSlot, blockSize);
 
 
 				if (timeSlot!=null){  // if worst schedule has a timeslot available, check if it works...
-					System.out.println("Scheduler: timeslot of worst "+timeSlot.toString());
+					//System.out.println("Scheduler: timeslot of worst "+timeSlot.toString());
 
 					// get day and time of open block
 					dayIndex=timeSlot.getDay();
@@ -70,15 +70,15 @@ public class Scheduler {
 								tempList.add(stu);
 							}
 						}
-						System.out.println("Scheduler: templist size "+tempList.size());
+						//System.out.println("Scheduler: templist size "+tempList.size());
 
 						// don't check for minSessionSize here. Some students who can come may have already been taken out of list
 						// check later when creating solutions
 
 						foundOne=true; // we found a legit session
-						System.out.println("Scheduler: found one: "+foundOne);
+						//System.out.println("Scheduler: found one: "+foundOne);
 						Session session = new Session(timeSlot); //create session
-						System.out.println("Scheduler: session: "+session.toString());
+						//System.out.println("Scheduler: session: "+session.toString());
 
 						Tree solutionLeaf = new Tree(parent, session); // create new leaf for tree
 						parent.addLeaf(solutionLeaf); //add leaf to tree
@@ -98,7 +98,7 @@ public class Scheduler {
 						smallerStudentList.removeAll(tempList);
 						// make tree from this new leaf/session just created
 						createTree(smallerStudentList,solutionLeaf,newMask,blockSize,maxStudents);
-						System.out.println("Scheduler: out of create tree ");
+						//System.out.println("Scheduler: out of create tree ");
 
 					}  // end if mask open
 

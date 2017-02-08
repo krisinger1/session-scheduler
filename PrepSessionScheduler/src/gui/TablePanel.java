@@ -45,7 +45,7 @@ public class TablePanel extends JPanel{
 					int row= studentTable.getSelectedRow();
 					//int row=studentTable.rowAtPoint(e.getPoint());
 					//studentTable.getSelectionModel().setSelectionInterval(row, row);
-					System.out.println("TablePanel: row "+row+" selected");
+					//System.out.println("TablePanel: row "+row+" selected");
 					studentTableListener.rowSelected(row);
 				}
 			}
@@ -78,7 +78,7 @@ public class TablePanel extends JPanel{
 	}
 
 	public void refresh(){
-		System.out.println("tablePanel refresh");
+		//System.out.println("tablePanel refresh");
 		studentTableModel.fireTableDataChanged();
 	}
 

@@ -17,21 +17,20 @@ import model.Tree;
 
 public class Controller {
 	StudentDatabase db= new StudentDatabase();
-	ArrayList<Solution> solutions;
+	ArrayList<Solution> solutions, distinctSolutions;
 	int maxStudents, minStudents, maxSessions, blockSize;
 
-	public void addStudent(String firstName, String lastName, String email, int[][] schedule){
-		Student student = new Student(firstName, lastName, email,schedule);
-		System.out.println("controller addStudent: "+student);
-		//System.out.println("controller: "+db.getStudents().get(0));
-		System.out.println("controller db: "+db.toString());
+	public void addStudent(String firstName, String lastName, String email, String area, int[][] schedule){
+		Student student = new Student(firstName, lastName, email,area, schedule);
+		//System.out.println("controller addStudent: "+student);
+		//System.out.println("controller db: "+db.toString());
 		db.addStudent(student);
-		System.out.println("controller db after: "+db.toString());
+		//System.out.println("controller db after: "+db.toString());
 	}
 
-	public void updateStudent(int id, String firstName, String lastName, String email, int[][] schedule){
-		Student student = new Student(id, firstName, lastName, email,schedule);
-		System.out.println("controller updateStudent: "+schedule[0][0]+" "+schedule[0][1]);
+	public void updateStudent(int id, String firstName, String lastName, String email, String area, int[][] schedule){
+		Student student = new Student(id, firstName, lastName, email,area, schedule);
+		//System.out.println("controller updateStudent: "+schedule[0][0]+" "+schedule[0][1]);
 		db.updateStudent(student);
 	}
 
@@ -51,21 +50,22 @@ public class Controller {
 		db.removeStudent(row);
 	}
 
-	public ArrayList<String[]> getVariations(int row) {
-		System.out.println("getting variationsof solution");
-		ArrayList<String[]> arrayList = new ArrayList<String[]>();
-		return arrayList;
-	}
+//	public ArrayList<String[]> getVariations(int row) {
+//		System.out.println("getting variationsof solution");
+//		ArrayList<String[]> arrayList = new ArrayList<String[]>();
+//		return arrayList;
+//	}
 
-	public void runScheduler(int maxStudents, int minStudents, int maxSessions, int blockSize) {
+	public void runScheduler(int maxStudents, int minStudents, int maxSessions, int blockSize,
+			int fewestSessionsWeight,int preferredTimesWeight, int canComeWeight, int mustComeWeight) {
 		this.maxStudents=maxStudents;
 		this.minStudents=minStudents;
 		this.maxSessions=maxSessions;
 		this.blockSize=blockSize;
-		System.out.println("running Scheduler");
+		//System.out.println("running Scheduler");
 		ArrayList<Student> students = db.getStudents();
 		ArrayList<Student> studentsCopy = new ArrayList<Student>(students);
-		
+
 		solutions=new ArrayList<Solution>();
 
 		if (students.isEmpty()) return;
@@ -87,7 +87,39 @@ public class Controller {
 		}		while (!solutionTree.hasLeaves());
 		if (!(solutionTree==null)) solutionTree.pruneTree();
 		createSolutions(solutionTree, new ArrayList<Session>(),studentsCopy);
-		System.out.println("out of createSolutions");
+		//System.out.println("out of createSolutions");
+		for (Solution sol:solutions){
+			sol.calculateNormalizedRank(fewestSessionsWeight, preferredTimesWeight, canComeWeight, mustComeWeight,solutions);
+		}
+		Collections.sort(solutions);
+
+		distinctSolutions = new ArrayList<Solution>();
+
+		// find similar solutions
+		for (Solution baseSolution:solutions){
+			//System.out.println("base solution: "+ baseSolution);
+			for (Solution testSolution:solutions){
+				if (!baseSolution.isSame(testSolution)){
+					if (baseSolution.isSimilar(testSolution)){
+						baseSolution.addSimilarSolution(testSolution);
+						//System.out.println("    similar solution: "+testSolution);
+					}
+				}
+			}
+		}
+
+		// reduce solutions down to just the ones that are distance from each other - remove similar ones
+		ArrayList<Solution> solutionsCopy = (ArrayList<Solution>)solutions.clone();
+		int index=0;
+		while (solutionsCopy.size()>0){
+			Solution sol=solutionsCopy.get(index);
+			//for (Solution s:sol.getSimilarSolutions()){
+			solutionsCopy.removeAll(sol.getSimilarSolutions());
+			solutionsCopy.remove(sol);
+			distinctSolutions.add(sol);
+			//index++;
+			//}
+		}
 	}
 
 	public void createSolutions(Tree t,ArrayList<Session> sessionList,ArrayList<Student> studentsCopy){
@@ -101,11 +133,10 @@ public class Controller {
 			}
 			solution.setSessions(sessionListClone);
 			solution.findAllMembers(studentsCopy, blockSize);
-			//TODO add this back in later
-//			for (Session session :solution.getSessions()){ //check parameters to make sure solution satisfies
-//				if (session.members.size()<minStudents)goodSolution=false;
-//				else if (solution.getSessions().size()>maxSessions)goodSolution=false;
-//			}
+			for (Session session :solution.getSessions()){ //check parameters to make sure solution satisfies
+				if (session.members.size()<minStudents) goodSolution=false;
+				else if (solution.getSessions().size()>maxSessions)goodSolution=false;
+			}
 			if (goodSolution) solutions.add(solution);
 			}
 		else for (Tree leaf:t.leaves){
@@ -125,7 +156,11 @@ public class Controller {
 	}
 
 	public ArrayList<Solution> getSolutions() {
-		return solutions;
+		return distinctSolutions;
+	}
+
+	public ArrayList<Solution> getVariations(int index){
+		return distinctSolutions.get(index).getSimilarSolutions();
 	}
 
 

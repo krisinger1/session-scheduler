@@ -53,7 +53,7 @@ public class StudentSchedule extends Schedule {
 
 	@Override
 	public boolean isBlockOpen(int index, int blockSize) {
-//		//TODO check this. it is different from SimpleSchedule in effort to simplify
+//		// check this. it is different from SimpleSchedule in effort to simplify
 //		return (index==findOpenBlock(index, blockSize));
 		int sum=0;
 		if ((index+blockSize)>timeSlots.length)return false;

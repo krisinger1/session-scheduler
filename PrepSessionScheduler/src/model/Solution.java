@@ -231,8 +231,8 @@ public class Solution implements Comparable<Solution>{
 			//if only one session fits, also add to mustAttend list
 			//System.out.println(schedule.getName()+" "+numFound);
 			if (numFound==1) sessionFound.addMustAttend(student);
-			//TODO error handling for this case
-			if (numFound==0) System.out.println("ERROR: no session found for schedule: "+student.getFullName());
+			// this should never happen...
+			if (numFound==0) System.out.println("ERROR: no session found for student: "+student.getFullName());
 		}
 	}
 
@@ -291,9 +291,8 @@ public class Solution implements Comparable<Solution>{
 		for (Session s:this.sessions){
 			int i= this.sessions.indexOf(s);
 			TimeSlot thisTimeSlot =s.timeSlot;
-			//System.out.println("thisTime:"+thisTime);
 			TimeSlot otherTimeSlot = sol.getSessions().get(i).timeSlot;
-			//System.out.println("otherTime:"+otherTime);
+			
 			//if sessions aren't on same day - not similar
 			if (thisTimeSlot.getDay()!=otherTimeSlot.getDay()) return false;
 			// sessions too far apart
