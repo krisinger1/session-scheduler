@@ -15,10 +15,10 @@ import model.Tree;
 
 public class Scheduler {
 	public static void createTree(ArrayList<Student> studentList,Tree parent, int[][] mask, int blockSize, int maxStudents){
-		//System.out.println("in createTree");
+		System.out.println("in createTree");
 		if (studentList.size()==0) { //if no students left in list, then this solution branch complete
 			parent.isEnd=true;
-			//System.out.println("Scheduler: END of branch");
+			System.out.println("**************************************\nScheduler: END of branch");
 
 			return;
 		}
@@ -33,15 +33,19 @@ public class Scheduler {
 
 			// start with worst schedule
 			Student worst=studentList.get(0);
-			//System.out.println("Scheduler: worst schedule: "+worst.toString());
+			System.out.println("Scheduler: worst schedule: "+worst.toString());
 
 			//new code
 			// while there are still students unassigned and there are still timeslots to try...
-			while (studentList.size()>0 && dayIndex<maxDay && timeIndex<maxTime-blockSize){
+			while (studentList.size()>0 && !(dayIndex>=maxDay && timeIndex>=maxTime)){
 				timeSlot=new TimeSlot(dayIndex, timeIndex);
+				System.out.println("Scheduler: start timeslot "+timeSlot+" "+worst);
+
 				//System.out.println("Scheduler: timeslot in while "+timeSlot.toString());
 				// find first open block in worst schedule
+				//TODO not starting find open block at right timeslot? from beginning? missing some?
 				timeSlot= worst.findOpenBlock(timeSlot, blockSize);
+				System.out.println("Scheduler: worst timeslot "+timeSlot+" "+worst);
 
 
 				if (timeSlot!=null){  // if worst schedule has a timeslot available, check if it works...
@@ -54,7 +58,7 @@ public class Scheduler {
 					// See if mask allows this timeslot as a session
 					boolean maskOpen=true; // assume mask has slot open
 					for (int i=0;i<blockSize;i++){
-						if (mask[dayIndex][timeIndex]==1) maskOpen=false; //if any slot has a 1 time slot is not open in mask
+						if (mask[dayIndex][timeIndex+i]==1) maskOpen=false; //if any slot has a 1 time slot is not open in mask
 					}
 
 					// if mask allows this timeslot, see who else can come...
@@ -65,9 +69,11 @@ public class Scheduler {
 						tempList=new ArrayList<Student>();
 
 						//see which people can come up to max allowed
+						//don't limit by min students yet. some who can come may have been removed already
 						for (Student stu:studentList){
 							if (stu.hasBlockOpen(timeSlot, blockSize) && tempList.size()<maxStudents){
 								tempList.add(stu);
+								System.out.println(stu);
 							}
 						}
 						//System.out.println("Scheduler: templist size "+tempList.size());
@@ -76,6 +82,8 @@ public class Scheduler {
 						// check later when creating solutions
 
 						foundOne=true; // we found a legit session
+						System.out.println("**********Scheduler: found one: "+timeSlot);
+
 						//System.out.println("Scheduler: found one: "+foundOne);
 						Session session = new Session(timeSlot); //create session
 						//System.out.println("Scheduler: session: "+session.toString());
@@ -88,14 +96,23 @@ public class Scheduler {
 						for (int i=0; i<3;i++){
 							for (int j=0;j<17;j++){
 								newMask[i][j]=mask[i][j];
+								//System.out.print(newMask[i][j]);
 							}
 						}
+						//System.out.println("");
 						//newMask=mask.clone();
 						for (int j=0;j<blockSize;j++) newMask[dayIndex][timeIndex+j]=1; //block out a blocksize section at this index so no overlapping sessions
+//						for (int i=0; i<3;i++){
+//							System.out.println(" ");
+//							for (int j=0;j<17;j++){
+//								System.out.print(newMask[i][j]);
+//							}
+//						}
 						//all all students who can come to the members of this session
 						session.members.addAll(tempList);
 						//create list of just the remaining unassigned students
 						smallerStudentList.removeAll(tempList);
+						//System.out.println("\nsmaller list size "+smallerStudentList.size());
 						// make tree from this new leaf/session just created
 						createTree(smallerStudentList,solutionLeaf,newMask,blockSize,maxStudents);
 						//System.out.println("Scheduler: out of create tree ");
@@ -105,13 +122,15 @@ public class Scheduler {
 					else{
 						// else if mask is not open
 						// increment timeslot and try again?
-						if (timeIndex==maxTime) {  //if at end of day...
-							if (dayIndex<maxDay){  //if not already on last day go to beginning of next day
-								dayIndex++;
-								timeIndex=0;
-							} // else dayIndex=maxday and timeindex=maxtime and should exit while loop
-						}
-						else timeIndex++; //else just move ahead one timeslot on same day
+						//FIXME incrementing not correct
+//						if (timeIndex>=maxTime) {  //if at end of day...
+//							if (dayIndex<maxDay){  //if not already on last day go to beginning of next day
+//								dayIndex++;
+//								timeIndex=0;
+//							} // else dayIndex=maxday and timeindex=maxtime and should exit while loop
+//						}
+//						else timeIndex++; //else just move ahead one timeslot on same day
+						System.out.println("Scheduler: trying "+dayIndex+" "+timeIndex);
 					} // end else mask not open
 
 				} // end if timeslot!=null
@@ -120,10 +139,15 @@ public class Scheduler {
 				// else if timeslot==null - ran out of options to try
 				// if haven't found any legit sessions, this parent node has no leaves and is dead
 				else {  //timeslot==null
-					if (!foundOne) parent.isDead=true;
+					if (!foundOne) {
+						parent.isDead=true;
+						System.out.println("********else timeslot null*********DEAD*****************\n");
+
+					}
 					//else parent.isEnd=true;
 					return;
 				}
+				//FIXME get incrementing correct. This code adds extra, but is needed in some cases - which?
 				if (timeIndex==maxTime) {  //if at end of day...
 					if (dayIndex<maxDay){  //if not already on last day go to beginning of next day
 						dayIndex++;
@@ -133,7 +157,11 @@ public class Scheduler {
 				else timeIndex++; //else just move ahead one timeslot on same day
 
 			} // end while
-			if (!foundOne) parent.isDead=true;
+			if (!foundOne) {
+				parent.isDead=true;
+				System.out.println("*********endwhile*******DEAD*****************");
+
+			}
 		}
 	}
 }

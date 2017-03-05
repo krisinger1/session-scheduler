@@ -62,7 +62,7 @@ public class Controller {
 		this.minStudents=minStudents;
 		this.maxSessions=maxSessions;
 		this.blockSize=blockSize;
-		//System.out.println("running Scheduler");
+		//System.out.println("controller: running Scheduler");
 		ArrayList<Student> students = db.getStudents();
 		ArrayList<Student> studentsCopy = new ArrayList<Student>(students);
 
@@ -73,21 +73,23 @@ public class Controller {
 			stu.calculateRank(blockSize);
 		}
 		//Collections.copy(studentsCopy, students);
-		Collections.sort(students);
+		Collections.sort(studentsCopy);
 
 		Tree solutionTree=new Tree(null, new Session(null));
+		// initialize mask
 		int[][] possibleMask=new int[3][17];
+		for (int i=0;i<8;i++) possibleMask[0][i]=1;
 		do {
 			Scheduler.createTree(studentsCopy, solutionTree,possibleMask,blockSize,maxStudents);
+			// remove impossible schedules if any
 			if (!solutionTree.hasLeaves()) {
 				JOptionPane.showMessageDialog(null, "Impossible schedule removed. \nThere are no possible solutions containing \nthis schedule for given parameters.\n> "+studentsCopy.get(0).getFullName(),"Impossible Schedule", JOptionPane.WARNING_MESSAGE);
-				//textSolutionOutput.append("Impossible schedule, "+schedulesCopy.get(0).getName()+" removed");
 				studentsCopy.remove(0);
 			}
 		}		while (!solutionTree.hasLeaves());
 		if (!(solutionTree==null)) solutionTree.pruneTree();
 		createSolutions(solutionTree, new ArrayList<Session>(),studentsCopy);
-		//System.out.println("out of createSolutions");
+		//System.out.println("controller: out of createSolutions");
 		for (Solution sol:solutions){
 			sol.calculateNormalizedRank(fewestSessionsWeight, preferredTimesWeight, canComeWeight, mustComeWeight,solutions);
 		}
@@ -97,7 +99,7 @@ public class Controller {
 
 		// find similar solutions
 		for (Solution baseSolution:solutions){
-			//System.out.println("base solution: "+ baseSolution);
+			//System.out.println("controller: base solution: "+ baseSolution);
 			for (Solution testSolution:solutions){
 				if (!baseSolution.isSame(testSolution)){
 					if (baseSolution.isSimilar(testSolution)){

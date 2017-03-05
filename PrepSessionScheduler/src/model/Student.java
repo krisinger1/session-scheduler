@@ -79,7 +79,8 @@ public class Student implements Serializable, Comparable<Student>{
 	}
 
 	public String toString(){
-		return (getFullName()+" "+email+" "+schedule[0][0]);
+		return (getFullName()+" "+email);
+		//return getFullName();
 	}
 
 	@Override
@@ -126,6 +127,7 @@ public class Student implements Serializable, Comparable<Student>{
 		int startTime = startTimeSlot.getTime();
 		int startDay = startTimeSlot.getDay();
 		for (int day=startDay;day<3;day++){
+			if (day>startDay) startTime=0;
 			for (int time=startTime; time<schedule[day].length;time++){
 				TimeSlot testSlot = new TimeSlot(day, time);
 				if (schedule[day][time]==0 && hasBlockOpen(testSlot, blockSize)) return testSlot;
