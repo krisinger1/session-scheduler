@@ -43,7 +43,6 @@ public class Scheduler {
 
 				//System.out.println("Scheduler: timeslot in while "+timeSlot.toString());
 				// find first open block in worst schedule
-				//TODO not starting find open block at right timeslot? from beginning? missing some?
 				timeSlot= worst.findOpenBlock(timeSlot, blockSize);
 				System.out.println("Scheduler: worst timeslot "+timeSlot+" "+worst);
 
@@ -122,7 +121,6 @@ public class Scheduler {
 					else{
 						// else if mask is not open
 						// increment timeslot and try again?
-						//FIXME incrementing not correct
 //						if (timeIndex>=maxTime) {  //if at end of day...
 //							if (dayIndex<maxDay){  //if not already on last day go to beginning of next day
 //								dayIndex++;
@@ -147,7 +145,6 @@ public class Scheduler {
 					//else parent.isEnd=true;
 					return;
 				}
-				//FIXME get incrementing correct. This code adds extra, but is needed in some cases - which?
 				if (timeIndex==maxTime) {  //if at end of day...
 					if (dayIndex<maxDay){  //if not already on last day go to beginning of next day
 						dayIndex++;
