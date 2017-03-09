@@ -1,5 +1,5 @@
 package gui;
 
-public interface ResultsTableListener {
+public interface VariationsTableListener {
 	public void rowSelected(int row);
 }

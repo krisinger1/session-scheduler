@@ -6,7 +6,14 @@ import java.awt.Event;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
+import java.security.AlgorithmParameterGeneratorSpi;
+import java.security.AlgorithmParameters;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.SecureRandom;
+import java.security.spec.AlgorithmParameterSpec;
+import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
@@ -18,9 +25,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileFilter;
 
 import controller.Controller;
 import model.Parameters;
+import model.Solution;
 
 public class MainFrame extends JFrame {
 	private InputPanel inputPanel = new InputPanel();
@@ -31,7 +40,7 @@ public class MainFrame extends JFrame {
 	private PreferencesDialog preferencesDialog;
 	private Preferences preferences;
 	private int maxStudents;
-	private JFileChooser fileChooser;
+	private JFileChooser fileChooser,solutionFileChooser;
 	private Controller controller;
 	private JPanel dataEntryTab;
 	private JPanel schedulerTab;
@@ -53,6 +62,10 @@ public class MainFrame extends JFrame {
 
 		fileChooser = new JFileChooser();
 		fileChooser.setFileFilter(new MyFileFilter());
+
+		solutionFileChooser = new JFileChooser();
+		solutionFileChooser.setFileFilter(new CsvFileFilter());
+
 		//fileChooser.addChoosableFileFilter(new MyFileFilter());
 
 /////////////////////// Tabs ////////////////////
@@ -136,11 +149,12 @@ public class MainFrame extends JFrame {
 						event.getNumSessionsWeight(),event.getPreferredWeight(),event.getCanWeight(),event.getMustWeight());
 				resultsPanel.setSolutionsData(controller.getSolutions());
 				resultsPanel.refreshSolutions();
+				resultsPanel.setVariationsData(new ArrayList<Solution>());
 			}
 		});
 
 ////////////////// Results Panel //////////////////////////////
-		resultsPanel.setResultsTableListener(new ResultsTableListener() {
+		resultsPanel.setSolutionsTableListener(new SolutionsTableListener() {
 
 			@Override
 			public void rowSelected(int row) {
@@ -148,6 +162,27 @@ public class MainFrame extends JFrame {
 
 				resultsPanel.setVariationsData(controller.getVariations(row));
 				resultsPanel.refreshVariations();
+			}
+		});
+
+		resultsPanel.setVariationsTableListener(new VariationsTableListener() {
+
+			@Override
+			public void rowSelected(int row) {
+				System.out.println(controller.getMembers(row));
+				resultsPanel.setMembersData(controller.getMembers(row));
+				//resultsPanel.refreshMembers();
+			}
+		});
+
+		resultsPanel.setSaveEventListener(new SaveEventListener() {
+
+			@Override
+			public void saveEventOccurred(SaveSolutionEvent event) {
+				int choice = solutionFileChooser.showSaveDialog(MainFrame.this);
+				if (choice==JFileChooser.APPROVE_OPTION){
+						controller.saveSolutionToFile(solutionFileChooser.getSelectedFile(), event.getIndex());
+				}
 			}
 		});
 
@@ -252,4 +287,23 @@ public class MainFrame extends JFrame {
 		return menuBar;
 
 	}
+}
+
+final class CsvFileFilter extends FileFilter{
+
+	@Override
+	public boolean accept(File file) {
+		if (file.isDirectory()) return true; //allow directories to be seen in fileChooser
+		String name = file.getName();
+		String extension = Utils.getFileExtension(name);
+		if (extension == null) return false;
+		else if (extension.equals("csv")) return true;
+		else return false;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Comma separated values file (*.csv)";
+	}
+
 }

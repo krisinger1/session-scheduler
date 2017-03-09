@@ -15,10 +15,10 @@ import model.Tree;
 
 public class Scheduler {
 	public static void createTree(ArrayList<Student> studentList,Tree parent, int[][] mask, int blockSize, int maxStudents){
-		System.out.println("in createTree");
+		//System.out.println("in createTree");
 		if (studentList.size()==0) { //if no students left in list, then this solution branch complete
 			parent.isEnd=true;
-			System.out.println("**************************************\nScheduler: END of branch");
+			//System.out.println("**************************************\nScheduler: END of branch");
 
 			return;
 		}
@@ -33,18 +33,18 @@ public class Scheduler {
 
 			// start with worst schedule
 			Student worst=studentList.get(0);
-			System.out.println("Scheduler: worst schedule: "+worst.toString());
+			//System.out.println("Scheduler: worst schedule: "+worst.toString());
 
 			//new code
 			// while there are still students unassigned and there are still timeslots to try...
 			while (studentList.size()>0 && !(dayIndex>=maxDay && timeIndex>=maxTime)){
 				timeSlot=new TimeSlot(dayIndex, timeIndex);
-				System.out.println("Scheduler: start timeslot "+timeSlot+" "+worst);
+				//System.out.println("Scheduler: start timeslot "+timeSlot+" "+worst);
 
 				//System.out.println("Scheduler: timeslot in while "+timeSlot.toString());
 				// find first open block in worst schedule
 				timeSlot= worst.findOpenBlock(timeSlot, blockSize);
-				System.out.println("Scheduler: worst timeslot "+timeSlot+" "+worst);
+				//System.out.println("Scheduler: worst timeslot "+timeSlot+" "+worst);
 
 
 				if (timeSlot!=null){  // if worst schedule has a timeslot available, check if it works...
@@ -72,7 +72,7 @@ public class Scheduler {
 						for (Student stu:studentList){
 							if (stu.hasBlockOpen(timeSlot, blockSize) && tempList.size()<maxStudents){
 								tempList.add(stu);
-								System.out.println(stu);
+								//System.out.println(stu);
 							}
 						}
 						//System.out.println("Scheduler: templist size "+tempList.size());
@@ -81,7 +81,7 @@ public class Scheduler {
 						// check later when creating solutions
 
 						foundOne=true; // we found a legit session
-						System.out.println("**********Scheduler: found one: "+timeSlot);
+						//System.out.println("**********Scheduler: found one: "+timeSlot);
 
 						//System.out.println("Scheduler: found one: "+foundOne);
 						Session session = new Session(timeSlot); //create session
@@ -128,7 +128,7 @@ public class Scheduler {
 //							} // else dayIndex=maxday and timeindex=maxtime and should exit while loop
 //						}
 //						else timeIndex++; //else just move ahead one timeslot on same day
-						System.out.println("Scheduler: trying "+dayIndex+" "+timeIndex);
+						//System.out.println("Scheduler: trying "+dayIndex+" "+timeIndex);
 					} // end else mask not open
 
 				} // end if timeslot!=null
@@ -139,7 +139,7 @@ public class Scheduler {
 				else {  //timeslot==null
 					if (!foundOne) {
 						parent.isDead=true;
-						System.out.println("********else timeslot null*********DEAD*****************\n");
+						//System.out.println("********else timeslot null*********DEAD*****************\n");
 
 					}
 					//else parent.isEnd=true;
@@ -156,7 +156,7 @@ public class Scheduler {
 			} // end while
 			if (!foundOne) {
 				parent.isDead=true;
-				System.out.println("*********endwhile*******DEAD*****************");
+				//System.out.println("*********endwhile*******DEAD*****************");
 
 			}
 		}

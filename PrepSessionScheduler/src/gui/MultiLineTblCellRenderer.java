@@ -25,7 +25,7 @@ public class MultiLineTblCellRenderer extends JList<String> implements TableCell
 		if (value instanceof String){
 			String[] data = ((String)value).split(",");
 			// set height of row based on how many lines printed in row
-	        table.setRowHeight((table.getFont().getSize()+8)*4);
+	        table.setRowHeight((table.getFont().getSize()+8)*5);
 			setListData(data);
 		}
 //		if (value instanceof ArrayList<?>){

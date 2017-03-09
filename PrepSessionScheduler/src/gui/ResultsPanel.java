@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -30,7 +31,12 @@ public class ResultsPanel extends JPanel {
 	private JTable variationsTable;
 	private SolutionsTableModel variationsTableModel = new SolutionsTableModel();
 	private JScrollPane solScrollPane,varScrollPane;
-	private ResultsTableListener listener;
+	private JTextArea membersArea;
+	private JScrollPane membersScrollPane;
+	private SolutionsTableListener solListener;
+	private VariationsTableListener varListener;
+	private SaveEventListener saveEventListener;
+	private int saveRow;
 	public ResultsPanel(){
 		super();
 
@@ -55,8 +61,7 @@ public class ResultsPanel extends JPanel {
 				if (e.getButton()==MouseEvent.BUTTON1){
 					super.mouseClicked(e);
 					int row=solutionsTable.rowAtPoint(e.getPoint());
-					//System.out.println("in mouseclicked...");
-					listener.rowSelected(row);
+						solListener.rowSelected(row);
 				}
 			}
 
@@ -65,28 +70,49 @@ public class ResultsPanel extends JPanel {
 		solutionsTable.getColumn("Sessions").setCellRenderer(renderer);
 
 		variationsTable = new JTable(variationsTableModel);
+		variationsTable.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				super.mouseClicked(e);
+				int row=variationsTable.rowAtPoint(e.getPoint());
+				varListener.rowSelected(row);
+				saveRow=row;
+			}
+		});
+
 		//variationsTable = new JTable(variationsTableModel);
 		//variationsTable.setRowHeight(rowHeight);
 		variationsTable.getColumn("").setMaxWidth(100);
 		variationsTable.getColumn("Sessions").setCellRenderer(renderer);
 
 		solScrollPane = new JScrollPane(solutionsTable);
-		solScrollPane.setMaximumSize(new Dimension(400,800));
+		solScrollPane.setMaximumSize(new Dimension(400,300));
 		solScrollPane.setMinimumSize(new Dimension(300,300));
 
 		varScrollPane = new JScrollPane(variationsTable);
-		varScrollPane.setMaximumSize(new Dimension(400,800));
+		varScrollPane.setMaximumSize(new Dimension(400,300));
 		varScrollPane.setMinimumSize(new Dimension(300,300));
 
-		gc.insets = new Insets(50, 20, 0, 0);
+		membersArea = new JTextArea();
+		membersArea.setMaximumSize(new Dimension(800,500));
+		membersArea.setMinimumSize(new Dimension(400,300));
+
+		membersScrollPane=new JScrollPane(membersArea);
+		membersScrollPane.setMinimumSize(new Dimension(400,300));
+		membersScrollPane.setMaximumSize(new Dimension(800,500));
+
+
+		gc.insets = new Insets(20, 20, 5, 0);
 		gc.gridx=0;
 		gc.gridy=0;
 		gc.weightx=1;
-		gc.weighty=0;
+		gc.weighty=1;
 		gc.anchor=GridBagConstraints.SOUTHWEST;
 		add(new JLabel("Solutions:"),gc);
 
-		gc.insets = new Insets(50, 20, 0, 20);
+		gc.insets = new Insets(20, 20, 5, 20);
 		gc.gridx=1;
 		add(new JLabel("Variations of selected solution:"),gc);
 
@@ -104,6 +130,23 @@ public class ResultsPanel extends JPanel {
 		gc.weighty=5;
 		add(varScrollPane,gc);
 
+		gc.insets = new Insets(20, 20, 5, 20);
+		gc.gridx=0;
+		gc.gridy++;
+		gc.weightx=1;
+		gc.weighty=1;
+		gc.anchor=GridBagConstraints.NORTHWEST;
+		add(new JLabel("Students for this solution:"),gc);
+
+		gc.insets=new Insets(0, 20, 5, 0);
+		gc.gridwidth=2;
+		gc.gridx=0;
+		gc.gridy++;
+		gc.weightx=1;
+		gc.weighty=10;
+		add(membersScrollPane,gc);
+
+		gc.insets = new Insets(0, 20, 20, 20);
 		gc.gridx=0;
 		gc.gridy++;
 		gc.weightx=1;
@@ -114,13 +157,18 @@ public class ResultsPanel extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Save button pressed");
-			}
+				if (saveRow!=-1){
+					saveEventListener.saveEventOccurred(new SaveSolutionEvent(this, saveRow));
+					}
+				}
 		});
 
 	}
-	public void setResultsTableListener(ResultsTableListener resultsTableListener) {
-		listener = resultsTableListener;
+	public void setSolutionsTableListener(SolutionsTableListener solTableListener) {
+		solListener = solTableListener;
+	}
+	public void setVariationsTableListener(VariationsTableListener varTableListener){
+		varListener=varTableListener;
 	}
 	public void setVariationsData(ArrayList<Solution> variations) {
 		variationsTableModel.setData(variations,"Variation");
@@ -134,5 +182,15 @@ public class ResultsPanel extends JPanel {
 	public void refreshVariations(){
 		variationsTableModel.fireTableDataChanged();
 	}
+
+	public void setMembersData(String members) {
+		membersArea.setText(members);
+	}
+	public void setSaveEventListener(SaveEventListener listener) {
+		saveEventListener=listener;
+	}
+
+
+
 
 }

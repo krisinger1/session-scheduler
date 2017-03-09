@@ -14,8 +14,8 @@ import java.util.List;
  *
  */
 public class Session implements Comparable<Session>{
-	public List<Student> members;
-	public List<Student> membersMustAttend;
+	public ArrayList<Student> members;
+	public ArrayList<Student> membersMustAttend;
 	//int time; //the index of the session on schedule
 	public TimeSlot timeSlot;
 	public boolean preferred;
@@ -84,6 +84,18 @@ public class Session implements Comparable<Session>{
 //		return result;
 
 		return timeSlot.toString();
+	}
+
+	public String membersToString(){
+		//String result=timeSlot.toString();
+		String result="";
+		for (Student s:members){
+			if (membersMustAttend.contains(s)) result+="*";
+			else result+=" ";
+			result+=" "+s.getFullName()+"\t\t "+s.getEmail()+"\n";
+		}
+		result+="\n";
+		return result;
 	}
 
 	/**
