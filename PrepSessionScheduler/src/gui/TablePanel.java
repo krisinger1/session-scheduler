@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -23,6 +26,7 @@ public class TablePanel extends JPanel{
 	private StudentTableModel studentTableModel;
 	private JPopupMenu tablePopup;
 	private TableListener studentTableListener;
+	private int currentRow = 0;
 
 	public TablePanel(){
 		studentTableModel = new StudentTableModel();
@@ -31,6 +35,9 @@ public class TablePanel extends JPanel{
 
 		JMenuItem deleteRow = new JMenuItem("Delete Row");
 		tablePopup.add(deleteRow);
+
+		studentTable.getColumn("Area").setPreferredWidth(40);
+		studentTable.getColumn("Area").setMaxWidth(40);
 
 		studentTable.addMouseListener(new MouseAdapter(){
 
@@ -43,13 +50,32 @@ public class TablePanel extends JPanel{
 				}
 				else if (e.getButton()==MouseEvent.BUTTON1){
 					int row= studentTable.getSelectedRow();
-					//int row=studentTable.rowAtPoint(e.getPoint());
-					//studentTable.getSelectionModel().setSelectionInterval(row, row);
-					//System.out.println("TablePanel: row "+row+" selected");
-					studentTableListener.rowSelected(row);
+					fireSelectionEvent(row);
 				}
 			}
 
+		});
+
+		studentTable.addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				//super.keyReleased(e);
+				int key = e.getKeyCode();
+				String keyText=KeyEvent.getKeyText(key);
+				int row = studentTable.getSelectedRow();
+				System.out.println(key +" pressed on row "+row+" "+keyText);
+				if (key==40 ||key==38){
+					fireSelectionEvent(row);
+				}
+				else if (key==127){
+					if (studentTableListener != null){
+						studentTableListener.rowDeleted(row);
+						studentTableModel.fireTableRowsDeleted(row, row);
+					}
+				}
+			}
 		});
 
 		deleteRow.addActionListener(new ActionListener(){
@@ -71,6 +97,17 @@ public class TablePanel extends JPanel{
 		setBackground(Parameters.schemeColor2);
 
 		add(new JScrollPane(studentTable),BorderLayout.CENTER);
+	}
+
+	private void fireSelectionEvent(int row){
+		row= studentTable.getSelectedRow();
+		//reset selection on table to current student if cancelled
+		boolean success = studentTableListener.rowSelected(row);
+		if (!success){
+			System.out.println("selection failed. current row= "+currentRow);
+			studentTable.setRowSelectionInterval(currentRow, currentRow);
+		}
+		else currentRow=row;
 	}
 
 	public void setData(List<Student> db){

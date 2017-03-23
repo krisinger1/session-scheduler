@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Event;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -16,6 +17,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -35,7 +37,8 @@ public class MainFrame extends JFrame {
 	private InputPanel inputPanel = new InputPanel();
 	private ResultsPanel resultsPanel = new ResultsPanel();
 	private StudentDataPanel studentDataPanel = new StudentDataPanel();
-	private TablePanel tablePanel=new TablePanel();
+	private TablePanel tablePanel=new TablePanel();	
+	private JPanel buttonPanel;
 	private JTabbedPane tabbedPane;
 	private PreferencesDialog preferencesDialog;
 	private Preferences preferences;
@@ -44,7 +47,9 @@ public class MainFrame extends JFrame {
 	private Controller controller;
 	private JPanel dataEntryTab;
 	private JPanel schedulerTab;
-
+	private JButton saveFileButton;
+	private JButton openFileButton;
+	private JButton newFileButton;
 
 	public MainFrame(String title){
 		super(title);
@@ -67,6 +72,69 @@ public class MainFrame extends JFrame {
 		solutionFileChooser.setFileFilter(new CsvFileFilter());
 
 		//fileChooser.addChoosableFileFilter(new MyFileFilter());
+		
+//////////////////Button Panel/////////////////////////////////
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		buttonPanel.setBackground(Parameters.schemeColor2);
+		
+		saveFileButton = new JButton("Save File");
+		saveFileButton.setMaximumSize(new Dimension(150, 25));
+		saveFileButton.setEnabled(false);
+		buttonPanel.add(saveFileButton);
+		openFileButton = new JButton("Open File");
+		openFileButton.setMaximumSize(new Dimension(150, 25));
+		buttonPanel.add(openFileButton);
+		newFileButton = new JButton("New File");
+		newFileButton.setMaximumSize(new Dimension(150, 25));
+		buttonPanel.add(newFileButton);
+	
+		saveFileButton.addActionListener(new ActionListener() {
+		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int choice = fileChooser.showSaveDialog(MainFrame.this);
+				if (choice==JFileChooser.APPROVE_OPTION){
+						try {
+							controller.saveToFile(fileChooser.getSelectedFile());
+							saveFileButton.setEnabled(false);
+
+						} 
+						catch (IOException e1) {
+							e1.printStackTrace();
+						}
+				}
+			}
+		});
+		
+		openFileButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int choice = fileChooser.showOpenDialog(MainFrame.this);
+				if (choice==JFileChooser.APPROVE_OPTION){
+					try {
+						controller.loadFromFile(fileChooser.getSelectedFile());
+						tablePanel.refresh();
+						saveFileButton.setEnabled(false);
+
+					} catch (IOException ie) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Could not load file", "Error", JOptionPane.ERROR_MESSAGE);
+						ie.printStackTrace();
+					}
+				}
+			}
+		});
+		
+		newFileButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("new file button");
+				System.out.println("changed? "+controller.databaseChanged());
+				saveFileButton.setEnabled(false);
+			}
+		});
 
 /////////////////////// Tabs ////////////////////
 		schedulerTab=new JPanel();
@@ -78,12 +146,21 @@ public class MainFrame extends JFrame {
 		dataEntryTab.setLayout(new BorderLayout());
 		dataEntryTab.add(studentDataPanel,BorderLayout.WEST);
 		dataEntryTab.add(tablePanel,BorderLayout.CENTER);
+		dataEntryTab.add(buttonPanel,BorderLayout.NORTH);
 		dataEntryTab.setMinimumSize(this.getMinimumSize());
 
 		tabbedPane=new JTabbedPane();
 		tabbedPane.setMinimumSize(this.getMinimumSize());
 		tabbedPane.addTab("Data Entry", dataEntryTab);
 		tabbedPane.addTab("Scheduler", schedulerTab);
+		int schedulerIndex = tabbedPane.indexOfTab("Scheduler");
+		int dataEntryIndex = tabbedPane.indexOfTab("Data Entry");
+
+		tabbedPane.setEnabledAt(schedulerIndex, false);
+		tabbedPane.setSelectedIndex(dataEntryIndex);
+
+
+
 
 ////////////////// Preferences ///////////////////////////
 		preferencesDialog.setPreferencesListener(new PreferencesListener() {
@@ -112,14 +189,27 @@ public class MainFrame extends JFrame {
 					System.out.println("StudentFormEvent: "+e.getSchedule()[0][0]+" "+e.getSchedule()[0][1]);
 					controller.addStudent(e.getFName(),e.getLName(), e.getEmail(),e.getArea(),e.getSchedule());
 					System.out.println("after controller: "+controller.getStudents().get(0));
-
+					saveFileButton.setEnabled(true);
 					tablePanel.refresh();
 				}
 				else if (!e.getFName().equals("") && !e.getLName().equals("")){
 					controller.updateStudent(e.getId(), e.getFName(),e.getLName(), e.getEmail(),e.getArea(),e.getSchedule());
 					System.out.println("StudentFormEvent update: "+e.getSchedule()[0][0]+" "+e.getSchedule()[0][1]);
+					saveFileButton.setEnabled(true);
 					tablePanel.refresh();
 				}
+			}
+
+			@Override
+			public void doneEventOccurred() {
+				System.out.println("done event occurred");
+				System.out.println("database changed? "+controller.databaseChanged());
+				if (controller.databaseChanged()){
+					int ans = JOptionPane.showConfirmDialog(getParent(), "Database file not saved. Continue anyway?", "File not saved", JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE);
+					if (ans!=JOptionPane.OK_OPTION) return;
+				}
+				tabbedPane.setEnabledAt(1, true);
+				tabbedPane.setSelectedIndex(1);
 			}
 		});
 
@@ -129,13 +219,26 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void rowDeleted(int row) {
-				controller.removeStudent(row);
+				int choice=JOptionPane.showConfirmDialog(getParent(), "Are you sure you want to delete this student?", "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (choice==JOptionPane.YES_OPTION) {
+					controller.removeStudent(row);
+					saveFileButton.setEnabled(true);
+					studentDataPanel.resetForm();
+				}
 			}
 
 			@Override
-			public void rowSelected(int row) {
+			public boolean rowSelected(int row) {
+
+				if (studentDataPanel.isDirty()){
+					int choice=JOptionPane.showConfirmDialog(getParent(), "Current student not saved. Continue anyway? Your changes will be lost.", "Data not saved", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+					if (choice==JOptionPane.CANCEL_OPTION) {
+						return false; // selection failed
+					}
+				}
 				studentDataPanel.populateForm(controller.getStudents().get(row));
 				//System.out.println("rowSelected: "+controller.getStudents().get(row).toString());
+				return true;
 			}
 		});
 

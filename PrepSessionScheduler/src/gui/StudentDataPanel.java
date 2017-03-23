@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -36,6 +37,8 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 	private JButton doneButton;
 	private StudentFormListener studentFormListener;
 	private boolean dirty = false;
+	private static Dimension BUTTONSIZE = new Dimension(150, 25);
+
 
 	public StudentDataPanel(){
 		super();
@@ -71,9 +74,13 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 
 		schedPanel.setData(days);
 		saveButton = new JButton("Save Student");
+		//saveButton.setPreferredSize(BUTTONSIZE);
 		saveButton.setEnabled(false);
-		newButton = new JButton("New");
+		newButton = new JButton("Add New Student");
+		//newButton.setPreferredSize(BUTTONSIZE);
 		doneButton = new JButton("Done");
+		//doneButton.setPreferredSize(BUTTONSIZE);
+		//saveFileButton.setPreferredSize(saveButton.getSize());
 
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Parameters.schemeColor1);
@@ -175,28 +182,24 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		gc.gridy++;
 		gc.weighty=1;
 		gc.gridwidth=1;
-		//add(idLabel,gc);
 		add(saveButton,gc);
 
 		gc.gridx=1;
-		//gc.gridy++;
 		gc.weighty=1;
 		gc.gridwidth=1;
 		gc.anchor=GridBagConstraints.NORTH;
 		add(newButton,gc);
 
 		gc.gridx=2;
-		//gc.gridy++;
 		gc.weighty=1;
 		gc.gridwidth=1;
 		gc.anchor=GridBagConstraints.FIRST_LINE_START;
-		//add(idLabel,gc);
 		add(doneButton,gc);
 
 		////////////////
 		gc.gridx=0;
 		gc.gridy++;
-		add(idLabel,gc);
+		//add(saveFileButton,gc);
 
 		saveButton.addActionListener(this);
 		newButton.addActionListener(this);
@@ -207,15 +210,20 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 	public void setStudentFormListener(StudentFormListener listener) {
 		this.studentFormListener=listener;
 	}
+	
+	public boolean isDirty(){
+		return dirty;
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand()=="New"){
+		//TODO if not saving data reset schedule to what it was
+		if (e.getActionCommand()=="Add New Student"){
 			if (!dirty){
 				resetForm();
 			}
 			else {
-				int ans = JOptionPane.showConfirmDialog(this, "Data not saved. Continue anyway?", "Data not saved", JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE);
+				int ans = JOptionPane.showConfirmDialog(this, "Student not saved. Continue anyway?", "Data not saved", JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE);
 				if (ans==JOptionPane.OK_OPTION) resetForm();
 			}
 		}
@@ -233,9 +241,18 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 			}
 		}
 		else if (e.getActionCommand()=="Done"){
-			//TODO implement Done button
 			System.out.println("Done button pressed");
+			//TODO make sure there is data in student database before allowing scheduler to run
+
+			if (studentFormListener !=null){
+				if (dirty) {
+					int ans = JOptionPane.showConfirmDialog(this, "Student not saved. Continue anyway?", "Data not saved", JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE);
+					if (ans!=JOptionPane.OK_OPTION) return;
+				}
+				studentFormListener.doneEventOccurred();
+			}
 		}
+		
 	}
 
 	public void populateForm(Student student){
@@ -245,7 +262,8 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		lNameTxt.setText(student.getLName());
 		emailTxt.setText(student.getEmail());
 		areaTxt.setText(student.getArea());
-		days=student.getSchedule();
+		//days=student.getSchedule();
+		days=Utils.copyOf(student.getSchedule());
 		schedPanel.setData(days);
 		//System.out.println("populateForm: "+days[0][0]+" "+days[0][1]);
 		schedPanel.clear();

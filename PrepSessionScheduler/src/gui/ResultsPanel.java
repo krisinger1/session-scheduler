@@ -49,9 +49,7 @@ public class ResultsPanel extends JPanel {
 
 		solutionsTable.setMaximumSize(new Dimension(400,100));
 		solutionsTable.getColumn("").setMaxWidth(100);
-		//int rowHeight = (solutionsTable.getFont().getSize()+8)*4;
 
-		//solutionsTable.setRowHeight(rowHeight);
 		//solutionsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		solutionsTable.addMouseListener(new MouseAdapter() {
@@ -61,7 +59,9 @@ public class ResultsPanel extends JPanel {
 				if (e.getButton()==MouseEvent.BUTTON1){
 					super.mouseClicked(e);
 					int row=solutionsTable.rowAtPoint(e.getPoint());
-						solListener.rowSelected(row);
+					solListener.rowSelected(row);
+					variationsTable.setRowSelectionInterval(0, 0);
+					varListener.rowSelected(0);
 				}
 			}
 
@@ -74,7 +74,6 @@ public class ResultsPanel extends JPanel {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 				super.mouseClicked(e);
 				int row=variationsTable.rowAtPoint(e.getPoint());
 				varListener.rowSelected(row);
@@ -82,8 +81,6 @@ public class ResultsPanel extends JPanel {
 			}
 		});
 
-		//variationsTable = new JTable(variationsTableModel);
-		//variationsTable.setRowHeight(rowHeight);
 		variationsTable.getColumn("").setMaxWidth(100);
 		variationsTable.getColumn("Sessions").setCellRenderer(renderer);
 
@@ -102,7 +99,6 @@ public class ResultsPanel extends JPanel {
 		membersScrollPane=new JScrollPane(membersArea);
 		membersScrollPane.setMinimumSize(new Dimension(400,300));
 		membersScrollPane.setMaximumSize(new Dimension(800,500));
-
 
 		gc.insets = new Insets(20, 20, 5, 0);
 		gc.gridx=0;
@@ -164,21 +160,27 @@ public class ResultsPanel extends JPanel {
 		});
 
 	}
+
 	public void setSolutionsTableListener(SolutionsTableListener solTableListener) {
 		solListener = solTableListener;
 	}
+
 	public void setVariationsTableListener(VariationsTableListener varTableListener){
 		varListener=varTableListener;
 	}
+
 	public void setVariationsData(ArrayList<Solution> variations) {
 		variationsTableModel.setData(variations,"Variation");
 	}
+
 	public void setSolutionsData(ArrayList<Solution> solutions) {
 		solutionsTableModel.setData(solutions,"Solution");
 	}
+
 	public void refreshSolutions(){
 		solutionsTableModel.fireTableDataChanged();
 	}
+
 	public void refreshVariations(){
 		variationsTableModel.fireTableDataChanged();
 	}
@@ -186,6 +188,7 @@ public class ResultsPanel extends JPanel {
 	public void setMembersData(String members) {
 		membersArea.setText(members);
 	}
+
 	public void setSaveEventListener(SaveEventListener listener) {
 		saveEventListener=listener;
 	}

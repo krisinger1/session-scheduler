@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.swing.text.ChangedCharSetException;
 
 import org.intervarsity.Schedule;
 
@@ -26,20 +27,19 @@ public class Controller {
 	ArrayList<Solution> solutions, distinctSolutions, variations;
 	int maxStudents, minStudents, maxSessions, blockSize;
 	int[][] preferredMask=new int[3][17];
+	boolean changed=true;
 
 
 	public void addStudent(String firstName, String lastName, String email, String area, int[][] schedule){
 		Student student = new Student(firstName, lastName, email,area, schedule);
-		//System.out.println("controller addStudent: "+student);
-		//System.out.println("controller db: "+db.toString());
 		db.addStudent(student);
-		//System.out.println("controller db after: "+db.toString());
+		changed=true;
 	}
 
 	public void updateStudent(int id, String firstName, String lastName, String email, String area, int[][] schedule){
 		Student student = new Student(id, firstName, lastName, email,area, schedule);
-		//System.out.println("controller updateStudent: "+schedule[0][0]+" "+schedule[0][1]);
 		db.updateStudent(student);
+		changed=true;
 	}
 
 	public List<Student> getStudents(){
@@ -48,21 +48,22 @@ public class Controller {
 
 	public void saveToFile(File file) throws IOException{
 		db.saveTofile(file);
+		changed=false;
 	}
 
 	public void loadFromFile(File file) throws IOException{
 		db.loadFromFile(file);
+		changed=false;
 	}
 
 	public void removeStudent(int row) {
 		db.removeStudent(row);
+		changed=true;
 	}
 
-//	public ArrayList<String[]> getVariations(int row) {
-//		System.out.println("getting variationsof solution");
-//		ArrayList<String[]> arrayList = new ArrayList<String[]>();
-//		return arrayList;
-//	}
+	public boolean databaseChanged(){
+		return changed;
+	}
 
 	public void runScheduler(int maxStudents, int minStudents, int maxSessions, int blockSize,
 			int fewestSessionsWeight,int preferredTimesWeight, int canComeWeight, int mustComeWeight) {

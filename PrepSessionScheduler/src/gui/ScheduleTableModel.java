@@ -34,7 +34,6 @@ public class ScheduleTableModel extends AbstractTableModel{
 
 	public int[][] getData(){
 		return days;
-
 	}
 
 	@Override

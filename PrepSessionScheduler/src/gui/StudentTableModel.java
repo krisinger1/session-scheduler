@@ -8,7 +8,7 @@ import model.Student;
 
 public class StudentTableModel extends AbstractTableModel{
 	private List<Student> db;
-	private String[] colNames = {"Name","Email Address"};
+	private String[] colNames = {"Name","Area","Email Address"};
 
 
 	@Override
@@ -22,7 +22,7 @@ public class StudentTableModel extends AbstractTableModel{
 
 	@Override
 	public int getColumnCount() {
-		return 2;
+		return 3;
 	}
 
 	@Override
@@ -37,6 +37,8 @@ public class StudentTableModel extends AbstractTableModel{
 		case 0:
 			return student.getFullName();
 		case 1:
+			return student.getArea();
+		case 2:
 			return student.getEmail();
 			//return student.getSchedule()[0][0];
 		}
