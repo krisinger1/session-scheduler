@@ -2,10 +2,13 @@ package model;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
@@ -13,6 +16,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.swing.JOptionPane;
+
+import gui.Utils;
 
 
 public class StudentDatabase {
@@ -101,6 +108,26 @@ public class StudentDatabase {
 		oos.close();
 	}
 
+	public void exportToCsv(File file) throws IOException{
+		PrintWriter writer;
+		String text="";
+		try {
+			writer = new PrintWriter(file, "UTF-8");
+			for (Student stu:students){
+				text=stu.getFullName()+","+stu.getArea()+","+stu.getEmail()+","+getScheduleAsCsv(stu)+"\n";
+				System.out.println(text);
+				writer.append(text);
+			}
+			writer.close();
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "File not found. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			JOptionPane.showMessageDialog(null, "Unsupported encoding exception. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
+	}
+
 	public void loadFromFile(File file) throws IOException{
 		FileInputStream fis = new FileInputStream(file);
 		ObjectInputStream ois = new ObjectInputStream(fis);
@@ -118,6 +145,18 @@ public class StudentDatabase {
 		String data ="";
 		for (Student s:students) data+=s.toString();
 		return data;
+	}
+
+	public String getScheduleAsCsv(Student stu){
+		String text="";
+		for (int i=0;i<stu.schedule.length;i++){
+			text+="2,";
+			for (int j=0;j<stu.schedule[0].length;j++){
+				text+=stu.schedule[i][j]+",";
+			}
+
+		}
+		return text;
 	}
 
 }

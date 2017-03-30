@@ -44,6 +44,8 @@ public class InputPanel extends JPanel implements ActionListener{
 	private InputFormListener inputFormListener;
 
 	public InputPanel(){
+
+		//TODO add labels and/or tooltips for instructions & info
 		super();
 		maxStudentsSpinner=new JSpinner(new SpinnerNumberModel(30,10,50,5));
 		minStudentsSpinner = new JSpinner(new SpinnerNumberModel(4, 1, 10, 1));

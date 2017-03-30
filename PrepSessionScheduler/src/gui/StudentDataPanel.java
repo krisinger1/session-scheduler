@@ -37,9 +37,8 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 	private JButton doneButton;
 	private StudentFormListener studentFormListener;
 	private boolean dirty = false;
-	private static Dimension BUTTONSIZE = new Dimension(150, 25);
 
-
+	//TODO add Undo button to student data entry panel
 	public StudentDataPanel(){
 		super();
 		setLayout(new GridBagLayout());
@@ -72,15 +71,32 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 			}
 		}
 
+		/// temporary code for mask
+		//TODO implement better method of setting mask
+		int[][] mask =new int[3][17];
+
+		for (int i=0;i<17;i++){
+			for (int j=0;j<3;j++){
+				mask[j][i]=0;
+			}
+		}
+		mask[0][0]=1;
+		mask[0][1]=1;
+		mask[0][2]=1;
+		mask[0][3]=1;
+		mask[0][4]=1;
+		mask[0][5]=1;
+		mask[0][6]=1;
+		mask[0][7]=1;
+
+		schedPanel.setMask(mask);
+
 		schedPanel.setData(days);
+
 		saveButton = new JButton("Save Student");
-		//saveButton.setPreferredSize(BUTTONSIZE);
 		saveButton.setEnabled(false);
 		newButton = new JButton("Add New Student");
-		//newButton.setPreferredSize(BUTTONSIZE);
 		doneButton = new JButton("Done");
-		//doneButton.setPreferredSize(BUTTONSIZE);
-		//saveFileButton.setPreferredSize(saveButton.getSize());
 
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Parameters.schemeColor1);
@@ -210,7 +226,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 	public void setStudentFormListener(StudentFormListener listener) {
 		this.studentFormListener=listener;
 	}
-	
+
 	public boolean isDirty(){
 		return dirty;
 	}
@@ -230,7 +246,6 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		else if (e.getActionCommand()=="Save Student"){
 			if (!fNameTxt.getText().equals("") && !lNameTxt.getText().equals("")){
 				StudentDataEvent event = new StudentDataEvent(this, id, fNameTxt.getText(), lNameTxt.getText(), emailTxt.getText(),areaTxt.getText(),schedPanel.getData() );
-				//System.out.println("actionPerformed "+days[0][0]+" "+days[0][1]);
 				if (studentFormListener != null){
 					studentFormListener.StudentFormEventOccurred(event);
 				}
@@ -241,8 +256,6 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 			}
 		}
 		else if (e.getActionCommand()=="Done"){
-			System.out.println("Done button pressed");
-			//TODO make sure there is data in student database before allowing scheduler to run
 
 			if (studentFormListener !=null){
 				if (dirty) {
@@ -252,7 +265,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 				studentFormListener.doneEventOccurred();
 			}
 		}
-		
+
 	}
 
 	public void populateForm(Student student){

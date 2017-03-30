@@ -39,7 +39,8 @@ public class ScheduleInputPanel extends JPanel {
 				if (!e.getValueIsAdjusting()&&rowIndexStart>-1&&colIndexStart>0) {
 					for (int r=rowIndexStart;r<=rowIndexEnd;r++){
 						for (int c = colIndexStart;c<=colIndexEnd;c++){
-							toggleValueAt(r, c);
+							System.out.println("r= "+r+" c= "+c);
+							if (scheduleTable.isCellEditable(r, c)) toggleValueAt(r, c);
 						}
 					}
 				}
@@ -62,6 +63,10 @@ public class ScheduleInputPanel extends JPanel {
 		scheduleTable.setValueAt(value, row, col);
 	}
 
+	public void setMask(int[][] mask){
+		scheduleTableModel.setBlockOutMask(mask);
+	}
+	
 	public void setData(int[][] days){
 		scheduleTableModel.setData(days);
 	}

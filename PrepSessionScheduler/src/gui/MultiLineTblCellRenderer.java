@@ -1,47 +1,77 @@
 package gui;
 
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.Arrays;
 
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
-import com.mysql.fabric.xmlrpc.base.Data;
+public class MultiLineTblCellRenderer implements TableCellRenderer{
+	JList<String> data;
+	JLabel name;
 
-import model.Session;
+	MultiLineTblCellRenderer(){
+		data = new JList<String>();
+	}
 
-public class MultiLineTblCellRenderer extends JList<String> implements TableCellRenderer{
 	@Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        //make multi line where the cell value is String[]
-//        if (value instanceof String[]) {
-//		//if (column==1){
-//        	//System.out.println(((String[])value)[1]+" "+((String[])value)[0]);
-//            setListData((String[])value);
-//        }
-		if (value instanceof String){
-			String[] data = ((String)value).split(",");
-			// set height of row based on how many lines printed in row
-	        table.setRowHeight((table.getFont().getSize()+8)*5);
-			setListData(data);
+        //make multi-line where the cell value is String
+		if (column==1){
+			if (value instanceof String){
+				String[] dataArray = ((String)value).split(",");
+				// set height of row based on how many lines printed in row
+				// TODO setting rowheight in renderer is wrong according to stack overflow. Fix this?
+				// or is it only wrong to do it here if changing dynamically when someone resizes column?
+		        table.setRowHeight(row,(table.getFont().getSize()+8)*dataArray.length);
+				data.setListData(dataArray);
+			}
+
+	        //cell background color when selected
+	        if (isSelected) {
+	            data.setBackground(UIManager.getColor("Table.selectionBackground"));
+	        } else {
+	            data.setBackground(UIManager.getColor("Table.background"));
+	        }
+	        return data;
 		}
-//		if (value instanceof ArrayList<?>){
-//			System.out.println(" multilinerenderer in instanceof");
-//			Object[] data =((ArrayList<Session>) value).toArray();
-//		}
-//
-        //cell background color when selected
-        if (isSelected) {
-            setBackground(UIManager.getColor("Table.selectionBackground"));
-        } else {
-            setBackground(UIManager.getColor("Table.background"));
-        }
-
-
-        return this;
+		else {
+			name = new JLabel((String)value);
+			return name;
+		}
     }
 }
+
+///////////////////////////////////  OLD renderer  //////////////////////////////////////////////////////////
+//public class MultiLineTblCellRenderer extends JList<String> implements TableCellRenderer{
+//	@Override
+//    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+//        //make multi line where the cell value is String
+//		if (column==1 && value instanceof String){
+//			String[] data = ((String)value).split(",");
+//			// set height of row based on how many lines printed in row
+//	        table.setRowHeight((table.getFont().getSize()+8)*(data.length>1 ? data.length:8));
+//	      //  table.setRowHeight((table.getFont().getSize()+8)*5);
+//
+//			setListData(data);
+//		}
+//
+////		if (value instanceof ArrayList<?>){
+////			System.out.println(" multilinerenderer in instanceof");
+////			Object[] data =((ArrayList<Session>) value).toArray();
+////		}
+////
+//        //cell background color when selected
+//        if (isSelected) {
+//            setBackground(UIManager.getColor("Table.selectionBackground"));
+//        } else {
+//            setBackground(UIManager.getColor("Table.background"));
+//        }
+//
+//
+//        return this;
+//    }
+//}
 

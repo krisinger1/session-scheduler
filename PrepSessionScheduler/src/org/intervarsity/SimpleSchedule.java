@@ -1,7 +1,6 @@
 package org.intervarsity;
 
 import java.util.Random;
-//TODO make just one Schedule class for this project?
 public class SimpleSchedule extends Schedule{
 	int size;
 

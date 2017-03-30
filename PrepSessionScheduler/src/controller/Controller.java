@@ -10,9 +10,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JOptionPane;
-import javax.swing.text.ChangedCharSetException;
-
-import org.intervarsity.Schedule;
 
 import model.Parameters;
 import model.Session;
@@ -26,9 +23,19 @@ public class Controller {
 	StudentDatabase db= new StudentDatabase();
 	ArrayList<Solution> solutions, distinctSolutions, variations;
 	int maxStudents, minStudents, maxSessions, blockSize;
+	//TODO don't explicitly set size of masks
 	int[][] preferredMask=new int[3][17];
+	int[][] possibleMask;
 	boolean changed=true;
 
+	public Controller(){
+
+	}
+
+	public Controller(int[][] allowedMask, int[][] preferredMask){
+		possibleMask=allowedMask;
+		this.preferredMask=preferredMask;
+	}
 
 	public void addStudent(String firstName, String lastName, String email, String area, int[][] schedule){
 		Student student = new Student(firstName, lastName, email,area, schedule);
@@ -163,7 +170,6 @@ public class Controller {
 			//System.out.println("createSolutions else "+leaf.isEnd+" "+leaf.isDead);
 			TimeSlot timeSlot=leaf.session.timeSlot;
 			boolean preferred=true;
-			//TODO add this back in later- staff preferred times mask
 			int time=timeSlot.getTime();
 			int day = timeSlot.getDay();
 			for (int i=0;i<blockSize;i++){
@@ -228,6 +234,14 @@ public class Controller {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
 			JOptionPane.showMessageDialog(null, "Unsupported encoding exception. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
+	}
+
+	public void exportToCsv(File file) {
+		try {
+			db.exportToCsv(file);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

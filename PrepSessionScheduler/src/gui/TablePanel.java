@@ -29,6 +29,7 @@ public class TablePanel extends JPanel{
 	private int currentRow = 0;
 
 	public TablePanel(){
+		//TODO do not allow multiple selections on student table
 		studentTableModel = new StudentTableModel();
 		studentTable = new JTable(studentTableModel);
 		tablePopup = new JPopupMenu();
@@ -60,8 +61,6 @@ public class TablePanel extends JPanel{
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				//super.keyReleased(e);
 				int key = e.getKeyCode();
 				String keyText=KeyEvent.getKeyText(key);
 				int row = studentTable.getSelectedRow();

@@ -2,18 +2,12 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Event;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.security.AlgorithmParameterGeneratorSpi;
-import java.security.AlgorithmParameters;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.SecureRandom;
-import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
@@ -34,29 +28,37 @@ import model.Parameters;
 import model.Solution;
 
 public class MainFrame extends JFrame {
-	private InputPanel inputPanel = new InputPanel();
-	private ResultsPanel resultsPanel = new ResultsPanel();
-	private StudentDataPanel studentDataPanel = new StudentDataPanel();
-	private TablePanel tablePanel=new TablePanel();	
-	private JPanel buttonPanel;
-	private JTabbedPane tabbedPane;
-	private PreferencesDialog preferencesDialog;
-	private Preferences preferences;
-	private int maxStudents;
-	private JFileChooser fileChooser,solutionFileChooser;
-	private Controller controller;
+	///Data Entry Tab Components////
 	private JPanel dataEntryTab;
-	private JPanel schedulerTab;
+	private StudentDataPanel studentDataPanel = new StudentDataPanel();
+	private TablePanel tablePanel=new TablePanel();
+	private JPanel buttonPanel;
 	private JButton saveFileButton;
 	private JButton openFileButton;
 	private JButton newFileButton;
 
+	///Scheduler Tab Components////
+	private JPanel schedulerTab;
+
+	private InputPanel inputPanel = new InputPanel();
+	private ResultsPanel resultsPanel = new ResultsPanel();
+
+	private JTabbedPane tabbedPane;
+
+	private JFileChooser fileChooser,solutionFileChooser;
+	private Controller controller;
+
+	//TODO remove Preferences code? Or implement
+	private PreferencesDialog preferencesDialog;
+	private Preferences preferences;
+
 	public MainFrame(String title){
 		super(title);
 		controller = new Controller();
-		preferencesDialog = new PreferencesDialog(this);
 
+		preferencesDialog = new PreferencesDialog(this);
 		preferences=Preferences.userRoot().node("db");
+
 		setBackground(Parameters.schemeColor1);
 		setPreferredSize(new Dimension(1200,700));
 		setMinimumSize(new Dimension(1000,700));
@@ -72,12 +74,13 @@ public class MainFrame extends JFrame {
 		solutionFileChooser.setFileFilter(new CsvFileFilter());
 
 		//fileChooser.addChoosableFileFilter(new MyFileFilter());
-		
+
 //////////////////Button Panel/////////////////////////////////
+
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		buttonPanel.setBackground(Parameters.schemeColor2);
-		
+
 		saveFileButton = new JButton("Save File");
 		saveFileButton.setMaximumSize(new Dimension(150, 25));
 		saveFileButton.setEnabled(false);
@@ -88,9 +91,9 @@ public class MainFrame extends JFrame {
 		newFileButton = new JButton("New File");
 		newFileButton.setMaximumSize(new Dimension(150, 25));
 		buttonPanel.add(newFileButton);
-	
+
 		saveFileButton.addActionListener(new ActionListener() {
-		
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int choice = fileChooser.showSaveDialog(MainFrame.this);
@@ -99,16 +102,16 @@ public class MainFrame extends JFrame {
 							controller.saveToFile(fileChooser.getSelectedFile());
 							saveFileButton.setEnabled(false);
 
-						} 
+						}
 						catch (IOException e1) {
 							e1.printStackTrace();
 						}
 				}
 			}
 		});
-		
+
 		openFileButton.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int choice = fileChooser.showOpenDialog(MainFrame.this);
@@ -125,11 +128,12 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
-		
+
 		newFileButton.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				//TODO implement "new file" button - make sure current database saved first
 				System.out.println("new file button");
 				System.out.println("changed? "+controller.databaseChanged());
 				saveFileButton.setEnabled(false);
@@ -204,6 +208,11 @@ public class MainFrame extends JFrame {
 			public void doneEventOccurred() {
 				System.out.println("done event occurred");
 				System.out.println("database changed? "+controller.databaseChanged());
+				if (controller.getStudents().isEmpty()) {
+					System.out.println("No data in database");
+					JOptionPane.showMessageDialog(getParent(), "No students in database.\nAdd students or open a data file before continuing.", "Database Error", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
 				if (controller.databaseChanged()){
 					int ans = JOptionPane.showConfirmDialog(getParent(), "Database file not saved. Continue anyway?", "File not saved", JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE);
 					if (ans!=JOptionPane.OK_OPTION) return;
@@ -253,6 +262,8 @@ public class MainFrame extends JFrame {
 				resultsPanel.setSolutionsData(controller.getSolutions());
 				resultsPanel.refreshSolutions();
 				resultsPanel.setVariationsData(new ArrayList<Solution>());
+				resultsPanel.refreshMembersData();
+
 			}
 		});
 
@@ -262,7 +273,6 @@ public class MainFrame extends JFrame {
 			@Override
 			public void rowSelected(int row) {
 				//System.out.println("in row selected...");
-
 				resultsPanel.setVariationsData(controller.getVariations(row));
 				resultsPanel.refreshVariations();
 			}
@@ -291,12 +301,6 @@ public class MainFrame extends JFrame {
 
 ////////////////// Add Components to Frame /////////////////////
 
-//		inputPanel.setVisible(false);
-//		add(inputPanel,BorderLayout.WEST);
-		//add(studentDataPanel,BorderLayout.WEST);
-		//add(resultsPanel,BorderLayout.EAST);
-		//add(tablePanel,BorderLayout.CENTER);
-		//add(scheduleInputPanel,BorderLayout.EAST);
 		add(tabbedPane,BorderLayout.CENTER);
 		setVisible(true);
 	}
@@ -304,9 +308,13 @@ public class MainFrame extends JFrame {
 ///////////////////// Menu Bar //////////////////////////////
 
 	private JMenuBar createMenuBar(){
+		//TODO remove unnecessary menu items and add useful ones
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
+		//TODO change "import" to import a csv and convert
+		//TODO or import a single schedule as csv and convert?
 		JMenuItem importMenuItem = new JMenuItem("Import File...");
+		//TODO change "export"to export database to csv file
 		JMenuItem exportMenuItem = new JMenuItem("Export file...");
 		JMenuItem exitItem = new JMenuItem("Exit");
 		JMenuItem preferencesMenuItem = new JMenuItem("Preferences...");
@@ -349,11 +357,39 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				int choice = fileChooser.showSaveDialog(MainFrame.this);
+				boolean goodFileName = false;
+				String extension;
+				int choice;
+				File file;
+				fileChooser.setFileFilter(new CsvFileFilter());
+
+				//TODO write a general extension check method to use for all save dialogs
+				//TODO add JOptionPane to notify user the extension is incorrect
+				//TODO check for file overwrite
+				do{
+					choice = fileChooser.showSaveDialog(MainFrame.this);
+					file = fileChooser.getSelectedFile();
+					System.out.println(file.getAbsolutePath());
+					extension=Utils.getFileExtension(file.getName());
+					System.out.println(Utils.getFileExtension(file.getName()));
+					if (extension!=null && extension.equals("csv")) goodFileName=true;
+					else {
+						if (extension!=null){
+							//remove current extension
+							//replace with .csv
+						}
+						if (extension==null){
+							file = new File(file.getAbsolutePath()+".csv");
+							fileChooser.setSelectedFile(file);
+						}
+					}
+				} while (!goodFileName && choice!=JFileChooser.CANCEL_OPTION);
+
 				if (choice==JFileChooser.APPROVE_OPTION){
 					try {
-						controller.saveToFile(fileChooser.getSelectedFile());
-					} catch (IOException e) {
+						//controller.saveToFile(fileChooser.getSelectedFile());
+						controller.exportToCsv(file);
+					} catch (Exception e) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Could not save file", "Error", JOptionPane.ERROR_MESSAGE);
 						e.printStackTrace();
 					}

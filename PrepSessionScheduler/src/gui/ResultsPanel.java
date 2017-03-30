@@ -37,6 +37,9 @@ public class ResultsPanel extends JPanel {
 	private VariationsTableListener varListener;
 	private SaveEventListener saveEventListener;
 	private int saveRow;
+
+	//TODO change layout of results pane to be split panes?
+	//TODO list of members should be taller. stack solutions and variations
 	public ResultsPanel(){
 		super();
 
@@ -92,6 +95,8 @@ public class ResultsPanel extends JPanel {
 		varScrollPane.setMaximumSize(new Dimension(400,300));
 		varScrollPane.setMinimumSize(new Dimension(300,300));
 
+
+		//TODO reformat members listing - use JTable? and renderer?
 		membersArea = new JTextArea();
 		membersArea.setMaximumSize(new Dimension(800,500));
 		membersArea.setMinimumSize(new Dimension(400,300));
@@ -187,6 +192,11 @@ public class ResultsPanel extends JPanel {
 
 	public void setMembersData(String members) {
 		membersArea.setText(members);
+	}
+
+	public void refreshMembersData(){
+		membersArea.setText("");
+
 	}
 
 	public void setSaveEventListener(SaveEventListener listener) {

@@ -10,6 +10,8 @@ import javax.swing.table.TableCellRenderer;
 
 import org.omg.CORBA.PRIVATE_MEMBER;
 
+import model.Parameters;
+
 public class ScheduleTableRenderer implements TableCellRenderer {
 
 	@Override
@@ -24,7 +26,11 @@ public class ScheduleTableRenderer implements TableCellRenderer {
 		String valueString = value.toString();
 		field.setText(valueString);
 		if (column!=0 && value!=null) {
-			if (isSelected) {
+			if (!table.isCellEditable(row, column)){
+				field.setBackground(new Color(240, 240, 240));
+				field.setText("");
+			}
+			else if (isSelected) {
 				if ((Integer)table.getValueAt(row, column)==1) field.setBackground(new Color(250,160,130));
 				else field.setBackground(new Color(100,230,90));
 			}
@@ -35,7 +41,7 @@ public class ScheduleTableRenderer implements TableCellRenderer {
 			}
 		}
 		else {
-			field.setBackground(new Color(230, 230, 230));
+			field.setBackground(new Color(240, 240, 240));
 		}
 
 		return field;

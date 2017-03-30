@@ -1,23 +1,32 @@
 package gui;
 
+import java.util.Arrays;
+
 import javax.swing.table.AbstractTableModel;
 
 public class ScheduleTableModel extends AbstractTableModel{
 	private int[][] days;
+	private int[][] mask;
 	private String[] times ={"9:00","9:30","10:00","10:30","11:00","11:30","12:00","12:30","1:00","1:30","2:00","2:30","3:00","3:30","4:00","4:30","5:00"};
 	private String[] colNames = {"","Wed","Thurs", "Fri"};
 
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		if (columnIndex==0) return false;
-		else return true;
+		//else if (areSameSize(mask, days))
+		else {
+//			System.out.println("mask=0? "+(mask[columnIndex-1][rowIndex]==0));
+//			System.out.println("row= "+rowIndex+" col= "+columnIndex);
+
+			return (mask[columnIndex-1][rowIndex]==0);
+		}
+		//else return true;
 	}
 
 	@Override
 	public void setValueAt(Object value, int row, int col) {
 		if (days==null) return;
 		days[col-1][row]=(Integer)value;
-		//days[col-1][row]=Integer.parseInt((String) value);
 		return;
 	}
 
@@ -26,10 +35,17 @@ public class ScheduleTableModel extends AbstractTableModel{
 		return colNames[column];
 	}
 
+	public void setBlockOutMask(int[][] mask){
+		this.mask=mask;
+	}
+
 	public void setData(int[][] timeSlots){
-		//System.out.println("days[][] in model: "+days);
 		this.days=timeSlots;
-		//System.out.println("days[][] in model: "+days);
+		for (int i=0;i<3;i++){
+			for (int j=0;j<17;j++){
+				if (mask!=null && mask[i][j]==1 ) this.days[i][j]=1;
+			}
+		}
 	}
 
 	public int[][] getData(){
@@ -57,4 +73,7 @@ public class ScheduleTableModel extends AbstractTableModel{
 		else return null;
 	}
 
+	private boolean areSameSize(int[][] mask,int[][] days){
+		return ((mask.length==days.length)&&(mask[0].length==days[0].length));
+	}
 }
