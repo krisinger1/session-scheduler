@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
 import org.intervarsity.Parameters;
 
@@ -29,7 +30,6 @@ public class TablePanel extends JPanel{
 	private int currentRow = 0;
 
 	public TablePanel(){
-		//TODO do not allow multiple selections on student table
 		studentTableModel = new StudentTableModel();
 		studentTable = new JTable(studentTableModel);
 		tablePopup = new JPopupMenu();
@@ -39,6 +39,7 @@ public class TablePanel extends JPanel{
 
 		studentTable.getColumn("Area").setPreferredWidth(40);
 		studentTable.getColumn("Area").setMaxWidth(40);
+		studentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		studentTable.addMouseListener(new MouseAdapter(){
 
