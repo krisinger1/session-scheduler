@@ -2,6 +2,7 @@ package controller;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -10,6 +11,14 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import model.Parameters;
 import model.Session;
@@ -205,6 +214,17 @@ public class Controller {
 		return list;
 	}
 
+	public Student importSchedule(File file){
+		//TODO check file is in correct format
+
+		//TODO read in data from excel file and put in a student object
+
+		//TODO return student for display in form
+
+		return null;
+	}
+
+
 	public String getCsvSingleSolution(int index){
 		ArrayList<Session> sessions = variations.get(index).getSessions();
 		String result = "";
@@ -236,6 +256,94 @@ public class Controller {
 			JOptionPane.showMessageDialog(null, "Unsupported encoding exception. Could not print to file.","Error",JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
+	}
+
+	public void saveSolutionToExcel(File file,int i) throws IOException{
+		//Create Blank workbook
+	    XSSFWorkbook workbook = new XSSFWorkbook();
+	    //Create a blank spreadsheet
+	    XSSFSheet spreadsheet = workbook.createSheet(" Solution ");
+	    //Create row object
+	    XSSFRow row;
+
+	    XSSFFont boldFont = workbook.createFont();
+	    boldFont.setBold(true);
+	    boldFont.setColor(HSSFColor.DARK_BLUE.index);
+	    XSSFCellStyle boldStyle = workbook.createCellStyle();
+	    boldStyle.setFont(boldFont);
+
+	    XSSFFont font = workbook.createFont();
+	    font.setBold(false);
+	    font.setColor(HSSFColor.BLACK.index);
+	    XSSFCellStyle style = workbook.createCellStyle();
+	    style.setFont(font);
+
+	    Solution solution = variations.get(i);
+	    ArrayList<Session> sessions = solution.getSessions();
+	    ArrayList<Student> students;
+
+	    String sessionTime = "";
+	    String studentNameString = "";
+	    int rowIndex=0;
+	    int columnIndex;
+	    Cell cell;
+
+	    spreadsheet.setColumnWidth(0, 6000);
+	    spreadsheet.setColumnWidth(1, 6000);
+
+		for (Session sess:sessions){
+			columnIndex=0;
+
+		    row = spreadsheet.createRow(rowIndex);
+			cell =row.createCell(0);
+			cell.setCellStyle(boldStyle);
+
+			students = sess.members;
+			String day= Parameters.dayNames[sess.timeSlot.getDay()];
+			String time=Parameters.timeSlotStrings[sess.timeSlot.getTime()];
+			sessionTime=day+" "+time;
+
+			cell.setCellValue(sessionTime);
+
+			rowIndex++;
+
+			for (Student stu:students){
+				boolean mustAttend=false;
+				row = spreadsheet.createRow(rowIndex++);
+
+				studentNameString = "";
+				if (sess.membersMustAttend.contains(stu)) {
+					studentNameString+="*";
+					mustAttend=true;
+				}
+				else {
+					//cell.setCellStyle(style);
+					mustAttend=false;
+				}
+				studentNameString+=stu.getFullName();
+
+				cell =row.createCell(0);
+				if (mustAttend){
+					font.setColor(HSSFColor.RED.index);
+					cell.setCellStyle(style);
+					}
+				cell.setCellValue(studentNameString);
+
+				cell = row.createCell(1);
+				cell.setCellValue(stu.getEmail());
+
+			}
+			rowIndex++;
+
+
+		}
+
+	    FileOutputStream out = new FileOutputStream(file);
+	    //write operation workbook using file out object
+	    workbook.write(out);
+	    out.close();
+	    System.out.println(file.getName()+"written successfully");
+	    workbook.close();
 	}
 
 	public void exportToCsv(File file) {

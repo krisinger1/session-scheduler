@@ -23,6 +23,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
+
 import controller.Controller;
 import model.Parameters;
 import model.Solution;
@@ -71,7 +74,8 @@ public class MainFrame extends JFrame {
 		fileChooser.setFileFilter(new MyFileFilter());
 
 		solutionFileChooser = new JFileChooser();
-		solutionFileChooser.setFileFilter(new CsvFileFilter());
+		solutionFileChooser.setFileFilter(new ExcelFileFilter());
+		//solutionFileChooser.setFileFilter(new CsvFileFilter());
 
 		//fileChooser.addChoosableFileFilter(new MyFileFilter());
 
@@ -294,7 +298,14 @@ public class MainFrame extends JFrame {
 			public void saveEventOccurred(SaveSolutionEvent event) {
 				int choice = solutionFileChooser.showSaveDialog(MainFrame.this);
 				if (choice==JFileChooser.APPROVE_OPTION){
-						controller.saveSolutionToFile(solutionFileChooser.getSelectedFile(), event.getIndex());
+						//controller.saveSolutionToFile(solutionFileChooser.getSelectedFile(), event.getIndex());
+						try {
+							controller.saveSolutionToExcel(solutionFileChooser.getSelectedFile(), event.getIndex());
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
 				}
 			}
 		});
@@ -446,3 +457,23 @@ final class CsvFileFilter extends FileFilter{
 	}
 
 }
+
+final class ExcelFileFilter extends FileFilter{
+
+	@Override
+	public boolean accept(File file) {
+		if (file.isDirectory()) return true; //allow directories to be seen in fileChooser
+		String name = file.getName();
+		String extension = Utils.getFileExtension(name);
+		if (extension == null) return false;
+		else if (extension.equals("xlsx")) return true;
+		else return false;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Excel file (*.xlsx)";
+	}
+
+}
+

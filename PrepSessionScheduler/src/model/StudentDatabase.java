@@ -19,6 +19,10 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import gui.Utils;
 
 
@@ -106,6 +110,26 @@ public class StudentDatabase {
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(arrayStudents);
 		oos.close();
+	}
+
+	public void exportToExcel(File file) throws IOException{
+		// export file of students and schedules to excel file
+		//Create Blank workbook
+	    XSSFWorkbook workbook = new XSSFWorkbook();
+	    //Create a blank spreadsheet
+	    XSSFSheet spreadsheet = workbook.createSheet(" Solution ");
+	    //Create row object
+	    XSSFRow row;
+
+	    //TODO code to export file to excel goes here
+
+	    //Create file system using specific name
+	    FileOutputStream out = new FileOutputStream(file);
+	    //write operation workbook using file out object
+	    workbook.write(out);
+	    out.close();
+	    System.out.println(file.getName()+"written successfully");
+	    workbook.close();
 	}
 
 	public void exportToCsv(File file) throws IOException{
