@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.TableCellRenderer;
@@ -17,6 +18,7 @@ public class ScheduleTableRenderer implements TableCellRenderer {
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 		JTextField field = new JTextField();
+		//JLabel field = new JLabel();
 		field.setBorder(null);
 		table.setRowHeight(20);
 		table.setGridColor(Color.LIGHT_GRAY);

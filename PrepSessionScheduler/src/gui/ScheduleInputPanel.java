@@ -3,9 +3,11 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -18,11 +20,17 @@ public class ScheduleInputPanel extends JPanel {
 	private ScheduleTableModel scheduleTableModel;
 	private ScheduleChangeListener scheduleChangeListener;
 
-	public ScheduleInputPanel(){
+	public ScheduleInputPanel(String[] timesStrings,String[] dayStrings){
 
-		scheduleTableModel = new ScheduleTableModel();
+		scheduleTableModel = new ScheduleTableModel(timesStrings,dayStrings);
 		scheduleTable = new JTable(scheduleTableModel);
 		scheduleTable.setCellSelectionEnabled(true);
+		
+//		JTextField tf = new JTextField();
+//		tf.setEditable(false);
+//		DefaultCellEditor editor = new DefaultCellEditor( tf );
+//		scheduleTable.setDefaultEditor(Object.class, editor);
+		
 		scheduleTable.setDefaultRenderer(Object.class, new ScheduleTableRenderer());
 		scheduleTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		scheduleTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -48,6 +56,7 @@ public class ScheduleInputPanel extends JPanel {
 		});
 
 		setLayout(new BorderLayout());
+		setMaximumSize(new Dimension(250,370));
 		setPreferredSize(new Dimension(250,370));
 		setMinimumSize(new Dimension(150,300));
 		setBackground(Parameters.schemeColor2);
@@ -63,10 +72,24 @@ public class ScheduleInputPanel extends JPanel {
 		scheduleTable.setValueAt(value, row, col);
 	}
 
+	public void init(){
+		int[][] empty =new int[3][17];
+		int[][] emptyMask =new int[3][17];
+
+		for (int i=0;i<17;i++){
+			for (int j=0;j<3;j++){
+				empty[j][i]=0;
+				emptyMask[j][i]=0;
+			}
+		}
+		scheduleTableModel.setData(empty);
+		scheduleTableModel.setBlockOutMask(emptyMask);
+	}
+
 	public void setMask(int[][] mask){
 		scheduleTableModel.setBlockOutMask(mask);
 	}
-	
+
 	public void setData(int[][] days){
 		scheduleTableModel.setData(days);
 	}
