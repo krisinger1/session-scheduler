@@ -39,7 +39,7 @@ public class ResultsPanel extends JPanel {
 	private int saveRow;
 
 	//TODO change layout of results pane to be split panes?
-	//TODO list of members should be taller. stack solutions and variations
+
 	public ResultsPanel(){
 		super();
 
@@ -84,26 +84,76 @@ public class ResultsPanel extends JPanel {
 			}
 		});
 
+		variationsTable.setMaximumSize(new Dimension(400,100));
 		variationsTable.getColumn("").setMaxWidth(100);
 		variationsTable.getColumn("Sessions").setCellRenderer(renderer);
 
 		solScrollPane = new JScrollPane(solutionsTable);
 		solScrollPane.setMaximumSize(new Dimension(400,300));
-		solScrollPane.setMinimumSize(new Dimension(300,300));
+		solScrollPane.setMinimumSize(new Dimension(300,250));
 
 		varScrollPane = new JScrollPane(variationsTable);
 		varScrollPane.setMaximumSize(new Dimension(400,300));
-		varScrollPane.setMinimumSize(new Dimension(300,300));
+		varScrollPane.setMinimumSize(new Dimension(300,250));
 
 
 		//TODO reformat members listing - use JTable? and renderer?
 		membersArea = new JTextArea();
-		membersArea.setMaximumSize(new Dimension(800,500));
-		membersArea.setMinimumSize(new Dimension(400,300));
+		membersArea.setMaximumSize(new Dimension(400,800));
+		membersArea.setMinimumSize(new Dimension(400,500));
 
 		membersScrollPane=new JScrollPane(membersArea);
-		membersScrollPane.setMinimumSize(new Dimension(400,300));
-		membersScrollPane.setMaximumSize(new Dimension(800,500));
+		membersScrollPane.setMinimumSize(new Dimension(400,500));
+		membersScrollPane.setMaximumSize(new Dimension(400,800));
+
+//		gc.insets = new Insets(20, 20, 5, 0);
+//		gc.gridx=0;
+//		gc.gridy=0;
+//		gc.weightx=1;
+//		gc.weighty=1;
+//		gc.anchor=GridBagConstraints.SOUTHWEST;
+//		add(new JLabel("Solutions:"),gc);
+//
+//		gc.insets = new Insets(20, 20, 5, 20);
+//		gc.gridx=1;
+//		add(new JLabel("Variations of selected solution:"),gc);
+//
+//		gc.anchor=GridBagConstraints.NORTHWEST;
+//		gc.insets = new Insets(0, 20, 0, 0);
+//		gc.gridx=0;
+//		gc.gridy++;
+//		gc.weightx=1;
+//		gc.weighty=5;
+//		add(solScrollPane,gc);
+//
+//		gc.insets = new Insets(0, 20, 0, 20);
+//		gc.gridx=1;
+//		gc.weightx=1;
+//		gc.weighty=5;
+//		add(varScrollPane,gc);
+//
+//		gc.insets = new Insets(20, 20, 5, 20);
+//		gc.gridx=0;
+//		gc.gridy++;
+//		gc.weightx=1;
+//		gc.weighty=1;
+//		gc.anchor=GridBagConstraints.NORTHWEST;
+//		add(new JLabel("Students for this solution:"),gc);
+//
+//		gc.insets=new Insets(0, 20, 5, 0);
+//		gc.gridwidth=2;
+//		gc.gridx=0;
+//		gc.gridy++;
+//		gc.weightx=1;
+//		gc.weighty=10;
+//		add(membersScrollPane,gc);
+//
+//		gc.insets = new Insets(0, 20, 20, 20);
+//		gc.gridx=0;
+//		gc.gridy++;
+//		gc.weightx=1;
+//		gc.weighty=1;
+//		add(saveButton,gc);
 
 		gc.insets = new Insets(20, 20, 5, 0);
 		gc.gridx=0;
@@ -113,43 +163,46 @@ public class ResultsPanel extends JPanel {
 		gc.anchor=GridBagConstraints.SOUTHWEST;
 		add(new JLabel("Solutions:"),gc);
 
+		gc.anchor=GridBagConstraints.NORTHWEST;
+		gc.insets = new Insets(0, 20, 0, 0);
+		gc.gridx=0;
+		gc.gridy=1;
+		gc.weightx=1;
+		gc.weighty=1;
+		add(solScrollPane,gc);
+
 		gc.insets = new Insets(20, 20, 5, 20);
-		gc.gridx=1;
+		gc.gridy=2;
+		gc.anchor=GridBagConstraints.SOUTHWEST;
 		add(new JLabel("Variations of selected solution:"),gc);
 
 		gc.anchor=GridBagConstraints.NORTHWEST;
 		gc.insets = new Insets(0, 20, 0, 0);
-		gc.gridx=0;
-		gc.gridy++;
+		gc.gridy=3;
 		gc.weightx=1;
-		gc.weighty=5;
-		add(solScrollPane,gc);
-
-		gc.insets = new Insets(0, 20, 0, 20);
-		gc.gridx=1;
-		gc.weightx=1;
-		gc.weighty=5;
+		gc.weighty=1;
 		add(varScrollPane,gc);
 
 		gc.insets = new Insets(20, 20, 5, 20);
-		gc.gridx=0;
-		gc.gridy++;
+		gc.gridx=1;
+		gc.gridy=0;
 		gc.weightx=1;
 		gc.weighty=1;
-		gc.anchor=GridBagConstraints.NORTHWEST;
+		gc.anchor=GridBagConstraints.SOUTHWEST;
 		add(new JLabel("Students for this solution:"),gc);
 
-		gc.insets=new Insets(0, 20, 5, 0);
-		gc.gridwidth=2;
-		gc.gridx=0;
-		gc.gridy++;
+		gc.anchor=GridBagConstraints.NORTHWEST;
+		gc.insets=new Insets(0, 20, 5, 20);
+		gc.gridheight=3;
+		gc.gridx=1;
+		gc.gridy=1;
 		gc.weightx=1;
 		gc.weighty=10;
 		add(membersScrollPane,gc);
 
 		gc.insets = new Insets(0, 20, 20, 20);
-		gc.gridx=0;
-		gc.gridy++;
+
+		gc.gridy=4;
 		gc.weightx=1;
 		gc.weighty=1;
 		add(saveButton,gc);
