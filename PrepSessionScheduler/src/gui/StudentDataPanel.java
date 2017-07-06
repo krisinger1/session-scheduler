@@ -31,7 +31,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 	private JTextField emailTxt;
 	private JTextField areaTxt;
 	private ScheduleInputPanel schedPanel;
-	int[][] days = new int[3][17];
+	int[][] days;
 	private JButton saveButton;
 	private JButton newButton;
 	private JButton doneButton;
@@ -39,7 +39,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 	private boolean dirty = false;
 
 	//TODO add Undo button to student data entry panel
-	public StudentDataPanel(){
+	public StudentDataPanel(String[] timesStrings,String[] dayStrings, int[][] mask){
 		super();
 		setLayout(new GridBagLayout());
 		GridBagConstraints gc= new GridBagConstraints();
@@ -49,7 +49,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		lNameTxt=new JTextField(15);
 		emailTxt = new JTextField(15);
 		areaTxt = new JTextField(15);
-		schedPanel = new ScheduleInputPanel();
+		schedPanel = new ScheduleInputPanel(timesStrings,dayStrings);
 		idLabel=new JLabel("ID= "+id);
 
 		fNameTxt.getDocument().addDocumentListener(new MyDocumentListener());
@@ -64,30 +64,30 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 			    saveButton.setEnabled(true);
 			}
 		});
-
-		for (int i=0;i<17;i++){
-			for (int j=0;j<3;j++){
-				days[j][i]=0;
-			}
-		}
+		days=new int[dayStrings.length][timesStrings.length];
+//		for (int i=0;i<timesStrings.length;i++){
+//			for (int j=0;j<dayStrings.length;j++){
+//				days[j][i]=0;
+//			}
+//		}
 
 		/// temporary code for mask
 		//TODO implement better method of setting mask
-		int[][] mask =new int[3][17];
+		//int[][] mask =new int[dayStrings.length][timesStrings.length];
 
-		for (int i=0;i<17;i++){
-			for (int j=0;j<3;j++){
-				mask[j][i]=0;
-			}
-		}
-		mask[0][0]=1;
-		mask[0][1]=1;
-		mask[0][2]=1;
-		mask[0][3]=1;
-		mask[0][4]=1;
-		mask[0][5]=1;
-		mask[0][6]=1;
-		mask[0][7]=1;
+//		for (int i=0;i<timesStrings.length;i++){
+//			for (int j=0;j<dayStrings.length;j++){
+//				mask[j][i]=0;
+//			}
+//		}
+//		mask[0][0]=1;
+//		mask[0][1]=1;
+//		mask[0][2]=1;
+//		mask[0][3]=1;
+//		mask[0][4]=1;
+//		mask[0][5]=1;
+//		mask[0][6]=1;
+//		mask[0][7]=1;
 
 		schedPanel.setMask(mask);
 
@@ -221,6 +221,10 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		newButton.addActionListener(this);
 		doneButton.addActionListener(this);
 		//TODO how to get ENTER key to trigger button event - not sure this is possible here. needs to be from jframe
+	}
+
+	public void setMask(int[][] mask){
+		schedPanel.setMask(mask);
 	}
 
 	public void setStudentFormListener(StudentFormListener listener) {

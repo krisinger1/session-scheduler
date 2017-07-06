@@ -19,10 +19,12 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import gui.MainFrame;
 import gui.Utils;
 
 
@@ -32,17 +34,32 @@ public class StudentDatabase {
 
 	public StudentDatabase(){
 		students = new ArrayList<Student>();
-		//students.add(new Student("k", "l", "r", new int[3][17]));
-		students = new ArrayList<Student>();
 	}
 
 	public void addStudent(Student student){
-		student.setId(maxID()+1);
-		System.out.println(students.toString());
-		students.add(student);
-		System.out.println("database addStudent -->student: "+student.getSchedule()[0][0]+" "+student.getSchedule()[0][1]);
-		System.out.println(students.toString());
-
+		boolean duplicate = false;
+		int index=-1;
+		for (Student s:students){
+			if (s.isDuplicate(student)) {
+				duplicate=true;
+				index=students.indexOf(s);
+			}
+		}
+		if (duplicate){
+			int choice = JOptionPane.showConfirmDialog(null, student.getFullName()+" already in database. Overwrite?");
+			if (choice==JOptionPane.NO_OPTION || choice==JOptionPane.CANCEL_OPTION) return;
+			if (choice==JOptionPane.YES_OPTION){
+				students.set(index, student);
+				System.out.println("student data overwritten");
+			}
+		}
+		else{
+			student.setId(maxID()+1);
+			System.out.println(students.toString());
+			students.add(student);
+			System.out.println("database addStudent -->student: "+student.getSchedule()[0][0]+" "+student.getSchedule()[0][1]);
+			System.out.println(students.toString());
+		}
 	}
 
 	private int maxID(){
@@ -59,6 +76,10 @@ public class StudentDatabase {
 
 	public void removeStudent(int index) {
 		students.remove(index);
+	}
+
+	public void clear(){
+		students.clear();
 	}
 
 	public void updateStudent(Student student){
@@ -103,11 +124,18 @@ public class StudentDatabase {
 //
 //	}
 
+	/**
+	 *
+	 * @param file
+	 * @throws IOException
+	 */
+
 	public void saveTofile(File file) throws IOException{
 		Student[] arrayStudents = students.toArray(new Student[students.size()]);
 
 		FileOutputStream fos = new FileOutputStream(file);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
+		oos.writeObject(Parameters.version);
 		oos.writeObject(arrayStudents);
 		oos.close();
 	}
@@ -117,11 +145,43 @@ public class StudentDatabase {
 		//Create Blank workbook
 	    XSSFWorkbook workbook = new XSSFWorkbook();
 	    //Create a blank spreadsheet
-	    XSSFSheet spreadsheet = workbook.createSheet(" Solution ");
+	    XSSFSheet spreadsheet = workbook.createSheet(" Students ");
 	    //Create row object
 	    XSSFRow row;
 
-	    //TODO code to export file to excel goes here
+	    int i=0;
+		row=spreadsheet.createRow(i);
+		for (int day=0;day<Parameters.dayNames.length;day++){
+	    	for (int time=0;time<Parameters.timeSlotStrings.length;time++){
+	    		if (time==0){
+	        		row.createCell(day*Parameters.timeSlotStrings.length+time+3).setCellValue(Parameters.dayNames[day]);
+	    		}
+	    		else {
+	    			row.createCell(day*Parameters.timeSlotStrings.length+time+3);
+	    		}
+	    	}
+	    }
+		i++;
+		row=spreadsheet.createRow(i);
+	    for (int day=0;day<Parameters.dayNames.length;day++){
+	    	for (int time=0;time<Parameters.timeSlotStrings.length;time++){
+	    		row.createCell(day*Parameters.timeSlotStrings.length+time+3).setCellValue(Parameters.timeSlotStrings[time]);
+	    	}
+	    }
+	    i++;
+	    for (Student stu:students){
+	    	row=spreadsheet.createRow(i);
+	    	row.createCell(0).setCellValue(stu.getFullName());
+	    	row.createCell(1).setCellValue(stu.getArea());
+	    	row.createCell(2).setCellValue(stu.getEmail());
+	    	int[][] sched=stu.getSchedule();
+	    	for (int day=0;day<sched.length;day++){
+	    		for (int time=0;time<sched[0].length;time++){
+	    			row.createCell(day*sched[0].length+time+3).setCellValue(sched[day][time]);
+	    		}
+	    	}
+	    	i++;
+	    }
 
 	    //Create file system using specific name
 	    FileOutputStream out = new FileOutputStream(file);
@@ -153,12 +213,23 @@ public class StudentDatabase {
 	}
 
 	public void loadFromFile(File file) throws IOException{
+		//FIXME how to deal with older version student objects so can load without error?
 		FileInputStream fis = new FileInputStream(file);
 		ObjectInputStream ois = new ObjectInputStream(fis);
 		try {
-			Student[] arrayStudents = (Student[])ois.readObject();
-			students.clear();
-			students.addAll(Arrays.asList(arrayStudents));
+			//TODO check for type of object in load file
+			String version = (String)ois.readObject();
+			System.out.println("version "+version);
+
+			if (version.equals(Parameters.version)){
+				Student[] arrayStudents = (Student[])ois.readObject();
+				students.clear();
+				students.addAll(Arrays.asList(arrayStudents));
+			}
+
+			else{
+				//TODO either joptionpane about failure to load or convert older file
+			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -181,6 +252,10 @@ public class StudentDatabase {
 
 		}
 		return text;
+	}
+
+	public int getNumStudents() {
+		return students.size();
 	}
 
 }

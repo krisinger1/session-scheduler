@@ -126,7 +126,7 @@ public class Student implements Serializable, Comparable<Student>{
 	public TimeSlot findOpenBlock(TimeSlot startTimeSlot, int blockSize ){
 		int startTime = startTimeSlot.getTime();
 		int startDay = startTimeSlot.getDay();
-		for (int day=startDay;day<3;day++){
+		for (int day=startDay;day<schedule.length;day++){
 			if (day>startDay) startTime=0;
 			for (int time=startTime; time<schedule[day].length;time++){
 				TimeSlot testSlot = new TimeSlot(day, time);
@@ -139,13 +139,25 @@ public class Student implements Serializable, Comparable<Student>{
 	public int numOpenBlocks(int blockSize){
 		TimeSlot t;
 		int count=0;
-		for (int day=0;day<3;day++){
+		for (int day=0;day<schedule.length;day++){
 			for (int time=0; time<schedule[day].length;time++){
 				t = new TimeSlot(day, time);
 				if (schedule[day][time]==0 && hasBlockOpen(t, blockSize)) count++;
 			}
 		}
 		return count;
+	}
+
+	public boolean isDuplicate(Student stu){
+
+		//FIXME remove checking for same area
+		if (this.firstName.equals(stu.firstName) &&
+				this.lastName.equals(stu.lastName) &&
+				this.email.equals(stu.email) &&
+				this.area.equals(stu.area)){
+			return true;
+		}
+		else return false;
 	}
 
 
