@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.intervarsity.Schedule;
 import org.omg.CosNaming.NamingContextExtPackage.AddressHelper;
 
+import model.Parameters;
 import model.Session;
 import model.Student;
 import model.TimeSlot;
@@ -91,11 +92,10 @@ public class Scheduler {
 						parent.addLeaf(solutionLeaf); //add leaf to tree
 
 						//block out this section in mask copy to send into next level of tree - prevent overlapping sessions
-						int[][] newMask = new int[3][17];
-						for (int i=0; i<3;i++){
-							for (int j=0;j<17;j++){
+						int[][] newMask = new int[mask.length][mask[0].length];
+						for (int i=0; i<mask.length;i++){
+							for (int j=0;j<mask[i].length;j++){
 								newMask[i][j]=mask[i][j];
-								//System.out.print(newMask[i][j]);
 							}
 						}
 						//System.out.println("");

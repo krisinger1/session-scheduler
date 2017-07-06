@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
@@ -29,16 +30,25 @@ import org.apache.poi.ss.usermodel.Workbook;
 import controller.Controller;
 import model.Parameters;
 import model.Solution;
+import model.Student;
 
 public class MainFrame extends JFrame {
+	///Set Up Tab Components////////
+	private JPanel setUpTab;
+	private JPanel setUpButtonPanel;
+	private ScheduleInputPanel maskInputPanel = new ScheduleInputPanel(Parameters.timeSlotStrings,Parameters.dayNames);
+	private JButton setPrefMask;
+	private JButton setAllowedMask;
+
 	///Data Entry Tab Components////
 	private JPanel dataEntryTab;
-	private StudentDataPanel studentDataPanel = new StudentDataPanel();
+	private StudentDataPanel studentDataPanel;
 	private TablePanel tablePanel=new TablePanel();
 	private JPanel buttonPanel;
 	private JButton saveFileButton;
 	private JButton openFileButton;
 	private JButton newFileButton;
+	private JButton importScheduleButton;
 
 	///Scheduler Tab Components////
 	private JPanel schedulerTab;
@@ -47,14 +57,18 @@ public class MainFrame extends JFrame {
 	private ResultsPanel resultsPanel = new ResultsPanel();
 
 	private JTabbedPane tabbedPane;
+	private int schedulerIndex;
+	private int dataEntryIndex;
+	private int setUpIndex;
 
-	private JFileChooser fileChooser,solutionFileChooser;
+	private JFileChooser fileChooser,solutionFileChooser,importFileChooser;
 	private Controller controller;
 
 	//TODO remove Preferences code? Or implement
 	private PreferencesDialog preferencesDialog;
 	private Preferences preferences;
 
+///////////////////// MainFrame ////////////////////////////////////////
 	public MainFrame(String title){
 		super(title);
 		controller = new Controller();
@@ -67,7 +81,6 @@ public class MainFrame extends JFrame {
 		setMinimumSize(new Dimension(1000,700));
 		setJMenuBar(createMenuBar());
 		setLayout(new BorderLayout());
-		//TODO learn how to use setImageIcon()
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		fileChooser = new JFileChooser();
@@ -75,11 +88,48 @@ public class MainFrame extends JFrame {
 
 		solutionFileChooser = new JFileChooser();
 		solutionFileChooser.setFileFilter(new ExcelFileFilter());
+
+		importFileChooser = new JFileChooser();
+		importFileChooser.setFileFilter(new ExcelFileFilter());
+
 		//solutionFileChooser.setFileFilter(new CsvFileFilter());
 
 		//fileChooser.addChoosableFileFilter(new MyFileFilter());
 
-//////////////////Button Panel/////////////////////////////////
+		//////////////////Set Up Tab Button Panel ////////////////////////
+		setUpButtonPanel = new JPanel();
+		setUpButtonPanel.setMaximumSize(new Dimension(200, this.getHeight()));
+		setUpButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		setUpButtonPanel.setBackground(Parameters.schemeColor2);
+
+		setAllowedMask = new JButton("Set As Allowed Times");
+		setAllowedMask.setMaximumSize(new Dimension(150, 25));
+		setUpButtonPanel.add(setAllowedMask);
+
+		setPrefMask = new JButton("Set As Preferred Times");
+		setPrefMask.setMaximumSize(new Dimension(150, 25));
+		setUpButtonPanel.add(setPrefMask);
+
+		setAllowedMask.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("set allowed times button");
+				controller.setAllowedTimesMask(Utils.copyOf(maskInputPanel.getData()));
+				controller.setPreferredTimesMask(Utils.copyOf(maskInputPanel.getData()));
+				studentDataPanel.setMask(controller.getAllowedTimesMask());
+				tabbedPane.setEnabledAt(dataEntryIndex,true);
+			}
+		});
+
+		setPrefMask.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("set preferred times button");
+				controller.setPreferredTimesMask(Utils.copyOf(maskInputPanel.getData()));
+			}
+		});
+
+
+
+		//////////////////Button Panel/////////////////////////////////
 
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -89,12 +139,20 @@ public class MainFrame extends JFrame {
 		saveFileButton.setMaximumSize(new Dimension(150, 25));
 		saveFileButton.setEnabled(false);
 		buttonPanel.add(saveFileButton);
+
 		openFileButton = new JButton("Open File");
 		openFileButton.setMaximumSize(new Dimension(150, 25));
 		buttonPanel.add(openFileButton);
+
 		newFileButton = new JButton("New File");
 		newFileButton.setMaximumSize(new Dimension(150, 25));
 		buttonPanel.add(newFileButton);
+
+		importScheduleButton = new JButton("Import Schedule");
+		importScheduleButton.setMaximumSize(new Dimension(150, 25));
+		buttonPanel.add(importScheduleButton);
+
+
 
 		saveFileButton.addActionListener(new ActionListener() {
 
@@ -103,8 +161,12 @@ public class MainFrame extends JFrame {
 				int choice = fileChooser.showSaveDialog(MainFrame.this);
 				if (choice==JFileChooser.APPROVE_OPTION){
 						try {
+							if (!Utils.extensionOK(fileChooser.getSelectedFile(), "stu")){
+								fileChooser.setSelectedFile(Utils.changeExtension(fileChooser.getSelectedFile(), "stu"));
+							}
 							controller.saveToFile(fileChooser.getSelectedFile());
 							saveFileButton.setEnabled(false);
+
 
 						}
 						catch (IOException e1) {
@@ -114,10 +176,14 @@ public class MainFrame extends JFrame {
 			}
 		});
 
+
+		//FIXME can open and create new file if unsaved student in data entry panel. check for save student first.
 		openFileButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
+				fileChooser.setFileFilter(new MyFileFilter());
 				int choice = fileChooser.showOpenDialog(MainFrame.this);
 				if (choice==JFileChooser.APPROVE_OPTION){
 					try {
@@ -137,20 +203,103 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO implement "new file" button - make sure current database saved first
 				System.out.println("new file button");
 				System.out.println("changed? "+controller.databaseChanged());
-				saveFileButton.setEnabled(false);
+				if (controller.databaseChanged()){
+					int choice = JOptionPane.showConfirmDialog(MainFrame.this,"File changed. Save first?");
+					if (choice==JOptionPane.YES_OPTION){
+						try {
+							if (fileChooser.getSelectedFile()!=null){
+								controller.saveToFile(fileChooser.getSelectedFile());
+							}
+							else{
+								int choice2 = fileChooser.showSaveDialog(MainFrame.this);
+								if (choice2==JFileChooser.APPROVE_OPTION){
+										try {
+											controller.saveToFile(fileChooser.getSelectedFile());
+											saveFileButton.setEnabled(false);
+
+										}
+										catch (IOException e1) {
+											e1.printStackTrace();
+										}
+								}
+							}
+							saveFileButton.setEnabled(false);
+
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					}
+					else if (choice==JOptionPane.CANCEL_OPTION) return;
+				}
+				//new file
+				controller.clearDatabase();
+				saveFileButton.setEnabled(true);
+				tablePanel.refresh();
+				studentDataPanel.resetForm();
+				fileChooser.setSelectedFile(null);
 			}
 		});
 
-/////////////////////// Tabs ////////////////////
+		importScheduleButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				importFileChooser.setFileFilter(new ExcelFileFilter());
+				importFileChooser.setMultiSelectionEnabled(true);
+				boolean fileOK=true;
+				//TODO don't import schedule if it already exists or was imported already
+				int choice;
+				//FIXME error handling for bad file
+				do{
+					choice=importFileChooser.showOpenDialog(MainFrame.this);
+					if (choice==JFileChooser.APPROVE_OPTION){
+						//Student student;
+						ArrayList<Student> students = new ArrayList<Student>();
+						try {
+							students = controller.importSchedule(importFileChooser.getSelectedFiles());
+							//studentDataPanel.populateForm(student);
+							if (students!=null){
+								for (Student student:students) {
+									controller.addStudent(student);
+									tablePanel.refresh();
+
+								}
+								saveFileButton.setEnabled(true);
+								return;
+							}
+							else {
+								System.out.println("Bad import file");
+								fileOK=false;
+								JOptionPane.showMessageDialog(MainFrame.this, "There is a problem with the file you chose. Please choose another file");
+							}
+						}
+						catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					}
+					else if (choice==JFileChooser.CANCEL_OPTION) return;
+
+				}
+				while(!fileOK||choice!=JFileChooser.CANCEL_OPTION);
+			}
+		});
+
+		/////////////////////// Tabs ////////////////////
+		setUpTab = new JPanel();
+		setUpTab.setLayout(new FlowLayout(FlowLayout.CENTER));
+		setUpTab.setBackground(Parameters.schemeColor2);
+		setUpTab.add(setUpButtonPanel);
+		maskInputPanel.init();
+		maskInputPanel.setPreferredSize(new Dimension(200, 500));
+		setUpTab.add(maskInputPanel);
+
 		schedulerTab=new JPanel();
 		schedulerTab.setLayout(new BorderLayout());
 		schedulerTab.add(inputPanel,BorderLayout.WEST);
 		schedulerTab.add(resultsPanel,BorderLayout.CENTER);
 
 		dataEntryTab = new JPanel();
+		studentDataPanel=new StudentDataPanel(Parameters.timeSlotStrings,Parameters.dayNames,new int[Parameters.dayNames.length][Parameters.timeSlotStrings.length]);
 		dataEntryTab.setLayout(new BorderLayout());
 		dataEntryTab.add(studentDataPanel,BorderLayout.WEST);
 		dataEntryTab.add(tablePanel,BorderLayout.CENTER);
@@ -159,18 +308,21 @@ public class MainFrame extends JFrame {
 
 		tabbedPane=new JTabbedPane();
 		tabbedPane.setMinimumSize(this.getMinimumSize());
+		tabbedPane.add("Set Up",setUpTab);
 		tabbedPane.addTab("Data Entry", dataEntryTab);
 		tabbedPane.addTab("Scheduler", schedulerTab);
-		int schedulerIndex = tabbedPane.indexOfTab("Scheduler");
-		int dataEntryIndex = tabbedPane.indexOfTab("Data Entry");
+		schedulerIndex = tabbedPane.indexOfTab("Scheduler");
+		dataEntryIndex = tabbedPane.indexOfTab("Data Entry");
+		setUpIndex = tabbedPane.indexOfTab("Set Up");
 
 		tabbedPane.setEnabledAt(schedulerIndex, false);
-		tabbedPane.setSelectedIndex(dataEntryIndex);
+		tabbedPane.setEnabledAt(dataEntryIndex,false);
+		tabbedPane.setSelectedIndex(setUpIndex);
 
 
 
 
-////////////////// Preferences ///////////////////////////
+		////////////////// Preferences ///////////////////////////
 		preferencesDialog.setPreferencesListener(new PreferencesListener() {
 
 			@Override
@@ -187,7 +339,7 @@ public class MainFrame extends JFrame {
 		Integer port = preferences.getInt("port", 3306);
 		preferencesDialog.setDefaults(user, password, port);
 
-//////////////// Student Data Panel /////////////////////
+		//////////////// Student Data Panel /////////////////////
 		studentDataPanel.setStudentFormListener(new StudentFormListener(){
 
 			@Override
@@ -221,12 +373,12 @@ public class MainFrame extends JFrame {
 					int ans = JOptionPane.showConfirmDialog(getParent(), "Database file not saved. Continue anyway?", "File not saved", JOptionPane.OK_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE);
 					if (ans!=JOptionPane.OK_OPTION) return;
 				}
-				tabbedPane.setEnabledAt(1, true);
-				tabbedPane.setSelectedIndex(1);
+				tabbedPane.setEnabledAt(schedulerIndex, true);
+				tabbedPane.setSelectedIndex(schedulerIndex);
 			}
 		});
 
-/////////////// Table Panel ///////////////////////////////////
+		/////////////// Table Panel ///////////////////////////////////
 		tablePanel.setData(controller.getStudents());
 		tablePanel.setTableListener(new TableListener(){
 
@@ -255,7 +407,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 
-////////////////// Input Panel ////////////////////////////////
+		////////////////// Input Panel ////////////////////////////////
 		inputPanel.setInputFormListener(new InputFormListener() {
 
 			@Override
@@ -271,7 +423,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 
-////////////////// Results Panel //////////////////////////////
+		////////////////// Results Panel //////////////////////////////
 		resultsPanel.setSolutionsTableListener(new SolutionsTableListener() {
 
 			@Override
@@ -302,7 +454,6 @@ public class MainFrame extends JFrame {
 						try {
 							controller.saveSolutionToExcel(solutionFileChooser.getSelectedFile(), event.getIndex());
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 
@@ -310,7 +461,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 
-////////////////// Add Components to Frame /////////////////////
+		////////////////// Add Components to Frame /////////////////////
 
 		add(tabbedPane,BorderLayout.CENTER);
 		setVisible(true);
@@ -322,15 +473,19 @@ public class MainFrame extends JFrame {
 		//TODO remove unnecessary menu items and add useful ones
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
+		JMenu exportMenu = new JMenu("Export ");
+		//TODO check to see if there is any data to export to a file - students in database
 		//TODO change "import" to import a csv and convert
-		//TODO or import a single schedule as csv and convert?
 		JMenuItem importMenuItem = new JMenuItem("Import File...");
-		//TODO change "export"to export database to csv file
-		JMenuItem exportMenuItem = new JMenuItem("Export file...");
+		JMenuItem exportMenuItemExcel = new JMenuItem("Export data to Excel...");
+		JMenuItem exportMenuItemCsv = new JMenuItem("Export data as CSV...");
 		JMenuItem exitItem = new JMenuItem("Exit");
 		JMenuItem preferencesMenuItem = new JMenuItem("Preferences...");
+		exportMenu.add(exportMenuItemExcel);
+		exportMenu.add(exportMenuItemCsv);
 		fileMenu.add(importMenuItem);
-		fileMenu.add(exportMenuItem);
+		//fileMenu.add(exportMenuItem);
+		fileMenu.add(exportMenu);
 		fileMenu.addSeparator();
 		fileMenu.add(preferencesMenuItem);
 		fileMenu.addSeparator();
@@ -349,6 +504,7 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				fileChooser.setFileFilter(new MyFileFilter());
 				int choice = fileChooser.showOpenDialog(MainFrame.this);
 				if (choice==JFileChooser.APPROVE_OPTION){
 					try {
@@ -364,7 +520,7 @@ public class MainFrame extends JFrame {
 
 		});
 
-		exportMenuItem.addActionListener(new ActionListener(){
+		exportMenuItemExcel.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -372,33 +528,101 @@ public class MainFrame extends JFrame {
 				String extension;
 				int choice;
 				File file;
-				fileChooser.setFileFilter(new CsvFileFilter());
+				if (controller.getNumStudents()==0){
+					JOptionPane.showMessageDialog(MainFrame.this, "There is no data to export", "No Data", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				fileChooser.setFileFilter(new ExcelFileFilter());
 
-				//TODO write a general extension check method to use for all save dialogs
-				//TODO add JOptionPane to notify user the extension is incorrect
-				//TODO check for file overwrite
-				do{
-					choice = fileChooser.showSaveDialog(MainFrame.this);
-					file = fileChooser.getSelectedFile();
-					System.out.println(file.getAbsolutePath());
+				choice = fileChooser.showSaveDialog(MainFrame.this);
+				file = fileChooser.getSelectedFile();
+				file = Utils.changeExtension(file, "xlsx");
+				fileChooser.setSelectedFile(file);
+
+				while (!goodFileName && choice!=JFileChooser.CANCEL_OPTION){
+
 					extension=Utils.getFileExtension(file.getName());
-					System.out.println(Utils.getFileExtension(file.getName()));
-					if (extension!=null && extension.equals("csv")) goodFileName=true;
+					if (extension!=null && extension.equals("xlsx")) goodFileName=true;
 					else {
 						if (extension!=null){
-							//remove current extension
-							//replace with .csv
+							file = new File(Utils.removeExtension(file.getAbsolutePath())+".xlsx");
+							System.out.println(file.getName());
+							fileChooser.setSelectedFile(file);
 						}
 						if (extension==null){
-							file = new File(file.getAbsolutePath()+".csv");
+							file = new File(file.getAbsolutePath()+".xlsx");
+
 							fileChooser.setSelectedFile(file);
 						}
 					}
-				} while (!goodFileName && choice!=JFileChooser.CANCEL_OPTION);
-
-				if (choice==JFileChooser.APPROVE_OPTION){
+					if (file.exists() && !file.isDirectory()){
+						int confirm=JOptionPane.showConfirmDialog(MainFrame.this, "File already exists. Overwrite?","File exists",JOptionPane.YES_NO_OPTION);
+						if (confirm==JOptionPane.NO_OPTION) goodFileName=false;
+					}
+					choice = fileChooser.showSaveDialog(MainFrame.this);
+					file = fileChooser.getSelectedFile();
+				}
+				if (choice==JFileChooser.CANCEL_OPTION) return;
+				else if (choice==JFileChooser.APPROVE_OPTION){
 					try {
-						//controller.saveToFile(fileChooser.getSelectedFile());
+						//FIXME excel export doesn't work, just exports days & times no students
+						controller.exportToExcel(file);
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Could not save file", "Error", JOptionPane.ERROR_MESSAGE);
+						e.printStackTrace();
+					}
+				}
+			}
+
+		});
+
+		exportMenuItemCsv.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				boolean goodFileName = false;
+				String extension;
+				int choice;
+				File file;
+
+				if (controller.getNumStudents()==0){
+					JOptionPane.showMessageDialog(MainFrame.this, "There is no data to export", "No Data", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+
+				fileChooser.setFileFilter(new CsvFileFilter());
+
+				choice = fileChooser.showSaveDialog(MainFrame.this);
+				file = fileChooser.getSelectedFile();
+
+
+				 while (!goodFileName && choice!=JFileChooser.CANCEL_OPTION){
+					extension=Utils.getFileExtension(file.getName());
+					if (extension!=null && extension.equals("csv")) goodFileName=true;
+					else {
+						if (extension!=null){
+							//TODO remove current extension
+							file = new File(Utils.removeExtension(file.getAbsolutePath())+".csv");
+							System.out.println(file.getName());
+							fileChooser.setSelectedFile(file);
+						}
+						if (extension==null){
+							file = new File(file.getAbsolutePath()+".csv");
+
+							fileChooser.setSelectedFile(file);
+						}
+					}
+					if (file.exists() && !file.isDirectory()){
+						int confirm=JOptionPane.showConfirmDialog(MainFrame.this, "File already exists. Overwrite?","File exists",JOptionPane.YES_NO_OPTION);
+						if (confirm==JOptionPane.NO_OPTION) goodFileName=false;
+					}
+					choice = fileChooser.showSaveDialog(MainFrame.this);
+					file = fileChooser.getSelectedFile();
+				}
+
+				if (choice==JFileChooser.CANCEL_OPTION) return;
+				else if (choice==JFileChooser.APPROVE_OPTION){
+					try {
 						controller.exportToCsv(file);
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Could not save file", "Error", JOptionPane.ERROR_MESSAGE);
@@ -409,8 +633,9 @@ public class MainFrame extends JFrame {
 
 		});
 
+
 		fileMenu.setMnemonic(KeyEvent.VK_F);
-		exportMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,ActionEvent.CTRL_MASK));
+		exportMenuItemExcel.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,ActionEvent.CTRL_MASK));
 		importMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,ActionEvent.CTRL_MASK));
 		exitItem.setMnemonic(KeyEvent.VK_X);
 		exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,ActionEvent.CTRL_MASK));
