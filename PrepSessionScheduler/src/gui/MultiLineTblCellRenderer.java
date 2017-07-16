@@ -23,7 +23,7 @@ public class MultiLineTblCellRenderer implements TableCellRenderer{
 			if (value instanceof String){
 				String[] dataArray = ((String)value).split(",");
 				// set height of row based on how many lines printed in row
-				// TODO setting rowheight in renderer is wrong according to stack overflow. Fix this?
+				// setting rowheight in renderer is wrong according to stack overflow. Fix this?
 				// or is it only wrong to do it here if changing dynamically when someone resizes column?
 		        table.setRowHeight(row,(table.getFont().getSize()+8)*dataArray.length);
 				data.setListData(dataArray);

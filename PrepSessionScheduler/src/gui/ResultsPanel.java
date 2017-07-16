@@ -38,7 +38,6 @@ public class ResultsPanel extends JPanel {
 	private SaveEventListener saveEventListener;
 	private int saveRow;
 
-	//TODO change layout of results pane to be split panes?
 
 	public ResultsPanel(){
 		super();
@@ -97,7 +96,7 @@ public class ResultsPanel extends JPanel {
 		varScrollPane.setMinimumSize(new Dimension(300,250));
 
 
-		//TODO reformat members listing - use JTable? and renderer?
+		//IDEA reformat members listing - use JTable? and renderer?
 		membersArea = new JTextArea();
 		membersArea.setMaximumSize(new Dimension(400,800));
 		membersArea.setMinimumSize(new Dimension(400,500));
@@ -106,6 +105,7 @@ public class ResultsPanel extends JPanel {
 		membersScrollPane.setMinimumSize(new Dimension(400,500));
 		membersScrollPane.setMaximumSize(new Dimension(400,800));
 
+		//XXX remove
 //		gc.insets = new Insets(20, 20, 5, 0);
 //		gc.gridx=0;
 //		gc.gridy=0;

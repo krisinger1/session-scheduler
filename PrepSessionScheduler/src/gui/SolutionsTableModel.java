@@ -39,12 +39,11 @@ public class SolutionsTableModel extends AbstractTableModel implements TableMode
 
 	@Override
 	public Object getValueAt(int row, int col) {
-		
-		//TODO use solution or session objects in table instead of strings?
+
 		String[][] solutionArray = new String[solutions.size()][2];
-		//System.out.println("solutionstablemodel valueat" + solutions.get(row).toString());
 		//TODO come up with simpler way to do this...
-		//TODO also in "if" limit number of solutions to show
+		//...use solution or session objects in table instead of strings?
+
 		for (int i=0;i<solutions.size();i++){
 			String printString="";
 			Solution sol=solutions.get(i);

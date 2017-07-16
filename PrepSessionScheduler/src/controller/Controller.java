@@ -42,7 +42,7 @@ public class Controller {
 	int maxStudents, minStudents, maxSessions, blockSize;
 	int[][] preferredTimesMask;
 	int[][] allowedTimesMask;
-	boolean changed=true;
+	boolean changed=false;
 
 	public Controller(){
 
@@ -319,6 +319,7 @@ public class Controller {
 			 }
 			 System.out.println("fileOK? "+fileOK);
 
+			 //FIXME move option pane from controller to mainframe
 			 if (!fileOK) {
 				 JOptionPane.showMessageDialog(null,
 						 "Problem with file '"+file.getName()+"'. Skipping file import.\nErrors:\n"+errorString,
