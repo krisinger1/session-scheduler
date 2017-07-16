@@ -9,24 +9,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import gui.MainFrame;
-import gui.Utils;
-
 
 public class StudentDatabase {
 	private ArrayList<Student> students;
@@ -45,6 +35,7 @@ public class StudentDatabase {
 				index=students.indexOf(s);
 			}
 		}
+		//FIXME option panes should not be in model - move to main frame?
 		if (duplicate){
 			int choice = JOptionPane.showConfirmDialog(null, student.getFullName()+" already in database. Overwrite?");
 			if (choice==JOptionPane.NO_OPTION || choice==JOptionPane.CANCEL_OPTION) return;
@@ -131,6 +122,8 @@ public class StudentDatabase {
 	 */
 
 	public void saveTofile(File file) throws IOException{
+		//TODO how to save mask with database?
+
 		Student[] arrayStudents = students.toArray(new Student[students.size()]);
 
 		FileOutputStream fos = new FileOutputStream(file);
@@ -214,6 +207,7 @@ public class StudentDatabase {
 
 	public void loadFromFile(File file) throws IOException{
 		//FIXME how to deal with older version student objects so can load without error?
+
 		FileInputStream fis = new FileInputStream(file);
 		ObjectInputStream ois = new ObjectInputStream(fis);
 		try {
@@ -229,6 +223,11 @@ public class StudentDatabase {
 
 			else{
 				//TODO either joptionpane about failure to load or convert older file
+				if(version.equals("1.0")){
+					Student[] arrayStudents = (Student[])ois.readObject();
+					students.clear();
+					students.addAll(Arrays.asList(arrayStudents));
+				}
 			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();

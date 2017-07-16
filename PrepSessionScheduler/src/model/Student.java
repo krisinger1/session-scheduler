@@ -150,11 +150,9 @@ public class Student implements Serializable, Comparable<Student>{
 
 	public boolean isDuplicate(Student stu){
 
-		//FIXME remove checking for same area
 		if (this.firstName.equals(stu.firstName) &&
 				this.lastName.equals(stu.lastName) &&
-				this.email.equals(stu.email) &&
-				this.area.equals(stu.area)){
+				this.email.equals(stu.email)){
 			return true;
 		}
 		else return false;

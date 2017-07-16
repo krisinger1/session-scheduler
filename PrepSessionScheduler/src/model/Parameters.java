@@ -3,7 +3,7 @@ package model;
 import java.awt.Color;
 
 public class Parameters {
-	public static String version = "1.0";
+	public static String version = "1.1";
 
 	public static Color schemeColor1=new Color(0,186,249);
 	public static Color schemeColor2=new Color(0,168,242);
