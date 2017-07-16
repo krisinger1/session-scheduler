@@ -15,6 +15,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -49,6 +50,7 @@ public class MainFrame extends JFrame {
 	private JButton openFileButton;
 	private JButton newFileButton;
 	private JButton importScheduleButton;
+	private JLabel currentFileLabel;
 
 	///Scheduler Tab Components////
 	private JPanel schedulerTab;
@@ -62,9 +64,10 @@ public class MainFrame extends JFrame {
 	private int setUpIndex;
 
 	private JFileChooser fileChooser,solutionFileChooser,importFileChooser;
+	private File currentFile = new File("Untitled.stu");
 	private Controller controller;
 
-	//TODO remove Preferences code? Or implement
+	//IDEA implement preferences- default save location? default mask?
 	private PreferencesDialog preferencesDialog;
 	private Preferences preferences;
 
@@ -152,46 +155,108 @@ public class MainFrame extends JFrame {
 		importScheduleButton.setMaximumSize(new Dimension(150, 25));
 		buttonPanel.add(importScheduleButton);
 
-
+		currentFileLabel = new JLabel(currentFile.getName());
+		currentFileLabel.setMaximumSize(new Dimension(150, 25));
+		buttonPanel.add(currentFileLabel);
 
 		saveFileButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int choice = fileChooser.showSaveDialog(MainFrame.this);
-				if (choice==JFileChooser.APPROVE_OPTION){
-						try {
-							if (!Utils.extensionOK(fileChooser.getSelectedFile(), "stu")){
-								fileChooser.setSelectedFile(Utils.changeExtension(fileChooser.getSelectedFile(), "stu"));
-							}
-							controller.saveToFile(fileChooser.getSelectedFile());
-							saveFileButton.setEnabled(false);
-
-
-						}
-						catch (IOException e1) {
-							e1.printStackTrace();
-						}
+				try {
+					saveFile(currentFile);
+					currentFileLabel.setText(currentFile.getName());
+					//saveFileButton.setEnabled(false);
+				} catch (IOException e1) {
+					e1.printStackTrace();
 				}
+//				int choice = fileChooser.showSaveDialog(MainFrame.this);
+//				if (choice==JFileChooser.APPROVE_OPTION){
+//						try {
+//							if (!Utils.extensionOK(fileChooser.getSelectedFile(), "stu")){
+//								fileChooser.setSelectedFile(Utils.changeExtension(fileChooser.getSelectedFile(), "stu"));
+//							}
+//							controller.saveToFile(fileChooser.getSelectedFile());
+//							saveFileButton.setEnabled(false);
+//							currentFile=fileChooser.getSelectedFile();
+//
+//						}
+//						catch (IOException e1) {
+//							e1.printStackTrace();
+//						}
+//				}
 			}
 		});
 
+		//IDEA add "Save As" button option
+		//TODO label that displays current filename. also save current filename in variable
 
-		//FIXME can open and create new file if unsaved student in data entry panel. check for save student first.
+
 		openFileButton.addActionListener(new ActionListener() {
-
+			//FIXME if file opened is not current version, prompt for save
+			//FIXME if nothing in database yet, don't prompt for save
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (studentDataPanel.isDirty()){
+					int choice=JOptionPane.showConfirmDialog(getParent(), "Current student not saved. Continue anyway? Your changes will be lost.", "Data not saved", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+					if (choice==JOptionPane.CANCEL_OPTION) {
+						return; // selection failed
+					}
+				}
+
+				System.out.println("changed? "+controller.databaseChanged());
+				if (controller.databaseChanged()){
+					int choice = JOptionPane.showConfirmDialog(MainFrame.this,"File changed. Save first?");
+					if (choice==JOptionPane.YES_OPTION){
+						try {
+							saveFile(currentFile);
+							currentFileLabel.setText(currentFile.getName());
+							//saveFileButton.setEnabled(false);
+						} 
+						catch (IOException e1) {
+							e1.printStackTrace();
+						}
+
+//						try {
+//							if (fileChooser.getSelectedFile()!=null){
+//								controller.saveToFile(fileChooser.getSelectedFile());
+//							}
+//							else{
+//								int choice2 = fileChooser.showSaveDialog(MainFrame.this);
+//								if (choice2==JFileChooser.APPROVE_OPTION){
+//										try {
+//											controller.saveToFile(fileChooser.getSelectedFile());
+//											saveFileButton.setEnabled(false);
+//
+//										}
+//										catch (IOException e1) {
+//											e1.printStackTrace();
+//										}
+//								}
+//							}
+//							saveFileButton.setEnabled(false);
+//
+//						} catch (IOException e1) {
+//							e1.printStackTrace();
+//						}
+					}
+					else if (choice==JOptionPane.CANCEL_OPTION) return;
+				}
+
 
 				fileChooser.setFileFilter(new MyFileFilter());
+				fileChooser.setSelectedFile(null);
 				int choice = fileChooser.showOpenDialog(MainFrame.this);
 				if (choice==JFileChooser.APPROVE_OPTION){
 					try {
-						controller.loadFromFile(fileChooser.getSelectedFile());
+						currentFile=fileChooser.getSelectedFile();
+						controller.loadFromFile(currentFile);
 						tablePanel.refresh();
 						saveFileButton.setEnabled(false);
+						currentFileLabel.setText(currentFile.getName());
 
-					} catch (IOException ie) {
+					} 
+					catch (IOException ie) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Could not load file", "Error", JOptionPane.ERROR_MESSAGE);
 						ie.printStackTrace();
 					}
@@ -203,33 +268,53 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("new file button");
-				System.out.println("changed? "+controller.databaseChanged());
+
+				//System.out.println("new file button");
+
+				if (studentDataPanel.isDirty()){
+					int choice=JOptionPane.showConfirmDialog(getParent(), "Current student not saved. Continue anyway? Your changes will be lost.", "Data not saved", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+					if (choice==JOptionPane.CANCEL_OPTION) {
+						return; // selection failed
+					}
+				}
+
+				//System.out.println("changed? "+controller.databaseChanged());
 				if (controller.databaseChanged()){
 					int choice = JOptionPane.showConfirmDialog(MainFrame.this,"File changed. Save first?");
 					if (choice==JOptionPane.YES_OPTION){
 						try {
-							if (fileChooser.getSelectedFile()!=null){
-								controller.saveToFile(fileChooser.getSelectedFile());
-							}
-							else{
-								int choice2 = fileChooser.showSaveDialog(MainFrame.this);
-								if (choice2==JFileChooser.APPROVE_OPTION){
-										try {
-											controller.saveToFile(fileChooser.getSelectedFile());
-											saveFileButton.setEnabled(false);
-
-										}
-										catch (IOException e1) {
-											e1.printStackTrace();
-										}
-								}
-							}
-							saveFileButton.setEnabled(false);
-
-						} catch (IOException e1) {
+							saveFile(currentFile);
+							currentFileLabel.setText(currentFile.getName());
+							//saveFileButton.setEnabled(false);
+						} 
+						catch (IOException e1) {
 							e1.printStackTrace();
 						}
+						
+						
+						
+//						try {
+//							if (fileChooser.getSelectedFile()!=null){
+//								controller.saveToFile(fileChooser.getSelectedFile());
+//							}
+//							else{
+//								int choice2 = fileChooser.showSaveDialog(MainFrame.this);
+//								if (choice2==JFileChooser.APPROVE_OPTION){
+//										try {
+//											controller.saveToFile(fileChooser.getSelectedFile());
+//											saveFileButton.setEnabled(false);
+//
+//										}
+//										catch (IOException e1) {
+//											e1.printStackTrace();
+//										}
+//								}
+//							}
+//							saveFileButton.setEnabled(false);
+//
+//						} catch (IOException e1) {
+//							e1.printStackTrace();
+//						}
 					}
 					else if (choice==JOptionPane.CANCEL_OPTION) return;
 				}
@@ -238,7 +323,9 @@ public class MainFrame extends JFrame {
 				saveFileButton.setEnabled(true);
 				tablePanel.refresh();
 				studentDataPanel.resetForm();
-				fileChooser.setSelectedFile(null);
+				fileChooser.setSelectedFile(new File("Untitled.stu"));
+				currentFile=fileChooser.getSelectedFile();
+				currentFileLabel.setText(currentFile.getName());
 			}
 		});
 
@@ -247,9 +334,7 @@ public class MainFrame extends JFrame {
 				importFileChooser.setFileFilter(new ExcelFileFilter());
 				importFileChooser.setMultiSelectionEnabled(true);
 				boolean fileOK=true;
-				//TODO don't import schedule if it already exists or was imported already
 				int choice;
-				//FIXME error handling for bad file
 				do{
 					choice=importFileChooser.showOpenDialog(MainFrame.this);
 					if (choice==JFileChooser.APPROVE_OPTION){
@@ -467,10 +552,36 @@ public class MainFrame extends JFrame {
 		setVisible(true);
 	}
 
+	private void saveFile(File file) throws IOException{
+		if (file!=null && !file.getName().equals("Untitled.stu")){
+			//TODO need to check for correct extension?
+			controller.saveToFile(file);
+			JOptionPane.showMessageDialog(MainFrame.this, "File saved successfully.", "File Saved", JOptionPane.PLAIN_MESSAGE);
+			saveFileButton.setEnabled(false);
+			currentFile=file;
+		}
+		else{
+			fileChooser.setSelectedFile(file);
+			int choice = fileChooser.showSaveDialog(MainFrame.this);
+			
+			if (choice==JFileChooser.APPROVE_OPTION){
+				if (!Utils.extensionOK(fileChooser.getSelectedFile(), "stu")){
+					fileChooser.setSelectedFile(Utils.changeExtension(fileChooser.getSelectedFile(), "stu"));
+				}
+				currentFile=fileChooser.getSelectedFile();
+				controller.saveToFile(currentFile);
+				saveFileButton.setEnabled(false);
+				JOptionPane.showMessageDialog(MainFrame.this, "File saved successfully.", "File Saved", JOptionPane.PLAIN_MESSAGE);
+
+
+			}
+		}
+
+	}
+
 ///////////////////// Menu Bar //////////////////////////////
 
 	private JMenuBar createMenuBar(){
-		//TODO remove unnecessary menu items and add useful ones
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		JMenu exportMenu = new JMenu("Export ");
@@ -487,7 +598,7 @@ public class MainFrame extends JFrame {
 		//fileMenu.add(exportMenuItem);
 		fileMenu.add(exportMenu);
 		fileMenu.addSeparator();
-		fileMenu.add(preferencesMenuItem);
+		//fileMenu.add(preferencesMenuItem);
 		fileMenu.addSeparator();
 		fileMenu.add(exitItem);
 
@@ -495,7 +606,8 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				preferencesDialog.setVisible(true);
+				//uncomment below if preferences implemented
+				//preferencesDialog.setVisible(true);
 			}
 
 		});
@@ -565,7 +677,6 @@ public class MainFrame extends JFrame {
 				if (choice==JFileChooser.CANCEL_OPTION) return;
 				else if (choice==JFileChooser.APPROVE_OPTION){
 					try {
-						//FIXME excel export doesn't work, just exports days & times no students
 						controller.exportToExcel(file);
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Could not save file", "Error", JOptionPane.ERROR_MESSAGE);
@@ -601,7 +712,6 @@ public class MainFrame extends JFrame {
 					if (extension!=null && extension.equals("csv")) goodFileName=true;
 					else {
 						if (extension!=null){
-							//TODO remove current extension
 							file = new File(Utils.removeExtension(file.getAbsolutePath())+".csv");
 							System.out.println(file.getName());
 							fileChooser.setSelectedFile(file);
@@ -651,14 +761,14 @@ public class MainFrame extends JFrame {
 
 		});
 
-		JMenu otherMenu = new JMenu("Other");
-		JMenu subMenu = new JMenu("Sub Menu");
-		JMenuItem subMenuItem =new JMenuItem("Item");
-		subMenu.add(subMenuItem);
-		otherMenu.add(subMenu);
+//		JMenu otherMenu = new JMenu("Other");
+//		JMenu subMenu = new JMenu("Sub Menu");
+//		JMenuItem subMenuItem =new JMenuItem("Item");
+//		subMenu.add(subMenuItem);
+//		otherMenu.add(subMenu);
 
 		menuBar.add(fileMenu);
-		menuBar.add(otherMenu);
+//		menuBar.add(otherMenu);
 		return menuBar;
 
 	}
