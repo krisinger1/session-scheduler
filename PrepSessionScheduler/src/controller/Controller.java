@@ -235,6 +235,8 @@ public class Controller {
 
 	public ArrayList<Student> importSchedule(File[] files) throws IOException{
 		ArrayList<Student> students=new ArrayList<Student>();
+		ArrayList<String> badFiles=new ArrayList<String>();
+		boolean importComplete=true;
 		System.out.println("importing schedule");
 		for (File file:files){
 
@@ -321,9 +323,11 @@ public class Controller {
 
 			 //FIXME move option pane from controller to mainframe
 			 if (!fileOK) {
-				 JOptionPane.showMessageDialog(null,
-						 "Problem with file '"+file.getName()+"'. Skipping file import.\nErrors:\n"+errorString,
-						 "Error Loading File", JOptionPane.ERROR_MESSAGE);
+				 importComplete=false;
+				 badFiles.add(file.getName());
+//				 JOptionPane.showMessageDialog(null,
+//						 "Problem with file '"+file.getName()+"'. Skipping file import.\nErrors:\n"+errorString,
+//						 "Error Loading File", JOptionPane.ERROR_MESSAGE);
 				 continue;
 			 }
 
@@ -335,6 +339,7 @@ public class Controller {
 				 schedule[2][key-schedStartKey]=(int)info.get(key)[3];
 				 }
 			 System.out.println(schedule.toString());
+			 //FIXME should not cause error if area missing
 			 Student student = new Student(info.get(firstKey)[1].toString(),
 					 info.get(lastKey)[1].toString(),
 					 info.get(emailKey)[1].toString(),

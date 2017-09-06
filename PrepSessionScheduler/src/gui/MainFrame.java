@@ -212,7 +212,7 @@ public class MainFrame extends JFrame {
 							saveFile(currentFile);
 							currentFileLabel.setText(currentFile.getName());
 							//saveFileButton.setEnabled(false);
-						} 
+						}
 						catch (IOException e1) {
 							e1.printStackTrace();
 						}
@@ -255,9 +255,10 @@ public class MainFrame extends JFrame {
 						saveFileButton.setEnabled(false);
 						currentFileLabel.setText(currentFile.getName());
 
-					} 
+					}
 					catch (IOException ie) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Could not load file", "Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.this, "Could not load file.\n"+ie.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
 						ie.printStackTrace();
 					}
 				}
@@ -286,13 +287,13 @@ public class MainFrame extends JFrame {
 							saveFile(currentFile);
 							currentFileLabel.setText(currentFile.getName());
 							//saveFileButton.setEnabled(false);
-						} 
+						}
 						catch (IOException e1) {
 							e1.printStackTrace();
 						}
-						
-						
-						
+
+
+
 //						try {
 //							if (fileChooser.getSelectedFile()!=null){
 //								controller.saveToFile(fileChooser.getSelectedFile());
@@ -341,6 +342,7 @@ public class MainFrame extends JFrame {
 						//Student student;
 						ArrayList<Student> students = new ArrayList<Student>();
 						try {
+							//TODO maybe send students arraylist into importschedules and return error info?
 							students = controller.importSchedule(importFileChooser.getSelectedFiles());
 							//studentDataPanel.populateForm(student);
 							if (students!=null){
@@ -537,6 +539,7 @@ public class MainFrame extends JFrame {
 				if (choice==JFileChooser.APPROVE_OPTION){
 						//controller.saveSolutionToFile(solutionFileChooser.getSelectedFile(), event.getIndex());
 						try {
+							//FIXME save solution to excel should automatically put .xlsx extension
 							controller.saveSolutionToExcel(solutionFileChooser.getSelectedFile(), event.getIndex());
 						} catch (IOException e) {
 							e.printStackTrace();
@@ -563,7 +566,7 @@ public class MainFrame extends JFrame {
 		else{
 			fileChooser.setSelectedFile(file);
 			int choice = fileChooser.showSaveDialog(MainFrame.this);
-			
+
 			if (choice==JFileChooser.APPROVE_OPTION){
 				if (!Utils.extensionOK(fileChooser.getSelectedFile(), "stu")){
 					fileChooser.setSelectedFile(Utils.changeExtension(fileChooser.getSelectedFile(), "stu"));
@@ -624,7 +627,7 @@ public class MainFrame extends JFrame {
 						tablePanel.refresh();
 
 					} catch (IOException e) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Could not load file", "Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.this, "Could not load file."+e.getMessage()+" "+e.getCause().toString(), "Error", JOptionPane.ERROR_MESSAGE);
 						e.printStackTrace();
 					}
 				}

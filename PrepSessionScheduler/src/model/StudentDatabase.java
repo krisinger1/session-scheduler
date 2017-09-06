@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -14,9 +15,11 @@ import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.extensions.XSSFCellFill;
 
 public class StudentDatabase {
 	private ArrayList<Student> students;
@@ -141,13 +144,16 @@ public class StudentDatabase {
 	    XSSFSheet spreadsheet = workbook.createSheet(" Students ");
 	    //Create row object
 	    XSSFRow row;
+	    XSSFCell cell;
 
 	    int i=0;
 		row=spreadsheet.createRow(i);
 		for (int day=0;day<Parameters.dayNames.length;day++){
 	    	for (int time=0;time<Parameters.timeSlotStrings.length;time++){
 	    		if (time==0){
-	        		row.createCell(day*Parameters.timeSlotStrings.length+time+3).setCellValue(Parameters.dayNames[day]);
+	        		//row.createCell(day*Parameters.timeSlotStrings.length+time+3).setCellValue(Parameters.dayNames[day]);
+	        		cell = row.createCell(day*Parameters.timeSlotStrings.length+time+3);
+	        		cell.setCellValue(Parameters.dayNames[day]);
 	    		}
 	    		else {
 	    			row.createCell(day*Parameters.timeSlotStrings.length+time+3);
@@ -206,13 +212,13 @@ public class StudentDatabase {
 	}
 
 	public void loadFromFile(File file) throws IOException{
-		//FIXME how to deal with older version student objects so can load without error?
-
 		FileInputStream fis = new FileInputStream(file);
 		ObjectInputStream ois = new ObjectInputStream(fis);
 		try {
-			//TODO check for type of object in load file
-			String version = (String)ois.readObject();
+			Object object=ois.readObject();
+			String version;
+			version = (String)object;
+			//String version = (String)ois.readObject();
 			System.out.println("version "+version);
 
 			if (version.equals(Parameters.version)){
@@ -228,9 +234,25 @@ public class StudentDatabase {
 					students.clear();
 					students.addAll(Arrays.asList(arrayStudents));
 				}
+				else {
+					ois.close();
+					throw new IOException("error in load file - unknown version");
+				}
+
 			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+			System.out.println("error in load file - Class Not Found Exception\nStudentDatabase.loadFromFile");
+			ois.close();
+			throw new IOException("Error in load file - Class Not Found\n"+e.getMessage(), e.getCause());
+
+			//return;
+		} catch (InvalidClassException e){
+			e.printStackTrace();
+			System.out.println("error in load file - Invalid Class Exception\nStudentDatabase.loadFromFile");
+			ois.close();
+			throw new IOException("Error in load file - Invalid Class\n"+e.getMessage(), e.getCause());
+
 		}
 		ois.close();
 	}
