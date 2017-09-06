@@ -35,10 +35,11 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 	private JButton saveButton;
 	private JButton newButton;
 	private JButton doneButton;
+	private JButton undoButton;
 	private StudentFormListener studentFormListener;
 	private boolean dirty = false;
 
-	//TODO add Undo button to student data entry panel
+	//TODO add Undo button to student data entry panel - harder than it sounds...
 	public StudentDataPanel(String[] timesStrings,String[] dayStrings, int[][] mask){
 		super();
 		setLayout(new GridBagLayout());
@@ -96,7 +97,8 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		saveButton = new JButton("Save Student");
 		saveButton.setEnabled(false);
 		newButton = new JButton("Add New Student");
-		doneButton = new JButton("Done");
+		doneButton = new JButton("Done Entering Data");
+		undoButton = new JButton("Undo");
 
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		setBackground(Parameters.schemeColor1);
@@ -209,18 +211,21 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 		gc.gridx=2;
 		gc.weighty=1;
 		gc.gridwidth=1;
-		gc.anchor=GridBagConstraints.FIRST_LINE_START;
-		add(doneButton,gc);
+		gc.anchor=GridBagConstraints.NORTH;
+		add(undoButton,gc);
 
 		////////////////
 		gc.gridx=0;
 		gc.gridy++;
-		//add(saveFileButton,gc);
+		gc.weighty=1;
+		gc.gridwidth=2;
+		gc.anchor=GridBagConstraints.FIRST_LINE_START;
+		add(doneButton,gc);
 
 		saveButton.addActionListener(this);
 		newButton.addActionListener(this);
 		doneButton.addActionListener(this);
-		//TODO how to get ENTER key to trigger button event - not sure this is possible here. needs to be from jframe
+		undoButton.addActionListener(this);
 	}
 
 	public void setMask(int[][] mask){
@@ -237,7 +242,6 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		//TODO if not saving data reset schedule to what it was
 		if (e.getActionCommand()=="Add New Student"){
 			if (!dirty){
 				resetForm();
@@ -259,7 +263,11 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 				JOptionPane.showMessageDialog(this, "Please enter a first and last name.", "Warning", JOptionPane.OK_OPTION);
 			}
 		}
-		else if (e.getActionCommand()=="Done"){
+		else if (e.getActionCommand()=="Undo"){
+			//implement undo button here
+		}
+
+		else if (e.getActionCommand()=="Done Entering Data"){
 
 			if (studentFormListener !=null){
 				if (dirty) {
@@ -267,6 +275,7 @@ public class StudentDataPanel extends JPanel implements ActionListener{
 					if (ans!=JOptionPane.OK_OPTION) return;
 				}
 				studentFormListener.doneEventOccurred();
+				resetForm();
 			}
 		}
 
