@@ -16,7 +16,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-import org.intervarsity.ParameterListener;
 import org.intervarsity.Parameters;
 
 public class InputPanel extends JPanel implements ActionListener{

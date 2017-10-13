@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
@@ -24,9 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
-
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Workbook;
 
 import controller.Controller;
 import model.Parameters;

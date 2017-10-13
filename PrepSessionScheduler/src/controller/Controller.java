@@ -12,9 +12,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.jar.Attributes.Name;
 
 import javax.swing.JOptionPane;
 
@@ -34,7 +32,6 @@ import model.Student;
 import model.StudentDatabase;
 import model.TimeSlot;
 import model.Tree;
-import unused.StudentSchedule;
 
 public class Controller {
 	StudentDatabase db= new StudentDatabase();

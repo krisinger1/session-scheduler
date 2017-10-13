@@ -14,8 +14,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import com.sun.media.jfxmedia.events.NewFrameEvent;
-
 
 public class PreferencesDialog extends JDialog {
 

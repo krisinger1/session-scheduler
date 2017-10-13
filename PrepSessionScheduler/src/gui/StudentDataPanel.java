@@ -1,17 +1,14 @@
 package gui;
 
 import java.awt.Dimension;
-import java.awt.Event;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;

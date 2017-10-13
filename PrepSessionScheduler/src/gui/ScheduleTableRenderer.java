@@ -4,14 +4,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.TableCellRenderer;
 
-import org.omg.CORBA.PRIVATE_MEMBER;
 
-import model.Parameters;
 
 public class ScheduleTableRenderer implements TableCellRenderer {
 

@@ -2,8 +2,6 @@ package gui;
 
 import java.util.EventObject;
 
-import model.Solution;
-
 public class SaveSolutionEvent extends EventObject{
 	int index;
 

@@ -1,14 +1,6 @@
 package controller;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.intervarsity.Schedule;
-import org.omg.CosNaming.NamingContextExtPackage.AddressHelper;
-
-import model.Parameters;
 import model.Session;
 import model.Student;
 import model.TimeSlot;
